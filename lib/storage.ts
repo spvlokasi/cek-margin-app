@@ -259,7 +259,7 @@ export function getStokList(kodeCabangFilter?: string): StokItem[] {
 
   if (!kodeCabangFilter || kodeCabangFilter === '') return []; // Admin MUST select branch first!
   if (kodeCabangFilter === 'ALL') return list;
-  return list.filter(item => item.kodeCabang === kodeCabangFilter);
+  return list.filter(item => !item.kodeCabang || item.kodeCabang === kodeCabangFilter);
 }
 
 /**
