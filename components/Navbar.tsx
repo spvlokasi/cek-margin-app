@@ -111,14 +111,7 @@ export default function Navbar({
             <span className="hidden sm:inline">Logout</span>
           </button>
 
-          {/* Refresh Button */}
-          <button
-            onClick={onRefreshData}
-            title="Refresh Data"
-            className="p-2 rounded-xl bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white hover:bg-slate-700/80 transition-all cursor-pointer"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
+
         </div>
       </header>
 
