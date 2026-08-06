@@ -123,7 +123,7 @@ export default function CekMarginPage() {
         const isPlus = row.mrg1 >= 0;
         return (
           <span className={`font-bold ${isPlus ? 'text-emerald-400' : 'text-rose-400'}`}>
-            {isPlus ? '+' : ''}{formatRupiah(row.mrg1)}
+            {formatRupiah(row.mrg1)}
           </span>
         );
       },
@@ -155,7 +155,7 @@ export default function CekMarginPage() {
         const isPlus = row.mrg2 >= 0;
         return (
           <span className={`font-semibold ${isPlus ? 'text-cyan-400' : 'text-rose-400'}`}>
-            {isPlus ? '+' : ''}{formatRupiah(row.mrg2)}
+            {formatRupiah(row.mrg2)}
           </span>
         );
       },
@@ -187,7 +187,7 @@ export default function CekMarginPage() {
         const isPlus = row.mrg3 >= 0;
         return (
           <span className={`font-semibold ${isPlus ? 'text-slate-300' : 'text-rose-400'}`}>
-            {isPlus ? '+' : ''}{formatRupiah(row.mrg3)}
+            {formatRupiah(row.mrg3)}
           </span>
         );
       },
