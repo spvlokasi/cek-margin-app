@@ -86,8 +86,8 @@ export default function CabangPage() {
 
   const handleDownloadTemplate = () => {
     const ws = XLSX.utils.json_to_sheet([
-      { Kode: 'CBG-001', Nama: 'Cabang Satu', Wilayah: 'Jakarta', Password: '123' },
-      { Kode: 'CBG-002', Nama: 'Cabang Dua', Wilayah: 'Surabaya', Password: '123' }
+      { Kode: 'M3001', Nama: 'Basmalah Pasean', Wilayah: 'Pamekasan', Password: 'M3001' },
+      { Kode: 'M3002', Nama: 'Basmalah Pakong', Wilayah: 'Pamekasan', Password: 'M3002' }
     ]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'TemplateCabang');
@@ -113,7 +113,7 @@ export default function CabangPage() {
             kode: kode.toUpperCase(),
             nama,
             wilayah: String(r['Wilayah'] || r['WILAYAH'] || 'Jawa Timur').trim(),
-            password: String(r['Password'] || r['PASSWORD'] || '123').trim(),
+            password: String(r['Password'] || r['PASSWORD'] || kode.toUpperCase()).trim(),
           });
         }
       });

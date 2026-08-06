@@ -149,16 +149,37 @@ export function authenticateUser(usernameInput: string, passwordInput: string): 
 }
 
 export function getCabangList(): Cabang[] {
-  if (typeof window === 'undefined') return MOCK_CABANG;
-  const saved = localStorage.getItem(STORAGE_KEYS.CABANG);
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    } catch {}
+  let list = MOCK_CABANG;
+  
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem(STORAGE_KEYS.CABANG);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          list = parsed;
+        }
+      } catch {}
+    }
   }
-  safeSetItem(STORAGE_KEYS.CABANG, JSON.stringify(MOCK_CABANG));
-  return MOCK_CABANG;
+
+  // MIGRATION: Update passwords to match kode
+  let hasChanges = false;
+  const migratedList = list.map(c => {
+    // If the password is 'M1002' but the kode is different, OR if we want to force all passwords to match kode:
+    // User requested: "kalau user M1003 maka password ya M1003".
+    if (c.password === 'M1002' && c.kode !== 'M1002') {
+      hasChanges = true;
+      return { ...c, password: c.kode };
+    }
+    return c;
+  });
+
+  if (hasChanges && typeof window !== 'undefined') {
+    safeSetItem(STORAGE_KEYS.CABANG, JSON.stringify(migratedList));
+  }
+
+  return migratedList;
 }
 
 export function addCabang(newCabang: Cabang): Cabang[] {
@@ -168,7 +189,7 @@ export function addCabang(newCabang: Cabang): Cabang[] {
   if (exists) {
     updated = current.map(c => c.kode.toUpperCase() === newCabang.kode.toUpperCase() ? { ...c, ...newCabang } : c);
   } else {
-    updated = [...current, { ...newCabang, password: newCabang.password || '123' }];
+    updated = [...current, { ...newCabang, password: newCabang.password || newCabang.kode }];
   }
   if (typeof window !== 'undefined') {
     safeSetItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
@@ -178,7 +199,7 @@ export function addCabang(newCabang: Cabang): Cabang[] {
     kode_cabang: newCabang.kode,
     nama_cabang: newCabang.nama,
     wilayah: newCabang.wilayah || 'Jawa Timur',
-    password: newCabang.password || '123',
+    password: newCabang.password || newCabang.kode,
   }).then();
 
   return updated;
@@ -196,7 +217,7 @@ export function bulkAddCabang(newCabangList: Cabang[]): Cabang[] {
       kode: nc.kode,
       nama: nc.nama,
       wilayah: nc.wilayah || existing?.wilayah || 'Jawa Timur',
-      password: nc.password || existing?.password || '123',
+      password: nc.password || existing?.password || nc.kode,
     });
   });
 
@@ -209,7 +230,7 @@ export function bulkAddCabang(newCabangList: Cabang[]): Cabang[] {
     kode_cabang: c.kode,
     nama_cabang: c.nama,
     wilayah: c.wilayah,
-    password: c.password || '123',
+    password: c.password || c.kode,
   }));
   supabase.from('cabang').upsert(dbRows).then();
 
