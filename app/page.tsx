@@ -76,9 +76,9 @@ export default function CekMarginPage() {
     {
       key: 'no',
       label: 'NO',
-      sortable: true,
+      sortable: false, // We usually don't sort by dynamic row number
       align: 'center',
-      render: (row) => <span className="text-slate-500 font-mono">{row.no}</span>,
+      render: (row, index) => <span className="text-slate-500 font-mono">{index}</span>,
     },
     {
       key: 'kode',

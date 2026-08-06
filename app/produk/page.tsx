@@ -98,9 +98,9 @@ export default function ProdukPage() {
     {
       key: 'no',
       label: 'NO',
-      sortable: true,
+      sortable: false,
       align: 'center',
-      render: (row) => <span className="text-slate-500 font-mono">{row.no}</span>,
+      render: (row, index) => <span className="text-slate-500 font-mono">{index}</span>,
     },
     {
       key: 'kode',

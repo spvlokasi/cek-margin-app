@@ -19,7 +19,7 @@ export interface Column<T> {
   label: string;
   sortable?: boolean;
   align?: 'left' | 'center' | 'right';
-  render?: (row: T) => React.ReactNode;
+  render?: (row: T, index: number) => React.ReactNode;
 }
 
 interface DataTableProps<T> {
@@ -228,27 +228,30 @@ export default function DataTable<T extends Record<string, any>>({
                 </td>
               </tr>
             ) : (
-              paginatedData.map((row, idx) => (
-                <tr
-                  key={row.id || row.kode || idx}
-                  className="hover:bg-slate-800/40 transition-colors duration-150"
-                >
-                  {columns.map((col) => (
-                    <td
-                      key={col.key}
-                      className={`py-3 px-4 ${
-                        col.align === 'center'
-                          ? 'text-center'
-                          : col.align === 'right'
-                          ? 'text-right'
-                          : 'text-left'
-                      }`}
-                    >
-                      {col.render ? col.render(row) : row[col.key] ?? '-'}
-                    </td>
-                  ))}
-                </tr>
-              ))
+              paginatedData.map((row, idx) => {
+                const globalIndex = (currentPage - 1) * pageSize + idx + 1;
+                return (
+                  <tr
+                    key={row.id || row.kode || idx}
+                    className="hover:bg-slate-800/40 transition-colors duration-150"
+                  >
+                    {columns.map((col) => (
+                      <td
+                        key={col.key}
+                        className={`py-3 px-4 ${
+                          col.align === 'center'
+                            ? 'text-center'
+                            : col.align === 'right'
+                            ? 'text-right'
+                            : 'text-left'
+                        }`}
+                      >
+                        {col.render ? col.render(row, globalIndex) : row[col.key] ?? '-'}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
