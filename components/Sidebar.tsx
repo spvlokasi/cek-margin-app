@@ -99,11 +99,6 @@ export default function Sidebar({ session, onOpenUpload }: SidebarProps) {
                   <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-cyan-400' : 'text-slate-400 group-hover:text-cyan-400'}`} />
                   <span>{item.label}</span>
                 </div>
-                {item.badge && (
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                    {item.badge}
-                  </span>
-                )}
               </Link>
             );
           })}
