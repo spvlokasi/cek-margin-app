@@ -50,38 +50,6 @@ export default function Navbar({
 
         {/* Controls / Session Switcher */}
         <div className="flex items-center gap-3">
-          {/* Cabang Filter / Switcher (Admin only) */}
-          {session.role === 'admin' && (
-            <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs">
-              <Building2 className="w-4 h-4 text-cyan-400" />
-              <input
-                type="text"
-                list="cabang-options"
-                placeholder="Ketik & pilih cabang..."
-                className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-48"
-                defaultValue={session.kodeCabang !== 'ALL' ? `${session.kodeCabang} - ${session.namaCabang}` : ''}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  const selectedCabang = cabangList.find(c => 
-                    `${c.kode} - ${c.nama}` === val
-                  );
-                  if (selectedCabang) {
-                    onSessionChange({
-                      ...session,
-                      kodeCabang: selectedCabang.kode,
-                      namaCabang: selectedCabang.nama,
-                    });
-                  }
-                }}
-              />
-              <datalist id="cabang-options">
-                {cabangList.map((c) => (
-                  <option key={c.kode} value={`${c.kode} - ${c.nama}`} />
-                ))}
-              </datalist>
-            </div>
-          )}
-
           {/* Change Password Button */}
           <button
             onClick={() => setIsPasswordModalOpen(true)}

@@ -29,6 +29,7 @@ interface DataTableProps<T> {
   title?: string;
   subtitle?: string;
   onExportCsv?: () => void;
+  customHeaderAction?: React.ReactNode;
 }
 
 export default function DataTable<T extends Record<string, any>>({
@@ -38,6 +39,7 @@ export default function DataTable<T extends Record<string, any>>({
   title,
   subtitle,
   onExportCsv,
+  customHeaderAction,
 }: DataTableProps<T>) {
   // State
   const [searchTerm, setSearchTerm] = useState('');
@@ -122,24 +124,23 @@ export default function DataTable<T extends Record<string, any>>({
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
+          {customHeaderAction}
+          
           {/* Show Entries Dropdown */}
           <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs text-slate-300">
-            <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400" />
-            <span>Tampilkan:</span>
             <select
               value={pageSize}
               onChange={(e) => {
                 setPageSize(Number(e.target.value));
                 setCurrentPage(1);
               }}
-              className="bg-slate-900 text-white font-bold focus:outline-none cursor-pointer rounded px-1"
+              className="bg-transparent text-white font-bold focus:outline-none cursor-pointer rounded px-1"
             >
               <option value={10}>10</option>
               <option value={25}>25</option>
               <option value={50}>50</option>
               <option value={100}>100</option>
             </select>
-            <span>entries</span>
           </div>
 
           {/* Search Box */}

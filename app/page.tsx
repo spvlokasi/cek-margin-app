@@ -216,7 +216,7 @@ export default function CekMarginPage() {
           cabangList={cabangList}
           onSessionChange={handleSessionChange}
           onRefreshData={handleRefresh}
-          title="Laporan Analisis Cek Margin"
+          title=""
         />
 
         <main className="p-6 flex-1">
@@ -224,6 +224,50 @@ export default function CekMarginPage() {
             data={reportData}
             columns={columns}
             searchKeys={['kode', 'nama', 'namaSupplier']}
+            customHeaderAction={
+              session.role === 'admin' ? (
+                <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
+                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                    <path d="M9 22v-4h6v4"></path>
+                    <path d="M8 6h.01"></path>
+                    <path d="M16 6h.01"></path>
+                    <path d="M12 6h.01"></path>
+                    <path d="M12 10h.01"></path>
+                    <path d="M12 14h.01"></path>
+                    <path d="M16 10h.01"></path>
+                    <path d="M16 14h.01"></path>
+                    <path d="M8 10h.01"></path>
+                    <path d="M8 14h.01"></path>
+                  </svg>
+                  <input
+                    type="text"
+                    list="cabang-options-table"
+                    placeholder="Ketik & pilih cabang..."
+                    className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-48"
+                    defaultValue={session.kodeCabang !== 'ALL' ? `${session.kodeCabang} - ${session.namaCabang}` : ''}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      const selectedCabang = cabangList.find(c => 
+                        `${c.kode} - ${c.nama}` === val
+                      );
+                      if (selectedCabang) {
+                        handleSessionChange({
+                          ...session,
+                          kodeCabang: selectedCabang.kode,
+                          namaCabang: selectedCabang.nama,
+                        });
+                      }
+                    }}
+                  />
+                  <datalist id="cabang-options-table">
+                    {cabangList.map((c) => (
+                      <option key={c.kode} value={`${c.kode} - ${c.nama}`} />
+                    ))}
+                  </datalist>
+                </div>
+              ) : null
+            }
           />
         </main>
       </div>
