@@ -30,7 +30,6 @@ export default function Sidebar({ session, onOpenUpload }: SidebarProps) {
       label: 'Cek Margin',
       href: '/',
       icon: TrendingUp,
-      badge: 'Laporan',
     },
     {
       label: 'Cabang',
@@ -70,26 +69,13 @@ export default function Sidebar({ session, onOpenUpload }: SidebarProps) {
                 Cek Margin
               </h1>
               <span className="text-[11px] text-cyan-400 font-medium">
-                Multi-Cabang System
+                {session.role === 'admin' ? 'Admin Pusat' : session.namaCabang}
               </span>
             </div>
           </div>
         </div>
 
-        {/* User Session Badge Card */}
-        <div className="mx-4 my-4 p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/50 flex items-center gap-3">
-          <div className={`p-2 rounded-lg ${session.role === 'admin' ? 'bg-amber-500/10 text-amber-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
-            {session.role === 'admin' ? <ShieldCheck className="w-5 h-5" /> : <Store className="w-5 h-5" />}
-          </div>
-          <div className="overflow-hidden">
-            <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 flex items-center gap-1">
-              Role: <span className={session.role === 'admin' ? 'text-amber-400' : 'text-emerald-400'}>{session.role}</span>
-            </div>
-            <p className="text-xs font-semibold text-white truncate">
-              {session.namaCabang}
-            </p>
-          </div>
-        </div>
+
 
         {/* Navigation Items */}
         <nav className="px-3 space-y-1.5 mt-2">
