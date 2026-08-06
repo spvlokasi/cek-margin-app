@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   Building2, 
   RotateCcw, 
@@ -8,11 +9,10 @@ import {
   ArrowRightLeft,
   KeyRound,
   LogOut,
-  User,
-  ShieldCheck,
-  Store
+  UserCheck
 } from 'lucide-react';
 import { Cabang, UserSession } from '@/lib/types';
+import { logoutUser } from '@/lib/storage';
 import ChangePasswordModal from './ChangePasswordModal';
 
 interface NavbarProps {
@@ -30,7 +30,13 @@ export default function Navbar({
   onRefreshData,
   title,
 }: NavbarProps) {
+  const router = useRouter();
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+
+  const handleLogout = () => {
+    logoutUser();
+    router.push('/login');
+  };
 
   return (
     <>
@@ -48,12 +54,13 @@ export default function Navbar({
 
         {/* Controls / Session Switcher */}
         <div className="flex items-center gap-3">
-          {/* Cabang Filter / Switcher */}
+          {/* Cabang Filter / Switcher (Admin only or view) */}
           <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs">
             <Building2 className="w-4 h-4 text-cyan-400" />
             <span className="text-slate-400 font-medium hidden sm:inline">Cabang View:</span>
             <select
               value={session.kodeCabang}
+              disabled={session.role !== 'admin'}
               onChange={(e) => {
                 const selectedKode = e.target.value;
                 if (selectedKode === 'ALL') {
@@ -71,9 +78,11 @@ export default function Navbar({
                   });
                 }
               }}
-              className="bg-transparent text-white font-semibold focus:outline-none cursor-pointer"
+              className="bg-transparent text-white font-semibold focus:outline-none cursor-pointer disabled:cursor-not-allowed"
             >
-              <option value="ALL" className="bg-slate-900 text-white">🏢 Semua Cabang (Admin)</option>
+              {session.role === 'admin' && (
+                <option value="ALL" className="bg-slate-900 text-white">🏢 Semua Cabang (Admin)</option>
+              )}
               {cabangList.map((c) => (
                 <option key={c.kode} value={c.kode} className="bg-slate-900 text-white">
                   📍 {c.nama} ({c.kode})
@@ -81,26 +90,6 @@ export default function Navbar({
               ))}
             </select>
           </div>
-
-          {/* Mode Switcher */}
-          <button
-            onClick={() => {
-              const nextRole = session.role === 'admin' ? 'cabang' : 'admin';
-              const defaultCabang = nextRole === 'admin' ? 'ALL' : (cabangList[0]?.kode || 'CBG-001');
-              const defaultNama = nextRole === 'admin' ? 'Semua Cabang (Admin)' : (cabangList[0]?.nama || 'Basmalah Pademawu');
-              onSessionChange({
-                ...session,
-                role: nextRole,
-                kodeCabang: defaultCabang,
-                namaCabang: defaultNama,
-              });
-            }}
-            title="Klik untuk ganti mode Admin <-> Cabang"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700/80 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-700/80 transition-all cursor-pointer"
-          >
-            <ArrowRightLeft className="w-3.5 h-3.5 text-amber-400" />
-            <span>Mode: <strong className="text-white uppercase">{session.role}</strong></span>
-          </button>
 
           {/* Change Password Button */}
           <button
@@ -110,6 +99,16 @@ export default function Navbar({
           >
             <KeyRound className="w-3.5 h-3.5" />
             <span className="hidden md:inline">Ubah Password</span>
+          </button>
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            title="Keluar / Logout"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-xs font-semibold text-rose-400 transition-all cursor-pointer"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Logout</span>
           </button>
 
           {/* Refresh Button */}

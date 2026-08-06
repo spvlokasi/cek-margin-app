@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import Navbar from '@/components/Navbar';
 import StatsSummary from '@/components/StatsSummary';
@@ -10,31 +11,47 @@ import { Cabang, StokItem, UserSession } from '@/lib/types';
 import { getCabangList, getInitialSession, getStokList, saveSession } from '@/lib/storage';
 
 export default function StokPage() {
+  const router = useRouter();
   const [session, setSession] = useState<UserSession>({
-    isLoggedIn: true,
-    role: 'admin',
-    kodeCabang: 'ALL',
-    namaCabang: 'Semua Cabang (Admin)',
+    isLoggedIn: false,
+    role: 'cabang',
+    kodeCabang: '',
+    namaCabang: '',
   });
 
   const [cabangList, setCabangList] = useState<Cabang[]>([]);
   const [stokData, setStokData] = useState<StokItem[]>([]);
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
 
-  // Load initial data from storage
+  // Load initial data & check authentication
   const loadData = () => {
-    const loadedCabang = getCabangList();
     const loadedSession = getInitialSession();
-    setCabangList(loadedCabang);
+    if (!loadedSession.isLoggedIn) {
+      router.push('/login');
+      return;
+    }
+
     setSession(loadedSession);
+    const loadedCabang = getCabangList();
+    setCabangList(loadedCabang);
 
     const loadedStok = getStokList(loadedSession.kodeCabang);
     setStokData(loadedStok);
+    setIsCheckingAuth(false);
   };
 
   useEffect(() => {
     loadData();
   }, []);
+
+  if (isCheckingAuth) {
+    return (
+      <div className="h-screen bg-slate-950 flex items-center justify-center text-cyan-400 font-bold text-sm">
+        Memeriksa Autentikasi...
+      </div>
+    );
+  }
 
   const handleSessionChange = (newSession: UserSession) => {
     setSession(newSession);

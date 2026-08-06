@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import Navbar from '@/components/Navbar';
 import UploadModal from '@/components/UploadModal';
@@ -11,7 +12,6 @@ import {
   Plus, 
   Database, 
   Copy, 
-  Check, 
   ShieldAlert, 
   Sparkles,
   Upload,
@@ -24,17 +24,19 @@ import {
 import * as XLSX from 'xlsx';
 
 export default function AdminPage() {
+  const router = useRouter();
   const [session, setSession] = useState<UserSession>({
-    isLoggedIn: true,
-    role: 'admin',
-    kodeCabang: 'ALL',
-    namaCabang: 'Semua Cabang (Admin)',
+    isLoggedIn: false,
+    role: 'cabang',
+    kodeCabang: '',
+    namaCabang: '',
   });
 
   const [cabangList, setCabangList] = useState<Cabang[]>([]);
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
   const [copiedSql, setCopiedSql] = useState<boolean>(false);
   const [searchCabang, setSearchCabang] = useState('');
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
 
   // Single Cabang Form
   const [newKode, setNewKode] = useState('');
@@ -50,14 +52,28 @@ export default function AdminPage() {
   const [branchPassInput, setBranchPassInput] = useState('');
 
   const loadData = () => {
-    setCabangList(getCabangList());
     const loadedSession = getInitialSession();
+    if (!loadedSession.isLoggedIn) {
+      router.push('/login');
+      return;
+    }
+
     setSession(loadedSession);
+    setCabangList(getCabangList());
+    setIsCheckingAuth(false);
   };
 
   useEffect(() => {
     loadData();
   }, []);
+
+  if (isCheckingAuth) {
+    return (
+      <div className="h-screen bg-slate-950 flex items-center justify-center text-cyan-400 font-bold text-sm">
+        Memeriksa Autentikasi...
+      </div>
+    );
+  }
 
   const handleSessionChange = (newSession: UserSession) => {
     setSession(newSession);
@@ -81,14 +97,13 @@ export default function AdminPage() {
     setNewWilayah('');
   };
 
-  // Bulk add logic from pasted text
   const handleBulkProcess = () => {
     if (!bulkText.trim()) return;
 
     const lines = bulkText.split('\n');
     const parsedCabang: Cabang[] = [];
 
-    lines.forEach((line, idx) => {
+    lines.forEach((line) => {
       const parts = line.split(/[,;\t]/).map(p => p.trim());
       if (parts.length >= 2 && parts[0]) {
         parsedCabang.push({
@@ -113,7 +128,6 @@ export default function AdminPage() {
     setTimeout(() => setBulkMessage(null), 3000);
   };
 
-  // Bulk add from Excel file
   const handleBulkExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -366,7 +380,6 @@ CREATE INDEX IF NOT EXISTS idx_stok_cabang_kode ON public.stok_cabang(kode_caban
                     <p className="text-[11px] text-slate-400">Total terdaftar: <strong className="text-cyan-400">{cabangList.length} Cabang</strong></p>
                   </div>
 
-                  {/* Search box for branches */}
                   <div className="relative w-48">
                     <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
@@ -379,7 +392,6 @@ CREATE INDEX IF NOT EXISTS idx_stok_cabang_kode ON public.stok_cabang(kode_caban
                   </div>
                 </div>
 
-                {/* Branch Cards List */}
                 <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
                   {filteredCabang.length === 0 ? (
                     <div className="text-center py-8 text-slate-500 text-xs">
@@ -419,7 +431,6 @@ CREATE INDEX IF NOT EXISTS idx_stok_cabang_kode ON public.stok_cabang(kode_caban
                 </div>
               </div>
 
-              {/* Supabase SQL quick ref button */}
               <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
                 <span>Skema SQL Supabase</span>
                 <button
@@ -435,7 +446,6 @@ CREATE INDEX IF NOT EXISTS idx_stok_cabang_kode ON public.stok_cabang(kode_caban
         </main>
       </div>
 
-      {/* Modal Edit Password Specific Branch */}
       {editingCabang && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl">

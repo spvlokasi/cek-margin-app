@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import Navbar from '@/components/Navbar';
 import DataTable, { Column } from '@/components/DataTable';
@@ -9,27 +10,43 @@ import { Cabang, Produk, UserSession } from '@/lib/types';
 import { getCabangList, getInitialSession, getProdukList, saveSession } from '@/lib/storage';
 
 export default function ProdukPage() {
+  const router = useRouter();
   const [session, setSession] = useState<UserSession>({
-    isLoggedIn: true,
-    role: 'admin',
-    kodeCabang: 'ALL',
-    namaCabang: 'Semua Cabang (Admin)',
+    isLoggedIn: false,
+    role: 'cabang',
+    kodeCabang: '',
+    namaCabang: '',
   });
 
   const [cabangList, setCabangList] = useState<Cabang[]>([]);
   const [produkData, setProdukData] = useState<Produk[]>([]);
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
 
   const loadData = () => {
-    setCabangList(getCabangList());
     const loadedSession = getInitialSession();
+    if (!loadedSession.isLoggedIn) {
+      router.push('/login');
+      return;
+    }
+
     setSession(loadedSession);
+    setCabangList(getCabangList());
     setProdukData(getProdukList());
+    setIsCheckingAuth(false);
   };
 
   useEffect(() => {
     loadData();
   }, []);
+
+  if (isCheckingAuth) {
+    return (
+      <div className="h-screen bg-slate-950 flex items-center justify-center text-cyan-400 font-bold text-sm">
+        Memeriksa Autentikasi...
+      </div>
+    );
+  }
 
   const handleSessionChange = (newSession: UserSession) => {
     setSession(newSession);
