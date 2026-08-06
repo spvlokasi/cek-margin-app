@@ -220,9 +220,8 @@ export default function AdminPage() {
       label: 'Nama Cabang & Wilayah',
       sortable: true,
       render: (row) => (
-        <div>
-          <p className="font-bold text-white leading-snug">{row.nama}</p>
-          <span className="text-[10px] text-slate-400">📍 {row.wilayah || 'Jawa Timur'}</span>
+        <div className="flex flex-col">
+          <span className="font-bold text-white mb-0.5">{row.nama}</span>
         </div>
       ),
     },
