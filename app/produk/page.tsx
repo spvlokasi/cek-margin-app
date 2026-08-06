@@ -306,6 +306,7 @@ export default function ProdukPage() {
         session={session}
         cabangList={cabangList}
         onUploadSuccess={handleRefresh}
+        mode="produk"
       />
     </div>
   );

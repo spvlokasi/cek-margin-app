@@ -22,6 +22,7 @@ interface UploadModalProps {
   session: UserSession;
   cabangList: Cabang[];
   onUploadSuccess: () => void;
+  mode?: 'margin' | 'produk' | 'stok';
 }
 
 export default function UploadModal({
@@ -30,7 +31,20 @@ export default function UploadModal({
   session,
   cabangList,
   onUploadSuccess,
+  mode = 'margin',
 }: UploadModalProps) {
+  const title = mode === 'produk' ? 'Upload Excel Master Produk' 
+              : mode === 'stok' ? 'Upload Excel Stok' 
+              : 'Upload Excel Cek Margin';
+  
+  const subtitle = mode === 'produk' ? 'Pembaruan master produk cabang' 
+                 : mode === 'stok' ? 'Pembaruan data stok gudang' 
+                 : 'Pembaruan data otomatis per cabang';
+
+  const instructionText = mode === 'produk' ? 'Pilih atau Drag File Excel PRODUK.xlsx'
+                        : mode === 'stok' ? 'Pilih atau Drag File Excel STOK.xlsx'
+                        : 'Pilih atau Drag File Excel CEK MARGIN.xlsx';
+
   const [selectedKodeCabang, setSelectedKodeCabang] = useState<string>(
     session.role === 'admin' ? (cabangList[0]?.kode || 'CBG-001') : session.kodeCabang
   );
@@ -114,8 +128,8 @@ export default function UploadModal({
               <UploadCloud className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-white text-base">Upload Excel Cek Margin</h3>
-              <p className="text-xs text-slate-400">Pembaruan data otomatis per cabang</p>
+              <h3 className="font-bold text-white text-base">{title}</h3>
+              <p className="text-xs text-slate-400">{subtitle}</p>
             </div>
           </div>
           <button
@@ -173,10 +187,8 @@ export default function UploadModal({
                 <FileSpreadsheet className="w-8 h-8" />
               </div>
               <p className="mt-3 text-xs font-bold text-white">
-                {selectedFile ? selectedFile.name : 'Pilih atau Drag File Excel CEK MARGIN.xlsx'}
-              </p>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Format yang didukung: .xlsx atau .xls (Sheet PRODUK & STOK T&G)
+                  <span className="font-bold text-slate-200 mt-2 block">{selectedFile ? selectedFile.name : instructionText}</span>
+                  <span className="text-slate-500 mt-1 block">Format yang didukung: .xlsx atau .xls (Sheet PRODUK & STOK T&G)</span>
               </p>
             </div>
           </div>

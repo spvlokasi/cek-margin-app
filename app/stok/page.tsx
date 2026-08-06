@@ -231,6 +231,7 @@ export default function StokPage() {
         session={session}
         cabangList={cabangList}
         onUploadSuccess={handleRefresh}
+        mode="stok"
       />
     </div>
   );
