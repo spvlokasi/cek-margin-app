@@ -7,10 +7,10 @@ import DataTable, { Column } from '@/components/DataTable';
 import UploadModal from '@/components/UploadModal';
 import { Cabang, Produk, UserSession } from '@/lib/types';
 import { getCabangList, getInitialSession, getProdukList, saveSession } from '@/lib/storage';
-import { Package, Tag, Building, Store } from 'lucide-react';
 
 export default function ProdukPage() {
   const [session, setSession] = useState<UserSession>({
+    isLoggedIn: true,
     role: 'admin',
     kodeCabang: 'ALL',
     namaCabang: 'Semua Cabang (Admin)',

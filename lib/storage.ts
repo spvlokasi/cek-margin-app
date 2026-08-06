@@ -7,22 +7,48 @@ const STORAGE_KEYS = {
   STOK: 'cek_margin_stok_v1',
   CABANG: 'cek_margin_cabang_v1',
   SESSION: 'cek_margin_session_v1',
+  ADMIN_PASS: 'cek_margin_admin_pass_v1',
 };
+
+export function getAdminPassword(): string {
+  if (typeof window === 'undefined') return 'admin123';
+  return localStorage.getItem(STORAGE_KEYS.ADMIN_PASS) || 'admin123';
+}
+
+export function updateAdminPassword(newPassword: string): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(STORAGE_KEYS.ADMIN_PASS, newPassword);
+}
 
 export function getInitialSession(): UserSession {
   if (typeof window === 'undefined') {
-    return { role: 'admin', kodeCabang: 'ALL', namaCabang: 'Semua Cabang (Admin)' };
+    return { isLoggedIn: true, role: 'admin', kodeCabang: 'ALL', namaCabang: 'Semua Cabang (Admin)', username: 'admin' };
   }
   const saved = localStorage.getItem(STORAGE_KEYS.SESSION);
   if (saved) {
-    try { return JSON.parse(saved); } catch {}
+    try {
+      const parsed = JSON.parse(saved);
+      if (parsed && typeof parsed.isLoggedIn === 'boolean') return parsed;
+    } catch {}
   }
-  return { role: 'admin', kodeCabang: 'ALL', namaCabang: 'Semua Cabang (Admin)' };
+  return { isLoggedIn: true, role: 'admin', kodeCabang: 'ALL', namaCabang: 'Semua Cabang (Admin)', username: 'admin' };
 }
 
 export function saveSession(session: UserSession): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(session));
+}
+
+export function logoutUser(): UserSession {
+  const emptySession: UserSession = {
+    isLoggedIn: false,
+    role: 'cabang',
+    kodeCabang: '',
+    namaCabang: '',
+    username: '',
+  };
+  saveSession(emptySession);
+  return emptySession;
 }
 
 export function getCabangList(): Cabang[] {
@@ -40,12 +66,12 @@ export function getCabangList(): Cabang[] {
 
 export function addCabang(newCabang: Cabang): Cabang[] {
   const current = getCabangList();
-  const exists = current.find(c => c.kode === newCabang.kode);
+  const exists = current.find(c => c.kode.toUpperCase() === newCabang.kode.toUpperCase());
   let updated: Cabang[];
   if (exists) {
-    updated = current.map(c => c.kode === newCabang.kode ? newCabang : c);
+    updated = current.map(c => c.kode.toUpperCase() === newCabang.kode.toUpperCase() ? { ...c, ...newCabang } : c);
   } else {
-    updated = [...current, newCabang];
+    updated = [...current, { ...newCabang, password: newCabang.password || '123' }];
   }
   if (typeof window !== 'undefined') {
     localStorage.setItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
@@ -55,10 +81,61 @@ export function addCabang(newCabang: Cabang): Cabang[] {
   supabase.from('cabang').upsert({
     kode_cabang: newCabang.kode,
     nama_cabang: newCabang.nama,
-    wilayah: newCabang.wilayah || 'Jawa Timur'
+    wilayah: newCabang.wilayah || 'Jawa Timur',
+    password: newCabang.password || '123',
   }).then();
 
   return updated;
+}
+
+/**
+ * Bulk add up to 400 branches at once!
+ */
+export function bulkAddCabang(newCabangList: Cabang[]): Cabang[] {
+  let current = getCabangList();
+  const map = new Map<string, Cabang>();
+  current.forEach(c => map.set(c.kode.toUpperCase(), c));
+
+  newCabangList.forEach(nc => {
+    const key = nc.kode.toUpperCase();
+    const existing = map.get(key);
+    map.set(key, {
+      kode: nc.kode,
+      nama: nc.nama,
+      wilayah: nc.wilayah || existing?.wilayah || 'Jawa Timur',
+      password: nc.password || existing?.password || '123',
+    });
+  });
+
+  const updated = Array.from(map.values());
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
+  }
+
+  // Async sync bulk to Supabase
+  const dbRows = updated.map(c => ({
+    kode_cabang: c.kode,
+    nama_cabang: c.nama,
+    wilayah: c.wilayah,
+    password: c.password || '123',
+  }));
+  supabase.from('cabang').upsert(dbRows).then();
+
+  return updated;
+}
+
+export function updateBranchPassword(kodeCabang: string, newPassword: string): boolean {
+  const current = getCabangList();
+  const target = current.find(c => c.kode.toUpperCase() === kodeCabang.toUpperCase());
+  if (!target) return false;
+
+  const updated = current.map(c => c.kode.toUpperCase() === kodeCabang.toUpperCase() ? { ...c, password: newPassword } : c);
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
+  }
+
+  supabase.from('cabang').update({ password: newPassword }).eq('kode_cabang', kodeCabang).then();
+  return true;
 }
 
 export function getProdukList(): Produk[] {
@@ -93,9 +170,6 @@ export function getStokList(kodeCabangFilter?: string): StokItem[] {
   return list;
 }
 
-/**
- * Wipe & Replace stock data for target branch locally AND directly on Supabase Cloud!
- */
 export function syncBranchStok(
   targetKodeCabang: string,
   targetNamaCabang: string,
@@ -104,10 +178,8 @@ export function syncBranchStok(
 ): { totalStokAdded: number; totalProdukUpdated: number } {
   const allStok = getStokList();
 
-  // 1. Wipe old stock for this specific branch ONLY locally
   const remainingStok = allStok.filter(item => item.kodeCabang !== targetKodeCabang);
 
-  // 2. Format new items
   const formattedNewStok = newStokItems.map(item => ({
     ...item,
     kodeCabang: targetKodeCabang,
@@ -119,7 +191,6 @@ export function syncBranchStok(
     localStorage.setItem(STORAGE_KEYS.STOK, JSON.stringify(updatedAllStok));
   }
 
-  // 3. Update master produk locally
   let produkUpdatedCount = 0;
   if (newProdukItems && newProdukItems.length > 0) {
     const currentProduk = getProdukList();
@@ -135,7 +206,6 @@ export function syncBranchStok(
       localStorage.setItem(STORAGE_KEYS.PRODUK, JSON.stringify(updatedAllProduk));
     }
 
-    // Async sync produk to Supabase
     const dbProdukRows = newProdukItems.map(p => ({
       kode_produk: p.kode,
       nama_produk: p.nama,
@@ -150,19 +220,15 @@ export function syncBranchStok(
     supabase.from('produk').upsert(dbProdukRows).then();
   }
 
-  // 4. SYNC TO SUPABASE CLOUD: Delete old branch stock & insert new branch stock
   async function syncToSupabase() {
     try {
-      // First ensure branch exists in cabang table
       await supabase.from('cabang').upsert({
         kode_cabang: targetKodeCabang,
         nama_cabang: targetNamaCabang,
       });
 
-      // Delete old rows for this branch
       await supabase.from('stok_cabang').delete().eq('kode_cabang', targetKodeCabang);
 
-      // Insert new rows
       if (formattedNewStok.length > 0) {
         const dbStokRows = formattedNewStok.map(s => ({
           kode_cabang: s.kodeCabang,

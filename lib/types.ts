@@ -36,12 +36,15 @@ export interface Cabang {
   kode: string;
   nama: string;
   wilayah?: string;
+  password?: string;
 }
 
 export type UserRole = 'admin' | 'cabang';
 
 export interface UserSession {
+  isLoggedIn: boolean;
   role: UserRole;
   kodeCabang: string; // 'ALL' if admin, or specific branch code like 'CBG-001'
   namaCabang: string;
+  username?: string;
 }

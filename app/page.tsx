@@ -8,10 +8,10 @@ import DataTable, { Column } from '@/components/DataTable';
 import UploadModal from '@/components/UploadModal';
 import { Cabang, StokItem, UserSession } from '@/lib/types';
 import { getCabangList, getInitialSession, getStokList, saveSession } from '@/lib/storage';
-import { ArrowUpRight, TrendingDown, PackageCheck, AlertTriangle } from 'lucide-react';
 
 export default function StokPage() {
   const [session, setSession] = useState<UserSession>({
+    isLoggedIn: true,
     role: 'admin',
     kodeCabang: 'ALL',
     namaCabang: 'Semua Cabang (Admin)',
@@ -172,10 +172,8 @@ export default function StokPage() {
 
   return (
     <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
-      {/* Sidebar */}
       <Sidebar session={session} onOpenUpload={() => setIsUploadOpen(true)} />
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <Navbar
           session={session}
@@ -186,10 +184,8 @@ export default function StokPage() {
         />
 
         <main className="p-6 space-y-6 flex-1">
-          {/* KPI Cards */}
           <StatsSummary stokList={stokData} />
 
-          {/* Interactive DataTable */}
           <DataTable<StokItem>
             data={stokData}
             columns={columns}
@@ -200,7 +196,6 @@ export default function StokPage() {
         </main>
       </div>
 
-      {/* Upload Modal */}
       <UploadModal
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
