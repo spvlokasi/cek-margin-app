@@ -8,7 +8,7 @@ import DataTable, { Column } from '@/components/DataTable';
 import UploadModal from '@/components/UploadModal';
 import { Cabang, Produk, UserSession } from '@/lib/types';
 import { getCabangList, getInitialSession, getProdukList, saveSession } from '@/lib/storage';
-import { Package, Upload, AlertCircle } from 'lucide-react';
+import { Package, Upload, AlertCircle, RotateCcw } from 'lucide-react';
 
 export default function ProdukPage() {
   const router = useRouter();
@@ -192,72 +192,79 @@ export default function ProdukPage() {
           cabangList={cabangList}
           onSessionChange={handleSessionChange}
           onRefreshData={handleRefresh}
-          title="Master Produk Cabang"
+          title=""
         />
 
         <main className="p-6 space-y-6 flex-1">
-          {/* Branch Selector Bar (Required for Admin) */}
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
-                <Package className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-bold text-white text-base">Filter Produk per Cabang</h3>
-                <p className="text-xs text-slate-400">
-                  {session.role === 'admin'
-                    ? 'Pilih cabang terlebih dahulu untuk melihat data produk.'
-                    : `Menampilkan produk khusus cabang [${session.namaCabang}]`}
-                </p>
-              </div>
-            </div>
-
-            {session.role === 'admin' ? (
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-slate-400">Pilih Cabang:</span>
-                <select
-                  value={selectedBranch}
-                  onChange={(e) => handleBranchSelectChange(e.target.value)}
-                  className="bg-slate-950 border border-slate-700 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none focus:border-cyan-500 cursor-pointer"
+          {/* Branch Search Datalist hidden if not admin */}
+          <DataTable<Produk>
+            data={produkData}
+            columns={columns}
+            searchKeys={['kode', 'nama', 'principle', 'namaPrinciple', 'supplier', 'kodeSupplier', 'kategori']}
+            title=""
+            customHeaderAction={
+              session.role === 'admin' ? (
+                <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
+                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                    <path d="M9 22v-4h6v4"></path>
+                    <path d="M8 6h.01"></path>
+                    <path d="M16 6h.01"></path>
+                    <path d="M12 6h.01"></path>
+                    <path d="M12 10h.01"></path>
+                    <path d="M12 14h.01"></path>
+                    <path d="M16 10h.01"></path>
+                    <path d="M16 14h.01"></path>
+                    <path d="M8 10h.01"></path>
+                    <path d="M8 14h.01"></path>
+                  </svg>
+                  <input
+                    id="branch-search"
+                    type="text"
+                    list="cabang-options-table"
+                    placeholder="Ketik & pilih cabang..."
+                    className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-48"
+                    defaultValue={selectedBranch !== 'ALL' && selectedBranch !== '' ? `${selectedBranch} - ${cabangList.find(c => c.kode === selectedBranch)?.nama}` : ''}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      const selectedCabang = cabangList.find(c => 
+                        `${c.kode} - ${c.nama}` === val
+                      );
+                      if (selectedCabang) {
+                        handleBranchSelectChange(selectedCabang.kode);
+                      }
+                    }}
+                  />
+                  {selectedBranch && (
+                    <button
+                      onClick={() => {
+                        const input = document.getElementById('branch-search') as HTMLInputElement;
+                        if (input) input.value = '';
+                        handleBranchSelectChange('');
+                      }}
+                      className="p-1 rounded-md hover:bg-slate-700/60 text-slate-400 hover:text-rose-400 transition-colors"
+                      title="Reset Cabang"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                  <datalist id="cabang-options-table">
+                    {cabangList.map((c) => (
+                      <option key={c.kode} value={`${c.kode} - ${c.nama}`} />
+                    ))}
+                  </datalist>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsUploadOpen(true)}
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 font-bold text-xs flex items-center gap-2 cursor-pointer"
                 >
-                  <option value="">-- Pilih Cabang (Tabel Kosong) --</option>
-                  <option value="ALL">🏢 Semua Cabang</option>
-                  {cabangList.map((c) => (
-                    <option key={c.kode} value={c.kode}>
-                      📍 {c.nama} ({c.kode})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ) : (
-              <button
-                onClick={() => setIsUploadOpen(true)}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 font-bold text-xs flex items-center gap-2 cursor-pointer"
-              >
-                <Upload className="w-4 h-4 stroke-[2.5]" />
-                <span>Upload Excel Produk Cabang Anda</span>
-              </button>
-            )}
-          </div>
-
-          {/* Empty Table Warning if No Branch Selected by Admin */}
-          {!selectedBranch && session.role === 'admin' ? (
-            <div className="p-12 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-3">
-              <AlertCircle className="w-10 h-10 text-cyan-400 mx-auto opacity-60" />
-              <h4 className="text-base font-bold text-white">Tabel Masih Kosong</h4>
-              <p className="text-xs text-slate-400 max-w-md mx-auto">
-                Silakan pilih salah satu cabang pada dropdown di atas untuk melihat data produk cabang tersebut.
-              </p>
-            </div>
-          ) : (
-            <DataTable<Produk>
-              data={produkData}
-              columns={columns}
-              searchKeys={['kode', 'nama', 'principle', 'namaPrinciple', 'supplier', 'kodeSupplier', 'kategori']}
-              title="Tabel Produk"
-              subtitle="Kolom: No, Kode, Nama, Principle, Nama Principle, Supplier, Kode Supplier, Kategori, HPP, Hrg1, Hrg2, Hrg3"
-            />
-          )}
+                  <Upload className="w-4 h-4 stroke-[2.5]" />
+                  <span>Upload Excel Produk Cabang Anda</span>
+                </button>
+              )
+            }
+          />
         </main>
       </div>
 
