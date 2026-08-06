@@ -3,463 +3,463 @@ import { Cabang, Produk, StokItem } from './types';
 export const MOCK_CABANG: Cabang[] = [
   {
     "kode": "M1002",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Sepuluh",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1003",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Geger",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1004",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Arosbaya",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1006",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Blega",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1007",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Tonaan",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1009",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Trageh",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1010",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Kwanyar",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1011",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Kamal",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1012",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Patemon",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1013",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Tanah Merah 02",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1014",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Klampis",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1015",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Galis",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1016",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Socah",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1017",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Trogan",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1018",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Suramadu",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1019",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Tanjung Bumi 02",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1020",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Tanah Merah 01",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1021",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Modung",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1022",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Jaddih 02",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1023",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Paka'an",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1024",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Martajasah",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1025",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Tengket",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M1026",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Tlangoh",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2001",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Omben",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2003",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Tamberuh",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2004",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Camplong",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2005",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Ketapang",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2006",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Karang Penang",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2008",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Lempong",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2009",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Mandangin",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2010",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Bungkak",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2012",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Torjun",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2013",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Sokobanah 2",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2014",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Kedungdung",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2015",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Karang Penang 02",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2017",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Sampang Kota",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2018",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Camplong 02",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2019",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Jatrah Timur",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M2020",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Robatal 02",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3001",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Pamekasan Kota",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3002",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Pakong",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3003",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Batu Bintang",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3004",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Tlanakan",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3005",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Pasean",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3006",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Pegantenan",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3007",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Waru 01",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3008",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Larangan",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3009",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Palengaan",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3010",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Waru 02",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3011",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Blumbungan",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3012",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Proppo",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3013",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Panempan",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3014",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Jung Cangcang",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3015",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Trasak",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3016",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Kadur",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3017",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Bugih",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3018",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Bugih 02",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3019",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Pademawu",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3020",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Bandungan",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M3021",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Sotabar",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M4001",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Lenteng",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M4002",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Sumenep Kota",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M4003",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Ganding",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M4004",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Ambunten",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M4005",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Pasongsongan",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M4008",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Banasareh",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M4009",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Bluto",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M4010",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Prenduan",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M4011",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Manding",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M4013",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Marengan",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M4014",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Batuan",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M4015",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Legung",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M4016",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Kalianget",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "M4017",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Adirasa",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "W1001",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Sidayu",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "L1002",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang Bulak Banteng",
     "wilayah": "Pusat",
     "password": "M1002"
   },
   {
     "kode": "L1003",
-    "nama": "undefined",
+    "nama": "Basmalah Cabang DAS Surabaya",
     "wilayah": "Pusat",
     "password": "M1002"
   }

@@ -16,7 +16,7 @@ const stokData = xlsx.utils.sheet_to_json(stokSheet);
 // Expects: no, kode, nama cabang, user, password
 const formattedCabang = cabangData.map(c => ({
   kode: String(c['kode'] || c['Kode'] || c['KODE']).trim(),
-  nama: String(c['nama cabang'] || c['Nama Cabang'] || c['NAMA CABANG']).trim(),
+  nama: String(c['nama'] || c['Nama'] || c['NAMA'] || c['nama cabang'] || c['Nama Cabang'] || c['NAMA CABANG']).trim(),
   wilayah: 'Pusat', // default
   password: String(c['password'] || c['Password'] || c['PASSWORD'] || '123').trim()
 })).filter(c => c.kode && c.kode !== 'undefined');
