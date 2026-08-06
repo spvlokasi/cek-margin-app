@@ -286,64 +286,12 @@ export default function CabangPage() {
           cabangList={cabangList}
           onSessionChange={handleSessionChange}
           onRefreshData={loadData}
-          title="Manajemen Cabang Toko"
+          title=""
         />
 
         <main className="p-6 space-y-6 flex-1 max-w-7xl mx-auto w-full">
-          {/* Top Banner */}
-          <div className="p-6 rounded-3xl bg-gradient-to-r from-cyan-900/40 via-slate-900 to-emerald-900/40 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h2 className="text-xl font-extrabold text-white">Kelola Cabang Toko (Total: {cabangList.length} Cabang)</h2>
-            </div>
-          </div>
-
           {/* Add Forms */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* BULK ADD */}
-            <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-cyan-400" />
-                  <span>Tambah Banyak Cabang Sekaligus (Bulk Add)</span>
-                </h3>
-
-                <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-cyan-400 border border-slate-700 cursor-pointer">
-                  <FileSpreadsheet className="w-3.5 h-3.5" />
-                  <span>Import Excel</span>
-                  <input
-                    type="file"
-                    accept=".xlsx, .xls"
-                    onChange={handleBulkExcelUpload}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-
-              {bulkMessage && (
-                <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 shrink-0" />
-                  <span>{bulkMessage}</span>
-                </div>
-              )}
-
-              <textarea
-                rows={3}
-                placeholder=""
-                value={bulkText}
-                onChange={(e) => setBulkText(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 text-slate-300 text-xs font-mono px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-500"
-              />
-
-              <button
-                onClick={handleBulkProcess}
-                disabled={!bulkText.trim()}
-                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 disabled:opacity-40 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 transition-all cursor-pointer"
-              >
-                <Plus className="w-4 h-4 stroke-[2.5]" />
-                <span>Proses & Simpan Semua Cabang</span>
-              </button>
-            </div>
-
+          <div className="max-w-md">
             {/* SINGLE ADD */}
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
