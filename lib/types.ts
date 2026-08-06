@@ -18,8 +18,8 @@ export interface Produk {
 export interface StokItem {
   id?: string;
   no?: number;
-  kodeCabang: string;
-  namaCabang: string;
+  kodeCabang?: string;
+  namaCabang?: string;
   kode: string;
   nama: string;
   stok: number;
@@ -64,8 +64,8 @@ export interface CekMarginItem {
   hrg3: number;
   mrg3: number;
   persen3: number;
-  kodeCabang: string;
-  namaCabang: string;
+  kodeCabang?: string;
+  namaCabang?: string;
 }
 
 export type UserRole = 'admin' | 'cabang';

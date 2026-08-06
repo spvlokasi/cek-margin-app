@@ -3,12 +3,23 @@ import { MOCK_CABANG, MOCK_PRODUK, MOCK_STOK } from './sampleData';
 import { supabase } from './supabase';
 
 const STORAGE_KEYS = {
-  PRODUK: 'cek_margin_produk_v2',
-  STOK: 'cek_margin_stok_v2',
-  CABANG: 'cek_margin_cabang_v2',
-  SESSION: 'cek_margin_session_v2',
-  ADMIN_USERS: 'cek_margin_admin_users_v2',
+  PRODUK: 'cek_margin_produk_v3',
+  STOK: 'cek_margin_stok_v3',
+  CABANG: 'cek_margin_cabang_v3',
+  SESSION: 'cek_margin_session_v3',
+  ADMIN_USERS: 'cek_margin_admin_users_v3',
 };
+
+function safeSetItem(key: string, value: string) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    console.error(`Storage Quota Exceeded for ${key}`, e);
+    alert(`Peringatan: Kapasitas penyimpanan browser Anda hampir penuh. Sebagian data mungkin tidak tersimpan.`);
+  }
+}
+
 
 const DEFAULT_ADMIN_USERS: AdminUser[] = [
   { id: 'adm-01', username: 'admin', nama: 'Super Admin Pusat', password: 'admin123' },
@@ -24,7 +35,7 @@ export function getAdminUserList(): AdminUser[] {
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     } catch {}
   }
-  localStorage.setItem(STORAGE_KEYS.ADMIN_USERS, JSON.stringify(DEFAULT_ADMIN_USERS));
+  safeSetItem(STORAGE_KEYS.ADMIN_USERS, JSON.stringify(DEFAULT_ADMIN_USERS));
   return DEFAULT_ADMIN_USERS;
 }
 
@@ -38,7 +49,7 @@ export function addAdminUser(newAdmin: AdminUser): AdminUser[] {
     updated = [...current, { ...newAdmin, id: `adm-${Date.now()}` }];
   }
   if (typeof window !== 'undefined') {
-    localStorage.setItem(STORAGE_KEYS.ADMIN_USERS, JSON.stringify(updated));
+    safeSetItem(STORAGE_KEYS.ADMIN_USERS, JSON.stringify(updated));
   }
   return updated;
 }
@@ -47,7 +58,7 @@ export function deleteAdminUser(id: string): AdminUser[] {
   const current = getAdminUserList();
   const updated = current.filter(a => a.id !== id && a.username !== 'admin');
   if (typeof window !== 'undefined') {
-    localStorage.setItem(STORAGE_KEYS.ADMIN_USERS, JSON.stringify(updated));
+    safeSetItem(STORAGE_KEYS.ADMIN_USERS, JSON.stringify(updated));
   }
   return updated;
 }
@@ -68,7 +79,7 @@ export function getInitialSession(): UserSession {
 
 export function saveSession(session: UserSession): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(session));
+  safeSetItem(STORAGE_KEYS.SESSION, JSON.stringify(session));
 }
 
 export function logoutUser(): UserSession {
@@ -146,7 +157,7 @@ export function getCabangList(): Cabang[] {
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     } catch {}
   }
-  localStorage.setItem(STORAGE_KEYS.CABANG, JSON.stringify(MOCK_CABANG));
+  safeSetItem(STORAGE_KEYS.CABANG, JSON.stringify(MOCK_CABANG));
   return MOCK_CABANG;
 }
 
@@ -160,7 +171,7 @@ export function addCabang(newCabang: Cabang): Cabang[] {
     updated = [...current, { ...newCabang, password: newCabang.password || '123' }];
   }
   if (typeof window !== 'undefined') {
-    localStorage.setItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
+    safeSetItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
   }
 
   supabase.from('cabang').upsert({
@@ -191,7 +202,7 @@ export function bulkAddCabang(newCabangList: Cabang[]): Cabang[] {
 
   const updated = Array.from(map.values());
   if (typeof window !== 'undefined') {
-    localStorage.setItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
+    safeSetItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
   }
 
   const dbRows = updated.map(c => ({
@@ -209,7 +220,7 @@ export function deleteCabang(kodeCabang: string): Cabang[] {
   const current = getCabangList();
   const updated = current.filter(c => c.kode.toUpperCase() !== kodeCabang.toUpperCase());
   if (typeof window !== 'undefined') {
-    localStorage.setItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
+    safeSetItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
   }
   supabase.from('cabang').delete().eq('kode_cabang', kodeCabang).then();
   return updated;
@@ -225,7 +236,7 @@ export function getProdukList(kodeCabangFilter?: string): Produk[] {
       if (Array.isArray(parsed) && parsed.length > 0) list = parsed;
     } catch {}
   } else {
-    localStorage.setItem(STORAGE_KEYS.PRODUK, JSON.stringify(MOCK_PRODUK));
+    safeSetItem(STORAGE_KEYS.PRODUK, JSON.stringify(MOCK_PRODUK));
   }
 
   if (!kodeCabangFilter || kodeCabangFilter === '') return []; // Admin MUST select branch first!
@@ -243,7 +254,7 @@ export function getStokList(kodeCabangFilter?: string): StokItem[] {
       if (Array.isArray(parsed) && parsed.length > 0) list = parsed;
     } catch {}
   } else {
-    localStorage.setItem(STORAGE_KEYS.STOK, JSON.stringify(MOCK_STOK));
+    safeSetItem(STORAGE_KEYS.STOK, JSON.stringify(MOCK_STOK));
   }
 
   if (!kodeCabangFilter || kodeCabangFilter === '') return []; // Admin MUST select branch first!
@@ -320,7 +331,7 @@ export function syncBranchStok(
 
   const updatedAllStok = [...remainingStok, ...formattedNewStok];
   if (typeof window !== 'undefined') {
-    localStorage.setItem(STORAGE_KEYS.STOK, JSON.stringify(updatedAllStok));
+    safeSetItem(STORAGE_KEYS.STOK, JSON.stringify(updatedAllStok));
   }
 
   let produkUpdatedCount = 0;
@@ -335,7 +346,7 @@ export function syncBranchStok(
 
     const updatedAllProduk = Array.from(produkMap.values());
     if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEYS.PRODUK, JSON.stringify(updatedAllProduk));
+      safeSetItem(STORAGE_KEYS.PRODUK, JSON.stringify(updatedAllProduk));
     }
   }
 
