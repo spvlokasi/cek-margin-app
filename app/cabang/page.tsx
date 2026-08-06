@@ -359,13 +359,11 @@ export default function CabangPage() {
             </div>
           </div>
 
-          {/* Exact Requested Table: No, Kode, Nama, User, Password, Aksi */}
           <DataTable<Cabang>
             data={cabangList}
             columns={cabangColumns}
             searchKeys={['kode', 'nama', 'wilayah', 'password']}
-            title="Tabel Cabang & User Login Toko"
-            subtitle="Kolom: No, Kode, Nama Cabang, User Login, Password, Aksi (Edit & Hapus)"
+            title=""
           />
         </main>
       </div>
