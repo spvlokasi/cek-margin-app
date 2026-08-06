@@ -46,50 +46,45 @@ export default function Navbar({
           <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
             {title}
           </h2>
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Multi-Cabang Safe</span>
-          </div>
         </div>
 
         {/* Controls / Session Switcher */}
         <div className="flex items-center gap-3">
-          {/* Cabang Filter / Switcher (Admin only or view) */}
-          <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs">
-            <Building2 className="w-4 h-4 text-cyan-400" />
-            <span className="text-slate-400 font-medium hidden sm:inline">Cabang View:</span>
-            <select
-              value={session.kodeCabang}
-              disabled={session.role !== 'admin'}
-              onChange={(e) => {
-                const selectedKode = e.target.value;
-                if (selectedKode === 'ALL') {
-                  onSessionChange({
-                    ...session,
-                    kodeCabang: 'ALL',
-                    namaCabang: 'Semua Cabang (Admin)',
-                  });
-                } else {
-                  const target = cabangList.find((c) => c.kode === selectedKode);
-                  onSessionChange({
-                    ...session,
-                    kodeCabang: selectedKode,
-                    namaCabang: target ? target.nama : selectedKode,
-                  });
-                }
-              }}
-              className="bg-transparent text-white font-semibold focus:outline-none cursor-pointer disabled:cursor-not-allowed"
-            >
-              {session.role === 'admin' && (
+          {/* Cabang Filter / Switcher (Admin only) */}
+          {session.role === 'admin' && (
+            <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs">
+              <Building2 className="w-4 h-4 text-cyan-400" />
+              <span className="text-slate-400 font-medium hidden sm:inline">Cabang View:</span>
+              <select
+                value={session.kodeCabang}
+                onChange={(e) => {
+                  const selectedKode = e.target.value;
+                  if (selectedKode === 'ALL') {
+                    onSessionChange({
+                      ...session,
+                      kodeCabang: 'ALL',
+                      namaCabang: 'Semua Cabang (Admin)',
+                    });
+                  } else {
+                    const target = cabangList.find((c) => c.kode === selectedKode);
+                    onSessionChange({
+                      ...session,
+                      kodeCabang: selectedKode,
+                      namaCabang: target ? target.nama : selectedKode,
+                    });
+                  }
+                }}
+                className="bg-transparent text-white font-semibold focus:outline-none cursor-pointer"
+              >
                 <option value="ALL" className="bg-slate-900 text-white">🏢 Semua Cabang (Admin)</option>
-              )}
-              {cabangList.map((c) => (
-                <option key={c.kode} value={c.kode} className="bg-slate-900 text-white">
-                  📍 {c.nama} ({c.kode})
-                </option>
-              ))}
-            </select>
-          </div>
+                {cabangList.map((c) => (
+                  <option key={c.kode} value={c.kode} className="bg-slate-900 text-white">
+                    📍 {c.nama} ({c.kode})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Change Password Button */}
           <button
