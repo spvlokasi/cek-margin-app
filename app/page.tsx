@@ -4,11 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import Navbar from '@/components/Navbar';
-import StatsSummary from '@/components/StatsSummary';
 import DataTable, { Column } from '@/components/DataTable';
 import UploadModal from '@/components/UploadModal';
-import { Cabang, CekMarginItem, StokItem, UserSession } from '@/lib/types';
-import { getCabangList, getCekMarginReport, getInitialSession, getStokList, saveSession } from '@/lib/storage';
+import { Cabang, CekMarginItem, UserSession } from '@/lib/types';
+import { getCabangList, getCekMarginReport, getInitialSession, saveSession } from '@/lib/storage';
 
 export default function CekMarginPage() {
   const router = useRouter();
@@ -21,7 +20,6 @@ export default function CekMarginPage() {
 
   const [cabangList, setCabangList] = useState<Cabang[]>([]);
   const [reportData, setReportData] = useState<CekMarginItem[]>([]);
-  const [stokForStats, setStokForStats] = useState<StokItem[]>([]);
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
 
@@ -38,9 +36,6 @@ export default function CekMarginPage() {
 
     const report = getCekMarginReport(loadedSession.kodeCabang);
     setReportData(report);
-
-    const stokList = getStokList(loadedSession.kodeCabang);
-    setStokForStats(stokList);
     setIsCheckingAuth(false);
   };
 
@@ -61,13 +56,11 @@ export default function CekMarginPage() {
     saveSession(newSession);
     const updatedReport = getCekMarginReport(newSession.kodeCabang);
     setReportData(updatedReport);
-    setStokForStats(getStokList(newSession.kodeCabang));
   };
 
   const handleRefresh = () => {
     const updatedReport = getCekMarginReport(session.kodeCabang);
     setReportData(updatedReport);
-    setStokForStats(getStokList(session.kodeCabang));
   };
 
   const formatRupiah = (val: number) => {
@@ -226,9 +219,7 @@ export default function CekMarginPage() {
           title="Laporan Analisis Cek Margin"
         />
 
-        <main className="p-6 space-y-6 flex-1">
-          <StatsSummary stokList={stokForStats} />
-
+        <main className="p-6 flex-1">
           <DataTable<CekMarginItem>
             data={reportData}
             columns={columns}
