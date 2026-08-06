@@ -22,7 +22,7 @@ export function updateAdminPassword(newPassword: string): void {
 
 export function getInitialSession(): UserSession {
   if (typeof window === 'undefined') {
-    return { isLoggedIn: true, role: 'admin', kodeCabang: 'ALL', namaCabang: 'Semua Cabang (Admin)', username: 'admin' };
+    return { isLoggedIn: false, role: 'cabang', kodeCabang: '', namaCabang: '', username: '' };
   }
   const saved = localStorage.getItem(STORAGE_KEYS.SESSION);
   if (saved) {
@@ -31,7 +31,7 @@ export function getInitialSession(): UserSession {
       if (parsed && typeof parsed.isLoggedIn === 'boolean') return parsed;
     } catch {}
   }
-  return { isLoggedIn: true, role: 'admin', kodeCabang: 'ALL', namaCabang: 'Semua Cabang (Admin)', username: 'admin' };
+  return { isLoggedIn: false, role: 'cabang', kodeCabang: '', namaCabang: '', username: '' };
 }
 
 export function saveSession(session: UserSession): void {
@@ -49,6 +49,62 @@ export function logoutUser(): UserSession {
   };
   saveSession(emptySession);
   return emptySession;
+}
+
+/**
+ * Universal Login: Auto-detects Admin vs Branch based on username!
+ */
+export function authenticateUser(usernameInput: string, passwordInput: string): { success: boolean; session?: UserSession; message?: string } {
+  const cleanUsername = usernameInput.trim();
+  const cleanPass = passwordInput.trim();
+
+  if (!cleanUsername || !cleanPass) {
+    return { success: false, message: 'Username dan Password wajib diisi.' };
+  }
+
+  // 1. Check if Admin
+  if (cleanUsername.toLowerCase() === 'admin') {
+    const adminPass = getAdminPassword();
+    if (cleanPass !== adminPass) {
+      return { success: false, message: 'Password Admin salah! (Default: admin123)' };
+    }
+    const adminSession: UserSession = {
+      isLoggedIn: true,
+      role: 'admin',
+      kodeCabang: 'ALL',
+      namaCabang: 'Semua Cabang (Admin)',
+      username: 'admin',
+    };
+    saveSession(adminSession);
+    return { success: true, session: adminSession };
+  }
+
+  // 2. Check if Cabang (match by kode or username)
+  const cabangList = getCabangList();
+  const targetCabang = cabangList.find(
+    (c) =>
+      c.kode.toUpperCase() === cleanUsername.toUpperCase() ||
+      c.nama.toLowerCase().includes(cleanUsername.toLowerCase())
+  );
+
+  if (!targetCabang) {
+    return { success: false, message: `Username / Kode Cabang "${cleanUsername}" tidak ditemukan.` };
+  }
+
+  const expectedPass = targetCabang.password || '123';
+  if (cleanPass !== expectedPass) {
+    return { success: false, message: `Password untuk [${targetCabang.nama}] salah!` };
+  }
+
+  const branchSession: UserSession = {
+    isLoggedIn: true,
+    role: 'cabang',
+    kodeCabang: targetCabang.kode,
+    namaCabang: targetCabang.nama,
+    username: targetCabang.kode,
+  };
+  saveSession(branchSession);
+  return { success: true, session: branchSession };
 }
 
 export function getCabangList(): Cabang[] {
@@ -77,7 +133,6 @@ export function addCabang(newCabang: Cabang): Cabang[] {
     localStorage.setItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
   }
 
-  // Async sync to Supabase cabang table
   supabase.from('cabang').upsert({
     kode_cabang: newCabang.kode,
     nama_cabang: newCabang.nama,
@@ -88,9 +143,6 @@ export function addCabang(newCabang: Cabang): Cabang[] {
   return updated;
 }
 
-/**
- * Bulk add up to 400 branches at once!
- */
 export function bulkAddCabang(newCabangList: Cabang[]): Cabang[] {
   let current = getCabangList();
   const map = new Map<string, Cabang>();
@@ -112,7 +164,6 @@ export function bulkAddCabang(newCabangList: Cabang[]): Cabang[] {
     localStorage.setItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
   }
 
-  // Async sync bulk to Supabase
   const dbRows = updated.map(c => ({
     kode_cabang: c.kode,
     nama_cabang: c.nama,
@@ -136,6 +187,16 @@ export function updateBranchPassword(kodeCabang: string, newPassword: string): b
 
   supabase.from('cabang').update({ password: newPassword }).eq('kode_cabang', kodeCabang).then();
   return true;
+}
+
+export function deleteCabang(kodeCabang: string): Cabang[] {
+  const current = getCabangList();
+  const updated = current.filter(c => c.kode.toUpperCase() !== kodeCabang.toUpperCase());
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
+  }
+  supabase.from('cabang').delete().eq('kode_cabang', kodeCabang).then();
+  return updated;
 }
 
 export function getProdukList(): Produk[] {
@@ -177,7 +238,6 @@ export function syncBranchStok(
   newProdukItems?: Produk[]
 ): { totalStokAdded: number; totalProdukUpdated: number } {
   const allStok = getStokList();
-
   const remainingStok = allStok.filter(item => item.kodeCabang !== targetKodeCabang);
 
   const formattedNewStok = newStokItems.map(item => ({
