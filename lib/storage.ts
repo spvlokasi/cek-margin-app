@@ -1,5 +1,6 @@
 import { Cabang, Produk, StokItem, UserSession } from './types';
 import { MOCK_CABANG, MOCK_PRODUK, MOCK_STOK } from './sampleData';
+import { supabase } from './supabase';
 
 const STORAGE_KEYS = {
   PRODUK: 'cek_margin_produk_v1',
@@ -49,6 +50,14 @@ export function addCabang(newCabang: Cabang): Cabang[] {
   if (typeof window !== 'undefined') {
     localStorage.setItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
   }
+
+  // Async sync to Supabase cabang table
+  supabase.from('cabang').upsert({
+    kode_cabang: newCabang.kode,
+    nama_cabang: newCabang.nama,
+    wilayah: newCabang.wilayah || 'Jawa Timur'
+  }).then();
+
   return updated;
 }
 
@@ -85,8 +94,7 @@ export function getStokList(kodeCabangFilter?: string): StokItem[] {
 }
 
 /**
- * Wipe and replace stock data specifically for a target branch!
- * This guarantees zero conflicts between branches.
+ * Wipe & Replace stock data for target branch locally AND directly on Supabase Cloud!
  */
 export function syncBranchStok(
   targetKodeCabang: string,
@@ -96,10 +104,10 @@ export function syncBranchStok(
 ): { totalStokAdded: number; totalProdukUpdated: number } {
   const allStok = getStokList();
 
-  // 1. Wipe old stock for this specific branch ONLY
+  // 1. Wipe old stock for this specific branch ONLY locally
   const remainingStok = allStok.filter(item => item.kodeCabang !== targetKodeCabang);
 
-  // 2. Attach updated metadata
+  // 2. Format new items
   const formattedNewStok = newStokItems.map(item => ({
     ...item,
     kodeCabang: targetKodeCabang,
@@ -111,7 +119,7 @@ export function syncBranchStok(
     localStorage.setItem(STORAGE_KEYS.STOK, JSON.stringify(updatedAllStok));
   }
 
-  // 3. Update master produk if provided
+  // 3. Update master produk locally
   let produkUpdatedCount = 0;
   if (newProdukItems && newProdukItems.length > 0) {
     const currentProduk = getProdukList();
@@ -126,7 +134,58 @@ export function syncBranchStok(
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEYS.PRODUK, JSON.stringify(updatedAllProduk));
     }
+
+    // Async sync produk to Supabase
+    const dbProdukRows = newProdukItems.map(p => ({
+      kode_produk: p.kode,
+      nama_produk: p.nama,
+      kategori: p.kategori,
+      principle: p.namaPrinciple || p.principle,
+      supplier: p.namaSupplier || p.supplier,
+      hpp: p.hpp,
+      hrg1: p.hrg1,
+      hrg2: p.hrg2,
+      hrg3: p.hrg3,
+    }));
+    supabase.from('produk').upsert(dbProdukRows).then();
   }
+
+  // 4. SYNC TO SUPABASE CLOUD: Delete old branch stock & insert new branch stock
+  async function syncToSupabase() {
+    try {
+      // First ensure branch exists in cabang table
+      await supabase.from('cabang').upsert({
+        kode_cabang: targetKodeCabang,
+        nama_cabang: targetNamaCabang,
+      });
+
+      // Delete old rows for this branch
+      await supabase.from('stok_cabang').delete().eq('kode_cabang', targetKodeCabang);
+
+      // Insert new rows
+      if (formattedNewStok.length > 0) {
+        const dbStokRows = formattedNewStok.map(s => ({
+          kode_cabang: s.kodeCabang,
+          kode_produk: s.kode,
+          nama_produk: s.nama,
+          stok: s.stok,
+          hpp: s.hpp,
+          nilai: s.nilai,
+          rl1: s.rl1,
+          persen_h1: s.persenH1,
+          rl2: s.rl2,
+          persen_h2: s.persenH2,
+          rl3: s.rl3,
+          persen_h3: s.persenH3,
+        }));
+        await supabase.from('stok_cabang').insert(dbStokRows);
+      }
+    } catch (e) {
+      console.error('Supabase Cloud Sync Error:', e);
+    }
+  }
+
+  syncToSupabase();
 
   return {
     totalStokAdded: formattedNewStok.length,
