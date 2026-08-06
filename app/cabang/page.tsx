@@ -24,7 +24,8 @@ import {
   Trash2, 
   CheckCircle, 
   FileSpreadsheet, 
-  Sparkles 
+  Sparkles,
+  Download
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -41,15 +42,8 @@ export default function CabangPage() {
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
 
-  // Forms
-  const [newKode, setNewKode] = useState('');
-  const [newNama, setNewNama] = useState('');
-  const [newWilayah, setNewWilayah] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-
-  // Bulk
-  const [bulkText, setBulkText] = useState('');
-  const [bulkMessage, setBulkMessage] = useState<string | null>(null);
+  // Upload state
+  const [uploadMessage, setUploadMessage] = useState<string | null>(null);
 
   // Edit Modal
   const [editingCabang, setEditingCabang] = useState<Cabang | null>(null);
@@ -90,55 +84,17 @@ export default function CabangPage() {
     saveSession(newSession);
   };
 
-  const handleAddCabang = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newKode.trim() || !newNama.trim()) return;
-
-    const added = addCabang({
-      kode: newKode.trim().toUpperCase(),
-      nama: newNama.trim(),
-      wilayah: newWilayah.trim() || 'Jawa Timur',
-      password: newPassword.trim() || '123',
-    });
-
-    setCabangList(added);
-    setNewKode('');
-    setNewNama('');
-    setNewWilayah('');
-    setNewPassword('');
+  const handleDownloadTemplate = () => {
+    const ws = XLSX.utils.json_to_sheet([
+      { Kode: 'CBG-001', Nama: 'Cabang Satu', Wilayah: 'Jakarta', Password: '123' },
+      { Kode: 'CBG-002', Nama: 'Cabang Dua', Wilayah: 'Surabaya', Password: '123' }
+    ]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'TemplateCabang');
+    XLSX.writeFile(wb, 'Template_Tambah_Cabang.xlsx');
   };
 
-  const handleBulkProcess = () => {
-    if (!bulkText.trim()) return;
-
-    const lines = bulkText.split('\n');
-    const parsedCabang: Cabang[] = [];
-
-    lines.forEach((line) => {
-      const parts = line.split(/[,;\t]/).map(p => p.trim());
-      if (parts.length >= 2 && parts[0]) {
-        parsedCabang.push({
-          kode: parts[0].toUpperCase(),
-          nama: parts[1],
-          wilayah: parts[2] || 'Jawa Timur',
-          password: parts[3] || '123',
-        });
-      }
-    });
-
-    if (parsedCabang.length === 0) {
-      setBulkMessage('Format tidak sesuai. Contoh: CBG-009, Basmalah Pasean, Pamekasan, 123');
-      return;
-    }
-
-    const updated = bulkAddCabang(parsedCabang);
-    setCabangList(updated);
-    setBulkMessage(`Berhasil menambahkan ${parsedCabang.length} cabang sekaligus!`);
-    setBulkText('');
-    setTimeout(() => setBulkMessage(null), 3000);
-  };
-
-  const handleBulkExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -165,11 +121,11 @@ export default function CabangPage() {
       if (parsedCabang.length > 0) {
         const updated = bulkAddCabang(parsedCabang);
         setCabangList(updated);
-        setBulkMessage(`Berhasil mengimpor ${parsedCabang.length} cabang dari Excel!`);
-        setTimeout(() => setBulkMessage(null), 3000);
+        setUploadMessage(`Berhasil mengimpor ${parsedCabang.length} cabang dari Excel!`);
+        setTimeout(() => setUploadMessage(null), 3000);
       }
     } catch (err) {
-      setBulkMessage('Gagal mengimpor file Excel cabang.');
+      setUploadMessage('Gagal mengimpor file Excel cabang.');
     }
   };
 
@@ -291,71 +247,41 @@ export default function CabangPage() {
 
         <main className="p-6 space-y-6 flex-1 max-w-7xl mx-auto w-full">
           {/* Add Forms */}
+          {/* Excel Actions */}
           <div className="max-w-md">
-            {/* SINGLE ADD */}
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-emerald-400" />
-                <span>Tambah 1 Cabang Satuan</span>
+              <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-2">
+                <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+                <span>Tambah Cabang via Excel</span>
               </h3>
 
-              <form onSubmit={handleAddCabang} className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] text-slate-400 mb-1">Kode Cabang</label>
-                    <input
-                      type="text"
-                      placeholder="Misal: CBG-012"
-                      value={newKode}
-                      onChange={(e) => setNewKode(e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] text-slate-400 mb-1">Password Login</label>
-                    <input
-                      type="text"
-                      placeholder="Default: 123"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
-                    />
-                  </div>
+              {uploadMessage && (
+                <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 shrink-0" />
+                  <span>{uploadMessage}</span>
                 </div>
+              )}
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] text-slate-400 mb-1">Nama Toko Cabang</label>
-                    <input
-                      type="text"
-                      placeholder="Misal: Basmalah Pasean"
-                      value={newNama}
-                      onChange={(e) => setNewNama(e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] text-slate-400 mb-1">Wilayah</label>
-                    <input
-                      type="text"
-                      placeholder="Misal: Pamekasan"
-                      value={newWilayah}
-                      onChange={(e) => setNewWilayah(e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
-                    />
-                  </div>
-                </div>
-
+              <div className="grid grid-cols-2 gap-3">
                 <button
-                  type="submit"
-                  className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-400 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  onClick={handleDownloadTemplate}
+                  className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
-                  <Plus className="w-4 h-4" />
-                  <span>Daftarkan Cabang Satuan</span>
+                  <Download className="w-4 h-4" />
+                  <span>Download Template</span>
                 </button>
-              </form>
+
+                <label className="w-full py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer">
+                  <Upload className="w-4 h-4" />
+                  <span>Upload Excel</span>
+                  <input
+                    type="file"
+                    accept=".xlsx, .xls"
+                    onChange={handleExcelUpload}
+                    className="hidden"
+                  />
+                </label>
+              </div>
             </div>
           </div>
 
