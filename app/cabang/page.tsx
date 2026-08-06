@@ -293,14 +293,7 @@ export default function CabangPage() {
           {/* Top Banner */}
           <div className="p-6 rounded-3xl bg-gradient-to-r from-cyan-900/40 via-slate-900 to-emerald-900/40 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs uppercase tracking-wider mb-1">
-                <Sparkles className="w-4 h-4" />
-                <span>Pendaftaran & Manajemen 400 Cabang</span>
-              </div>
               <h2 className="text-xl font-extrabold text-white">Kelola Cabang Toko (Total: {cabangList.length} Cabang)</h2>
-              <p className="text-xs text-slate-400 mt-1 max-w-2xl">
-                Tambah cabang satuan, tambah banyak cabang sekaligus dari Excel/Teks, serta kelola username dan password tiap cabang.
-              </p>
             </div>
           </div>
 
@@ -335,10 +328,10 @@ export default function CabangPage() {
 
               <textarea
                 rows={3}
-                placeholder={`Paste dari Excel (Kode, Nama, Wilayah, Password):\nCBG-009, Basmalah Pasean, Pamekasan, 123\nCBG-010, Basmalah Waru, Pamekasan, 123`}
+                placeholder=""
                 value={bulkText}
                 onChange={(e) => setBulkText(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white font-mono focus:outline-none focus:border-cyan-500"
+                className="w-full bg-slate-950 border border-slate-700 text-slate-300 text-xs font-mono px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-500"
               />
 
               <button
