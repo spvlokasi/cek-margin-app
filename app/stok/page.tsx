@@ -117,9 +117,8 @@ export default function StokPage() {
       label: 'NAMA PRODUK',
       sortable: true,
       render: (row) => (
-        <div>
-          <p className="font-bold text-white leading-snug">{row.nama}</p>
-          <span className="text-[10px] text-slate-400">📍 {row.namaCabang}</span>
+        <div className="flex flex-col">
+          <span className="font-bold text-white mb-0.5">{row.nama}</span>
         </div>
       ),
     },
@@ -176,21 +175,7 @@ export default function StokPage() {
 
         <main className="p-6 space-y-6 flex-1">
           {/* Branch Selector Bar (Required for Admin) */}
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
-                <BarChart3 className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-bold text-white text-base">Filter Stok per Cabang</h3>
-                <p className="text-xs text-slate-400">
-                  {session.role === 'admin'
-                    ? 'Pilih cabang terlebih dahulu untuk melihat data stok.'
-                    : `Menampilkan stok khusus cabang [${session.namaCabang}]`}
-                </p>
-              </div>
-            </div>
-
+          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-end gap-4">
             {session.role === 'admin' ? (
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-slate-400">Pilih Cabang:</span>
