@@ -7,10 +7,10 @@ import Navbar from '@/components/Navbar';
 import StatsSummary from '@/components/StatsSummary';
 import DataTable, { Column } from '@/components/DataTable';
 import UploadModal from '@/components/UploadModal';
-import { Cabang, StokItem, UserSession } from '@/lib/types';
-import { getCabangList, getInitialSession, getStokList, saveSession } from '@/lib/storage';
+import { Cabang, CekMarginItem, StokItem, UserSession } from '@/lib/types';
+import { getCabangList, getCekMarginReport, getInitialSession, getStokList, saveSession } from '@/lib/storage';
 
-export default function StokPage() {
+export default function CekMarginPage() {
   const router = useRouter();
   const [session, setSession] = useState<UserSession>({
     isLoggedIn: false,
@@ -20,11 +20,11 @@ export default function StokPage() {
   });
 
   const [cabangList, setCabangList] = useState<Cabang[]>([]);
-  const [stokData, setStokData] = useState<StokItem[]>([]);
+  const [reportData, setReportData] = useState<CekMarginItem[]>([]);
+  const [stokForStats, setStokForStats] = useState<StokItem[]>([]);
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
 
-  // Load initial data & check authentication
   const loadData = () => {
     const loadedSession = getInitialSession();
     if (!loadedSession.isLoggedIn) {
@@ -36,8 +36,11 @@ export default function StokPage() {
     const loadedCabang = getCabangList();
     setCabangList(loadedCabang);
 
-    const loadedStok = getStokList(loadedSession.kodeCabang);
-    setStokData(loadedStok);
+    const report = getCekMarginReport(loadedSession.kodeCabang);
+    setReportData(report);
+
+    const stokList = getStokList(loadedSession.kodeCabang);
+    setStokForStats(stokList);
     setIsCheckingAuth(false);
   };
 
@@ -56,13 +59,15 @@ export default function StokPage() {
   const handleSessionChange = (newSession: UserSession) => {
     setSession(newSession);
     saveSession(newSession);
-    const updatedStok = getStokList(newSession.kodeCabang);
-    setStokData(updatedStok);
+    const updatedReport = getCekMarginReport(newSession.kodeCabang);
+    setReportData(updatedReport);
+    setStokForStats(getStokList(newSession.kodeCabang));
   };
 
   const handleRefresh = () => {
-    const updatedStok = getStokList(session.kodeCabang);
-    setStokData(updatedStok);
+    const updatedReport = getCekMarginReport(session.kodeCabang);
+    setReportData(updatedReport);
+    setStokForStats(getStokList(session.kodeCabang));
   };
 
   const formatRupiah = (val: number) => {
@@ -73,18 +78,19 @@ export default function StokPage() {
     }).format(val);
   };
 
-  // Define Table Columns for Stok & Margin
-  const columns: Column<StokItem>[] = [
+  // Exact Columns requested:
+  // No, Kode, Nama, Nama Supplier, Hrg1, Mrg1, %1, Hrg2, Mrg2, %2, Hrg3, Mrg3, %3
+  const columns: Column<CekMarginItem>[] = [
     {
       key: 'no',
-      label: 'No.',
+      label: 'NO',
       sortable: true,
       align: 'center',
       render: (row) => <span className="text-slate-500 font-mono">{row.no}</span>,
     },
     {
       key: 'kode',
-      label: 'Kode SKU',
+      label: 'KODE',
       sortable: true,
       render: (row) => (
         <span className="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-900/60">
@@ -94,95 +100,115 @@ export default function StokPage() {
     },
     {
       key: 'nama',
-      label: 'Nama Produk',
+      label: 'NAMA PRODUK',
       sortable: true,
       render: (row) => (
         <div>
           <p className="font-bold text-white leading-snug">{row.nama}</p>
-          <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
-            <span>📍 {row.namaCabang}</span>
-          </p>
+          <span className="text-[10px] text-slate-400">Stok: {row.stok.toLocaleString('id-ID')} | {row.namaCabang}</span>
         </div>
       ),
     },
     {
-      key: 'stok',
-      label: 'Stok',
+      key: 'namaSupplier',
+      label: 'NAMA SUPPLIER',
+      sortable: true,
+      render: (row) => <span className="text-slate-300 font-medium text-xs">{row.namaSupplier}</span>,
+    },
+    {
+      key: 'hrg1',
+      label: 'HRG1',
+      sortable: true,
+      align: 'right',
+      render: (row) => <span className="font-semibold text-slate-200">{formatRupiah(row.hrg1)}</span>,
+    },
+    {
+      key: 'mrg1',
+      label: 'MRG1',
       sortable: true,
       align: 'right',
       render: (row) => {
-        const isLow = row.stok <= 10;
+        const isPlus = row.mrg1 >= 0;
         return (
-          <div className="flex items-center justify-end gap-1.5">
-            <span
-              className={`font-black text-sm px-2.5 py-0.5 rounded-lg border ${
-                isLow
-                  ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
-                  : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-              }`}
-            >
-              {row.stok.toLocaleString('id-ID')}
-            </span>
-          </div>
+          <span className={`font-bold ${isPlus ? 'text-emerald-400' : 'text-rose-400'}`}>
+            {isPlus ? '+' : ''}{formatRupiah(row.mrg1)}
+          </span>
         );
       },
     },
     {
-      key: 'hpp',
-      label: 'HPP',
-      sortable: true,
-      align: 'right',
-      render: (row) => <span className="font-medium text-slate-300">{formatRupiah(row.hpp)}</span>,
-    },
-    {
-      key: 'nilai',
-      label: 'Nilai (Stok×HPP)',
+      key: 'persen1',
+      label: '%1',
       sortable: true,
       align: 'right',
       render: (row) => (
-        <span className="font-bold text-amber-400">{formatRupiah(row.nilai)}</span>
+        <span className="text-[11px] font-bold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">
+          {row.persen1.toFixed(1)}%
+        </span>
       ),
     },
     {
-      key: 'rl1',
-      label: 'Rugi Laba H1',
+      key: 'hrg2',
+      label: 'HRG2',
+      sortable: true,
+      align: 'right',
+      render: (row) => <span className="font-medium text-slate-300">{formatRupiah(row.hrg2)}</span>,
+    },
+    {
+      key: 'mrg2',
+      label: 'MRG2',
+      sortable: true,
+      align: 'right',
+      render: (row) => {
+        const isPlus = row.mrg2 >= 0;
+        return (
+          <span className={`font-semibold ${isPlus ? 'text-cyan-400' : 'text-rose-400'}`}>
+            {isPlus ? '+' : ''}{formatRupiah(row.mrg2)}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'persen2',
+      label: '%2',
       sortable: true,
       align: 'right',
       render: (row) => (
-        <div>
-          <span className="font-bold text-emerald-400 block">{formatRupiah(row.rl1)}</span>
-          <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 inline-block mt-0.5">
-            +{row.persenH1}%
-          </span>
-        </div>
+        <span className="text-[11px] font-medium bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/20">
+          {row.persen2.toFixed(1)}%
+        </span>
       ),
     },
     {
-      key: 'rl2',
-      label: 'Rugi Laba H2',
+      key: 'hrg3',
+      label: 'HRG3',
       sortable: true,
       align: 'right',
-      render: (row) => (
-        <div>
-          <span className="font-semibold text-slate-300 block">{formatRupiah(row.rl2)}</span>
-          <span className="text-[10px] text-cyan-400 font-medium bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20 inline-block mt-0.5">
-            +{row.persenH2}%
-          </span>
-        </div>
-      ),
+      render: (row) => <span className="font-medium text-slate-400">{formatRupiah(row.hrg3)}</span>,
     },
     {
-      key: 'rl3',
-      label: 'Rugi Laba H3',
+      key: 'mrg3',
+      label: 'MRG3',
+      sortable: true,
+      align: 'right',
+      render: (row) => {
+        const isPlus = row.mrg3 >= 0;
+        return (
+          <span className={`font-semibold ${isPlus ? 'text-slate-300' : 'text-rose-400'}`}>
+            {isPlus ? '+' : ''}{formatRupiah(row.mrg3)}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'persen3',
+      label: '%3',
       sortable: true,
       align: 'right',
       render: (row) => (
-        <div>
-          <span className="font-semibold text-slate-400 block">{formatRupiah(row.rl3)}</span>
-          <span className="text-[10px] text-slate-400 font-medium bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 inline-block mt-0.5">
-            +{row.persenH3}%
-          </span>
-        </div>
+        <span className="text-[11px] font-medium bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">
+          {row.persen3.toFixed(1)}%
+        </span>
       ),
     },
   ];
@@ -197,18 +223,18 @@ export default function StokPage() {
           cabangList={cabangList}
           onSessionChange={handleSessionChange}
           onRefreshData={handleRefresh}
-          title="Analisis Stok & Margin Cabang"
+          title="Laporan Analisis Cek Margin"
         />
 
         <main className="p-6 space-y-6 flex-1">
-          <StatsSummary stokList={stokData} />
+          <StatsSummary stokList={stokForStats} />
 
-          <DataTable<StokItem>
-            data={stokData}
+          <DataTable<CekMarginItem>
+            data={reportData}
             columns={columns}
-            searchKeys={['kode', 'nama', 'namaCabang']}
-            title={`Tabel Stok & Margin (${session.namaCabang})`}
-            subtitle="Hasil analisis dari sheet STOK T&G dengan pencarian, pengurutan, dan paginasi."
+            searchKeys={['kode', 'nama', 'namaSupplier']}
+            title={`Laporan Cek Margin (${session.namaCabang})`}
+            subtitle="Menampilkan khusus item produk yang ADA STOK-NYA (Stok > 0) beserta kalkulasi nilai margin (+/-) dan persentase (%)"
           />
         </main>
       </div>

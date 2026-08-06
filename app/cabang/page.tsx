@@ -13,25 +13,22 @@ import {
   deleteCabang, 
   getCabangList, 
   getInitialSession, 
-  saveSession 
+  saveSession, 
 } from '@/lib/storage';
 import { 
   Building2, 
   Plus, 
-  Copy, 
-  Sparkles,
-  Upload,
-  Layers,
-  KeyRound,
-  Trash2,
-  Edit,
-  CheckCircle,
-  FileSpreadsheet,
-  Users
+  Upload, 
+  Layers, 
+  Edit, 
+  Trash2, 
+  CheckCircle, 
+  FileSpreadsheet, 
+  Sparkles 
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-export default function AdminPage() {
+export default function CabangPage() {
   const router = useRouter();
   const [session, setSession] = useState<UserSession>({
     isLoggedIn: false,
@@ -42,20 +39,19 @@ export default function AdminPage() {
 
   const [cabangList, setCabangList] = useState<Cabang[]>([]);
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
-  const [copiedSql, setCopiedSql] = useState<boolean>(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
 
-  // Single Cabang Form
+  // Forms
   const [newKode, setNewKode] = useState('');
   const [newNama, setNewNama] = useState('');
   const [newWilayah, setNewWilayah] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
-  // Bulk Cabang Form
+  // Bulk
   const [bulkText, setBulkText] = useState('');
   const [bulkMessage, setBulkMessage] = useState<string | null>(null);
 
-  // Edit Cabang Modal
+  // Edit Modal
   const [editingCabang, setEditingCabang] = useState<Cabang | null>(null);
   const [editNama, setEditNama] = useState('');
   const [editWilayah, setEditWilayah] = useState('');
@@ -65,6 +61,10 @@ export default function AdminPage() {
     const loadedSession = getInitialSession();
     if (!loadedSession.isLoggedIn) {
       router.push('/login');
+      return;
+    }
+    if (loadedSession.role !== 'admin') {
+      router.push('/');
       return;
     }
 
@@ -80,7 +80,7 @@ export default function AdminPage() {
   if (isCheckingAuth) {
     return (
       <div className="h-screen bg-slate-950 flex items-center justify-center text-cyan-400 font-bold text-sm">
-        Memeriksa Autentikasi...
+        Memeriksa Hak Akses Admin...
       </div>
     );
   }
@@ -135,7 +135,6 @@ export default function AdminPage() {
     setCabangList(updated);
     setBulkMessage(`Berhasil menambahkan ${parsedCabang.length} cabang sekaligus!`);
     setBulkText('');
-
     setTimeout(() => setBulkMessage(null), 3000);
   };
 
@@ -193,11 +192,12 @@ export default function AdminPage() {
     setEditingCabang(null);
   };
 
-  // Table Columns format: No., Kode Cabang, Nama Cabang, Username, Password, Aksi
-  const cabangTableColumns: Column<Cabang>[] = [
+  // Exact Columns requested:
+  // No, Kode, Nama, User, Password, Aksi
+  const cabangColumns: Column<Cabang>[] = [
     {
       key: 'no',
-      label: 'No.',
+      label: 'NO',
       sortable: true,
       align: 'center',
       render: (row) => {
@@ -207,38 +207,38 @@ export default function AdminPage() {
     },
     {
       key: 'kode',
-      label: 'Kode Cabang',
+      label: 'KODE',
       sortable: true,
       render: (row) => (
-        <span className="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-900/60">
+        <span className="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2.5 py-0.5 rounded border border-cyan-900/60">
           {row.kode}
         </span>
       ),
     },
     {
       key: 'nama',
-      label: 'Nama Cabang & Wilayah',
+      label: 'NAMA CABANG',
       sortable: true,
       render: (row) => (
         <div>
           <p className="font-bold text-white leading-snug">{row.nama}</p>
-          <span className="text-[10px] text-slate-400">📍 {row.wilayah || 'Jawa Timur'}</span>
+          <span className="text-[10px] text-slate-400">📍 Wilayah: {row.wilayah || 'Jawa Timur'}</span>
         </div>
       ),
     },
     {
-      key: 'username',
-      label: 'Username Login',
+      key: 'user',
+      label: 'USER LOGIN',
       sortable: true,
       render: (row) => (
-        <span className="font-mono text-slate-300 font-medium">
+        <span className="font-mono text-slate-300 font-medium bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
           {row.kode}
         </span>
       ),
     },
     {
       key: 'password',
-      label: 'Password',
+      label: 'PASSWORD',
       sortable: true,
       render: (row) => (
         <span className="font-mono text-amber-400 font-bold bg-amber-950/40 px-2 py-0.5 rounded border border-amber-900/40">
@@ -248,7 +248,7 @@ export default function AdminPage() {
     },
     {
       key: 'aksi',
-      label: 'Aksi',
+      label: 'AKSI',
       align: 'center',
       render: (row) => (
         <div className="flex items-center justify-center gap-2">
@@ -287,35 +287,27 @@ export default function AdminPage() {
           cabangList={cabangList}
           onSessionChange={handleSessionChange}
           onRefreshData={loadData}
-          title="Manajemen User & Cabang Toko"
+          title="Manajemen Cabang Toko"
         />
 
         <main className="p-6 space-y-6 flex-1 max-w-7xl mx-auto w-full">
-          {/* Header Banner */}
+          {/* Top Banner */}
           <div className="p-6 rounded-3xl bg-gradient-to-r from-cyan-900/40 via-slate-900 to-emerald-900/40 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs uppercase tracking-wider mb-1">
                 <Sparkles className="w-4 h-4" />
-                <span>Branch & User Credential Management</span>
+                <span>Pendaftaran & Manajemen 400 Cabang</span>
               </div>
               <h2 className="text-xl font-extrabold text-white">Kelola Cabang Toko (Total: {cabangList.length} Cabang)</h2>
               <p className="text-xs text-slate-400 mt-1 max-w-2xl">
-                Setiap cabang memiliki Kode (Username) dan Password tersendiri untuk masuk ke sistem.
+                Tambah cabang satuan, tambah banyak cabang sekaligus dari Excel/Teks, serta kelola username dan password tiap cabang.
               </p>
             </div>
-
-            <button
-              onClick={() => setIsUploadOpen(true)}
-              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 hover:scale-[1.02] transition-transform cursor-pointer shrink-0"
-            >
-              <Upload className="w-4 h-4 stroke-[2.5]" />
-              <span>Upload Excel Stok</span>
-            </button>
           </div>
 
-          {/* Form Add Box (Bulk & Single) */}
+          {/* Add Forms */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* BULK ADD CABANG */}
+            {/* BULK ADD */}
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -360,7 +352,7 @@ export default function AdminPage() {
               </button>
             </div>
 
-            {/* SINGLE ADD CABANG */}
+            {/* SINGLE ADD */}
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <Building2 className="w-4 h-4 text-emerald-400" />
@@ -381,7 +373,7 @@ export default function AdminPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-400 mb-1">Password</label>
+                    <label className="block text-[11px] text-slate-400 mb-1">Password Login</label>
                     <input
                       type="text"
                       placeholder="Default: 123"
@@ -427,24 +419,24 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {/* Table Data Cabang dengan Fitur Edit & Hapus */}
+          {/* Exact Requested Table: No, Kode, Nama, User, Password, Aksi */}
           <DataTable<Cabang>
             data={cabangList}
-            columns={cabangTableColumns}
+            columns={cabangColumns}
             searchKeys={['kode', 'nama', 'wilayah', 'password']}
-            title="Tabel Manajemen Cabang & User Login"
-            subtitle="Daftar seluruh cabang terdaftar lengkap dengan username, password, dan aksi edit/hapus."
+            title="Tabel Cabang & User Login Toko"
+            subtitle="Kolom: No, Kode, Nama Cabang, User Login, Password, Aksi (Edit & Hapus)"
           />
         </main>
       </div>
 
-      {/* Edit Cabang Modal */}
+      {/* Edit Modal */}
       {editingCabang && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 space-y-4 shadow-2xl">
             <h3 className="font-bold text-white text-base">Edit Data Cabang</h3>
             <p className="text-xs text-slate-400">
-              Kode Cabang: <strong className="text-cyan-400 font-mono">{editingCabang.kode}</strong>
+              Kode: <strong className="text-cyan-400 font-mono">{editingCabang.kode}</strong>
             </p>
 
             <div className="space-y-3">

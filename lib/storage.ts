@@ -1,23 +1,55 @@
-import { Cabang, Produk, StokItem, UserSession } from './types';
+import { AdminUser, Cabang, CekMarginItem, Produk, StokItem, UserSession } from './types';
 import { MOCK_CABANG, MOCK_PRODUK, MOCK_STOK } from './sampleData';
 import { supabase } from './supabase';
 
 const STORAGE_KEYS = {
-  PRODUK: 'cek_margin_produk_v1',
-  STOK: 'cek_margin_stok_v1',
-  CABANG: 'cek_margin_cabang_v1',
-  SESSION: 'cek_margin_session_v1',
-  ADMIN_PASS: 'cek_margin_admin_pass_v1',
+  PRODUK: 'cek_margin_produk_v2',
+  STOK: 'cek_margin_stok_v2',
+  CABANG: 'cek_margin_cabang_v2',
+  SESSION: 'cek_margin_session_v2',
+  ADMIN_USERS: 'cek_margin_admin_users_v2',
 };
 
-export function getAdminPassword(): string {
-  if (typeof window === 'undefined') return 'admin123';
-  return localStorage.getItem(STORAGE_KEYS.ADMIN_PASS) || 'admin123';
+const DEFAULT_ADMIN_USERS: AdminUser[] = [
+  { id: 'adm-01', username: 'admin', nama: 'Super Admin Pusat', password: 'admin123' },
+  { id: 'adm-02', username: 'spv', nama: 'SPV Bisnis', password: 'spv123' },
+];
+
+export function getAdminUserList(): AdminUser[] {
+  if (typeof window === 'undefined') return DEFAULT_ADMIN_USERS;
+  const saved = localStorage.getItem(STORAGE_KEYS.ADMIN_USERS);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    } catch {}
+  }
+  localStorage.setItem(STORAGE_KEYS.ADMIN_USERS, JSON.stringify(DEFAULT_ADMIN_USERS));
+  return DEFAULT_ADMIN_USERS;
 }
 
-export function updateAdminPassword(newPassword: string): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEYS.ADMIN_PASS, newPassword);
+export function addAdminUser(newAdmin: AdminUser): AdminUser[] {
+  const current = getAdminUserList();
+  const exists = current.find(a => a.username.toLowerCase() === newAdmin.username.toLowerCase());
+  let updated: AdminUser[];
+  if (exists) {
+    updated = current.map(a => a.username.toLowerCase() === newAdmin.username.toLowerCase() ? { ...a, ...newAdmin } : a);
+  } else {
+    updated = [...current, { ...newAdmin, id: `adm-${Date.now()}` }];
+  }
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(STORAGE_KEYS.ADMIN_USERS, JSON.stringify(updated));
+  }
+  return updated;
+}
+
+export function deleteAdminUser(id: string): AdminUser[] {
+  const current = getAdminUserList();
+  const updated = current.filter(a => a.id !== id && a.username !== 'admin');
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(STORAGE_KEYS.ADMIN_USERS, JSON.stringify(updated));
+  }
+  return updated;
 }
 
 export function getInitialSession(): UserSession {
@@ -51,9 +83,6 @@ export function logoutUser(): UserSession {
   return emptySession;
 }
 
-/**
- * Universal Login: Auto-detects Admin vs Branch based on username!
- */
 export function authenticateUser(usernameInput: string, passwordInput: string): { success: boolean; session?: UserSession; message?: string } {
   const cleanUsername = usernameInput.trim();
   const cleanPass = passwordInput.trim();
@@ -62,24 +91,25 @@ export function authenticateUser(usernameInput: string, passwordInput: string): 
     return { success: false, message: 'Username dan Password wajib diisi.' };
   }
 
-  // 1. Check if Admin
-  if (cleanUsername.toLowerCase() === 'admin') {
-    const adminPass = getAdminPassword();
-    if (cleanPass !== adminPass) {
-      return { success: false, message: 'Password Admin salah! (Default: admin123)' };
+  // 1. Check in Admin Users List
+  const adminList = getAdminUserList();
+  const matchedAdmin = adminList.find(a => a.username.toLowerCase() === cleanUsername.toLowerCase());
+  if (matchedAdmin) {
+    if (cleanPass !== (matchedAdmin.password || 'admin123')) {
+      return { success: false, message: `Password Admin [${matchedAdmin.nama}] salah!` };
     }
     const adminSession: UserSession = {
       isLoggedIn: true,
       role: 'admin',
       kodeCabang: 'ALL',
       namaCabang: 'Semua Cabang (Admin)',
-      username: 'admin',
+      username: matchedAdmin.username,
     };
     saveSession(adminSession);
     return { success: true, session: adminSession };
   }
 
-  // 2. Check if Cabang (match by kode or username)
+  // 2. Check in Cabang List
   const cabangList = getCabangList();
   const targetCabang = cabangList.find(
     (c) =>
@@ -93,7 +123,7 @@ export function authenticateUser(usernameInput: string, passwordInput: string): 
 
   const expectedPass = targetCabang.password || '123';
   if (cleanPass !== expectedPass) {
-    return { success: false, message: `Password untuk [${targetCabang.nama}] salah!` };
+    return { success: false, message: `Password untuk cabang [${targetCabang.nama}] salah!` };
   }
 
   const branchSession: UserSession = {
@@ -175,20 +205,6 @@ export function bulkAddCabang(newCabangList: Cabang[]): Cabang[] {
   return updated;
 }
 
-export function updateBranchPassword(kodeCabang: string, newPassword: string): boolean {
-  const current = getCabangList();
-  const target = current.find(c => c.kode.toUpperCase() === kodeCabang.toUpperCase());
-  if (!target) return false;
-
-  const updated = current.map(c => c.kode.toUpperCase() === kodeCabang.toUpperCase() ? { ...c, password: newPassword } : c);
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
-  }
-
-  supabase.from('cabang').update({ password: newPassword }).eq('kode_cabang', kodeCabang).then();
-  return true;
-}
-
 export function deleteCabang(kodeCabang: string): Cabang[] {
   const current = getCabangList();
   const updated = current.filter(c => c.kode.toUpperCase() !== kodeCabang.toUpperCase());
@@ -199,17 +215,22 @@ export function deleteCabang(kodeCabang: string): Cabang[] {
   return updated;
 }
 
-export function getProdukList(): Produk[] {
+export function getProdukList(kodeCabangFilter?: string): Produk[] {
   if (typeof window === 'undefined') return MOCK_PRODUK;
   const saved = localStorage.getItem(STORAGE_KEYS.PRODUK);
+  let list: Produk[] = MOCK_PRODUK;
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) list = parsed;
     } catch {}
+  } else {
+    localStorage.setItem(STORAGE_KEYS.PRODUK, JSON.stringify(MOCK_PRODUK));
   }
-  localStorage.setItem(STORAGE_KEYS.PRODUK, JSON.stringify(MOCK_PRODUK));
-  return MOCK_PRODUK;
+
+  if (!kodeCabangFilter || kodeCabangFilter === '') return []; // Admin MUST select branch first!
+  if (kodeCabangFilter === 'ALL') return list;
+  return list.filter(p => !p.kodeCabang || p.kodeCabang === kodeCabangFilter);
 }
 
 export function getStokList(kodeCabangFilter?: string): StokItem[] {
@@ -225,10 +246,61 @@ export function getStokList(kodeCabangFilter?: string): StokItem[] {
     localStorage.setItem(STORAGE_KEYS.STOK, JSON.stringify(MOCK_STOK));
   }
 
-  if (kodeCabangFilter && kodeCabangFilter !== 'ALL') {
-    return list.filter(item => item.kodeCabang === kodeCabangFilter);
-  }
-  return list;
+  if (!kodeCabangFilter || kodeCabangFilter === '') return []; // Admin MUST select branch first!
+  if (kodeCabangFilter === 'ALL') return list;
+  return list.filter(item => item.kodeCabang === kodeCabangFilter);
+}
+
+/**
+ * Generate Cek Margin Report combining Produk & Stok
+ * FILTERED strictly to ONLY show items where STOK > 0!
+ */
+export function getCekMarginReport(kodeCabangFilter?: string): CekMarginItem[] {
+  const allStok = getStokList(kodeCabangFilter);
+  const allProduk = getProdukList('ALL');
+
+  const produkMap = new Map<string, Produk>();
+  allProduk.forEach(p => produkMap.set(p.kode, p));
+
+  // Only include items with Stok > 0!
+  const filteredStok = allStok.filter(s => (s.stok || 0) > 0);
+
+  return filteredStok.map((stk, index) => {
+    const prd = produkMap.get(stk.kode);
+    const hpp = stk.hpp || prd?.hpp || 0;
+    const hrg1 = prd?.hrg1 || hpp * 1.1;
+    const hrg2 = prd?.hrg2 || hpp * 1.08;
+    const hrg3 = prd?.hrg3 || hpp * 1.05;
+
+    const mrg1 = hrg1 - hpp;
+    const persen1 = hrg1 > 0 ? (mrg1 / hrg1) * 100 : 0;
+
+    const mrg2 = hrg2 - hpp;
+    const persen2 = hrg2 > 0 ? (mrg2 / hrg2) * 100 : 0;
+
+    const mrg3 = hrg3 - hpp;
+    const persen3 = hrg3 > 0 ? (mrg3 / hrg3) * 100 : 0;
+
+    return {
+      no: index + 1,
+      kode: stk.kode,
+      nama: stk.nama,
+      namaSupplier: prd?.namaSupplier || prd?.supplier || 'Supplier Center',
+      stok: stk.stok,
+      hpp,
+      hrg1,
+      mrg1,
+      persen1,
+      hrg2,
+      mrg2,
+      persen2,
+      hrg3,
+      mrg3,
+      persen3,
+      kodeCabang: stk.kodeCabang,
+      namaCabang: stk.namaCabang,
+    };
+  });
 }
 
 export function syncBranchStok(
@@ -237,7 +309,7 @@ export function syncBranchStok(
   newStokItems: StokItem[],
   newProdukItems?: Produk[]
 ): { totalStokAdded: number; totalProdukUpdated: number } {
-  const allStok = getStokList();
+  const allStok = getStokList('ALL');
   const remainingStok = allStok.filter(item => item.kodeCabang !== targetKodeCabang);
 
   const formattedNewStok = newStokItems.map(item => ({
@@ -253,11 +325,11 @@ export function syncBranchStok(
 
   let produkUpdatedCount = 0;
   if (newProdukItems && newProdukItems.length > 0) {
-    const currentProduk = getProdukList();
+    const currentProduk = getProdukList('ALL');
     const produkMap = new Map<string, Produk>();
     currentProduk.forEach(p => produkMap.set(p.kode, p));
     newProdukItems.forEach(p => {
-      produkMap.set(p.kode, p);
+      produkMap.set(p.kode, { ...p, kodeCabang: targetKodeCabang });
       produkUpdatedCount++;
     });
 
@@ -265,19 +337,6 @@ export function syncBranchStok(
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEYS.PRODUK, JSON.stringify(updatedAllProduk));
     }
-
-    const dbProdukRows = newProdukItems.map(p => ({
-      kode_produk: p.kode,
-      nama_produk: p.nama,
-      kategori: p.kategori,
-      principle: p.namaPrinciple || p.principle,
-      supplier: p.namaSupplier || p.supplier,
-      hpp: p.hpp,
-      hrg1: p.hrg1,
-      hrg2: p.hrg2,
-      hrg3: p.hrg3,
-    }));
-    supabase.from('produk').upsert(dbProdukRows).then();
   }
 
   async function syncToSupabase() {
@@ -297,12 +356,12 @@ export function syncBranchStok(
           stok: s.stok,
           hpp: s.hpp,
           nilai: s.nilai,
-          rl1: s.rl1,
-          persen_h1: s.persenH1,
-          rl2: s.rl2,
-          persen_h2: s.persenH2,
-          rl3: s.rl3,
-          persen_h3: s.persenH3,
+          rl1: 0,
+          persen_h1: 0,
+          rl2: 0,
+          persen_h2: 0,
+          rl3: 0,
+          persen_h3: 0,
         }));
         await supabase.from('stok_cabang').insert(dbStokRows);
       }

@@ -6,11 +6,11 @@ import Sidebar from '@/components/Sidebar';
 import Navbar from '@/components/Navbar';
 import DataTable, { Column } from '@/components/DataTable';
 import UploadModal from '@/components/UploadModal';
-import { Cabang, Produk, UserSession } from '@/lib/types';
-import { getCabangList, getInitialSession, getProdukList, saveSession } from '@/lib/storage';
-import { Package, Upload, AlertCircle } from 'lucide-react';
+import { Cabang, StokItem, UserSession } from '@/lib/types';
+import { getCabangList, getInitialSession, getStokList, saveSession } from '@/lib/storage';
+import { BarChart3, Upload, AlertCircle } from 'lucide-react';
 
-export default function ProdukPage() {
+export default function StokPage() {
   const router = useRouter();
   const [session, setSession] = useState<UserSession>({
     isLoggedIn: false,
@@ -21,7 +21,7 @@ export default function ProdukPage() {
 
   const [cabangList, setCabangList] = useState<Cabang[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<string>('');
-  const [produkData, setProdukData] = useState<Produk[]>([]);
+  const [stokData, setStokData] = useState<StokItem[]>([]);
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
 
@@ -40,9 +40,9 @@ export default function ProdukPage() {
     setSelectedBranch(initialBranch);
 
     if (initialBranch) {
-      setProdukData(getProdukList(initialBranch));
+      setStokData(getStokList(initialBranch));
     } else {
-      setProdukData([]);
+      setStokData([]);
     }
     setIsCheckingAuth(false);
   };
@@ -62,9 +62,9 @@ export default function ProdukPage() {
   const handleBranchSelectChange = (branchCode: string) => {
     setSelectedBranch(branchCode);
     if (!branchCode) {
-      setProdukData([]);
+      setStokData([]);
     } else {
-      setProdukData(getProdukList(branchCode));
+      setStokData(getStokList(branchCode));
     }
   };
 
@@ -73,14 +73,14 @@ export default function ProdukPage() {
     saveSession(newSession);
     const target = newSession.role === 'admin' ? '' : newSession.kodeCabang;
     setSelectedBranch(target);
-    setProdukData(target ? getProdukList(target) : []);
+    setStokData(target ? getStokList(target) : []);
   };
 
   const handleRefresh = () => {
     if (selectedBranch) {
-      setProdukData(getProdukList(selectedBranch));
+      setStokData(getStokList(selectedBranch));
     } else {
-      setProdukData([]);
+      setStokData([]);
     }
   };
 
@@ -93,8 +93,8 @@ export default function ProdukPage() {
   };
 
   // Exact Requested Column Structure:
-  // No, Kode, Nama, Principle, Nama Principle, Supplier, Kode Supplier, Kategori, HPP, Hrg1, Hrg2, Hrg3
-  const columns: Column<Produk>[] = [
+  // No, Kode, Nama, Stok, HPP, Nilai
+  const columns: Column<StokItem>[] = [
     {
       key: 'no',
       label: 'NO',
@@ -116,41 +116,32 @@ export default function ProdukPage() {
       key: 'nama',
       label: 'NAMA PRODUK',
       sortable: true,
-      render: (row) => <p className="font-bold text-white leading-snug">{row.nama}</p>,
-    },
-    {
-      key: 'principle',
-      label: 'PRINCIPLE',
-      sortable: true,
-      render: (row) => <span className="text-slate-300 font-mono text-xs">{row.principle || '-'}</span>,
-    },
-    {
-      key: 'namaPrinciple',
-      label: 'NAMA PRINCIPLE',
-      sortable: true,
-      render: (row) => <span className="text-slate-300 text-xs">{row.namaPrinciple || '-'}</span>,
-    },
-    {
-      key: 'supplier',
-      label: 'SUPPLIER',
-      sortable: true,
-      render: (row) => <span className="text-slate-300 text-xs">{row.supplier || '-'}</span>,
-    },
-    {
-      key: 'kodeSupplier',
-      label: 'KODE SUPPLIER',
-      sortable: true,
-      render: (row) => <span className="text-slate-300 font-mono text-xs">{row.kodeSupplier || '-'}</span>,
-    },
-    {
-      key: 'kategori',
-      label: 'KATEGORI',
-      sortable: true,
       render: (row) => (
-        <span className="text-[10px] text-cyan-400 font-medium bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20">
-          {row.kategori || 'Umum'}
-        </span>
+        <div>
+          <p className="font-bold text-white leading-snug">{row.nama}</p>
+          <span className="text-[10px] text-slate-400">📍 {row.namaCabang}</span>
+        </div>
       ),
+    },
+    {
+      key: 'stok',
+      label: 'STOK',
+      sortable: true,
+      align: 'right',
+      render: (row) => {
+        const isLow = row.stok <= 10;
+        return (
+          <span
+            className={`font-black text-sm px-2.5 py-0.5 rounded-lg border ${
+              isLow
+                ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+            }`}
+          >
+            {row.stok.toLocaleString('id-ID')}
+          </span>
+        );
+      },
     },
     {
       key: 'hpp',
@@ -160,25 +151,13 @@ export default function ProdukPage() {
       render: (row) => <span className="font-medium text-slate-300">{formatRupiah(row.hpp)}</span>,
     },
     {
-      key: 'hrg1',
-      label: 'HRG1',
+      key: 'nilai',
+      label: 'NILAI',
       sortable: true,
       align: 'right',
-      render: (row) => <span className="font-bold text-emerald-400">{formatRupiah(row.hrg1)}</span>,
-    },
-    {
-      key: 'hrg2',
-      label: 'HRG2',
-      sortable: true,
-      align: 'right',
-      render: (row) => <span className="font-semibold text-cyan-400">{formatRupiah(row.hrg2)}</span>,
-    },
-    {
-      key: 'hrg3',
-      label: 'HRG3',
-      sortable: true,
-      align: 'right',
-      render: (row) => <span className="font-semibold text-slate-400">{formatRupiah(row.hrg3)}</span>,
+      render: (row) => (
+        <span className="font-bold text-amber-400">{formatRupiah(row.nilai)}</span>
+      ),
     },
   ];
 
@@ -192,7 +171,7 @@ export default function ProdukPage() {
           cabangList={cabangList}
           onSessionChange={handleSessionChange}
           onRefreshData={handleRefresh}
-          title="Master Produk Cabang"
+          title="Data Stok Fisik Cabang"
         />
 
         <main className="p-6 space-y-6 flex-1">
@@ -200,14 +179,14 @@ export default function ProdukPage() {
           <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
-                <Package className="w-5 h-5" />
+                <BarChart3 className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-base">Filter Produk per Cabang</h3>
+                <h3 className="font-bold text-white text-base">Filter Stok per Cabang</h3>
                 <p className="text-xs text-slate-400">
                   {session.role === 'admin'
-                    ? 'Pilih cabang terlebih dahulu untuk melihat data produk.'
-                    : `Menampilkan produk khusus cabang [${session.namaCabang}]`}
+                    ? 'Pilih cabang terlebih dahulu untuk melihat data stok.'
+                    : `Menampilkan stok khusus cabang [${session.namaCabang}]`}
                 </p>
               </div>
             </div>
@@ -235,7 +214,7 @@ export default function ProdukPage() {
                 className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 font-bold text-xs flex items-center gap-2 cursor-pointer"
               >
                 <Upload className="w-4 h-4 stroke-[2.5]" />
-                <span>Upload Excel Produk Cabang Anda</span>
+                <span>Upload Excel Stok Cabang Anda</span>
               </button>
             )}
           </div>
@@ -246,16 +225,16 @@ export default function ProdukPage() {
               <AlertCircle className="w-10 h-10 text-cyan-400 mx-auto opacity-60" />
               <h4 className="text-base font-bold text-white">Tabel Masih Kosong</h4>
               <p className="text-xs text-slate-400 max-w-md mx-auto">
-                Silakan pilih salah satu cabang pada dropdown di atas untuk melihat data produk cabang tersebut.
+                Silakan pilih salah satu cabang pada dropdown di atas untuk melihat data stok cabang tersebut.
               </p>
             </div>
           ) : (
-            <DataTable<Produk>
-              data={produkData}
+            <DataTable<StokItem>
+              data={stokData}
               columns={columns}
-              searchKeys={['kode', 'nama', 'principle', 'namaPrinciple', 'supplier', 'kodeSupplier', 'kategori']}
-              title="Tabel Produk"
-              subtitle="Kolom: No, Kode, Nama, Principle, Nama Principle, Supplier, Kode Supplier, Kategori, HPP, Hrg1, Hrg2, Hrg3"
+              searchKeys={['kode', 'nama', 'namaCabang']}
+              title="Tabel Stok"
+              subtitle="Kolom: No, Kode, Nama, Stok, HPP, Nilai"
             />
           )}
         </main>

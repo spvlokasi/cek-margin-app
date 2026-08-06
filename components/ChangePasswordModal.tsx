@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Lock, KeyRound, CheckCircle, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { X, KeyRound, CheckCircle, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { UserSession } from '@/lib/types';
-import { getAdminPassword, updateAdminPassword, updateBranchPassword } from '@/lib/storage';
+import { addAdminUser, addCabang, getAdminUserList, getCabangList } from '@/lib/storage';
 
 interface ChangePasswordModalProps {
   isOpen: boolean;
@@ -42,21 +42,29 @@ export default function ChangePasswordModal({
     }
 
     if (session.role === 'admin') {
-      const currentAdminPass = getAdminPassword();
-      if (oldPassword !== currentAdminPass) {
+      const adminList = getAdminUserList();
+      const currentAdmin = adminList.find(a => a.username.toLowerCase() === session.username?.toLowerCase() || a.username === 'admin');
+      if (currentAdmin && oldPassword !== (currentAdmin.password || 'admin123')) {
         setError('Password lama Admin salah!');
         return;
       }
-      updateAdminPassword(newPassword);
-      setSuccess('Password Admin berhasil diperbarui!');
+
+      if (currentAdmin) {
+        addAdminUser({ ...currentAdmin, password: newPassword });
+        setSuccess('Password Admin berhasil diperbarui!');
+      }
     } else {
-      // Cabang user
-      const ok = updateBranchPassword(session.kodeCabang, newPassword);
-      if (!ok) {
-        setError('Gagal memperbarui password cabang.');
+      const cabangList = getCabangList();
+      const targetCabang = cabangList.find(c => c.kode.toUpperCase() === session.kodeCabang.toUpperCase());
+      if (targetCabang && oldPassword !== (targetCabang.password || '123')) {
+        setError('Password lama cabang salah!');
         return;
       }
-      setSuccess(`Password untuk [${session.namaCabang}] berhasil diperbarui!`);
+
+      if (targetCabang) {
+        addCabang({ ...targetCabang, password: newPassword });
+        setSuccess(`Password untuk [${session.namaCabang}] berhasil diperbarui!`);
+      }
     }
 
     setTimeout(() => {
@@ -80,7 +88,7 @@ export default function ChangePasswordModal({
             <div>
               <h3 className="font-bold text-white text-base">Ubah Password</h3>
               <p className="text-xs text-slate-400">
-                {session.role === 'admin' ? 'Akun Admin Pusat' : `Cabang: ${session.namaCabang}`}
+                {session.role === 'admin' ? `Admin: ${session.username}` : `Cabang: ${session.namaCabang}`}
               </p>
             </div>
           </div>
@@ -111,16 +119,14 @@ export default function ChangePasswordModal({
             <label className="block text-xs font-semibold text-slate-400 mb-1">
               Password Saat Ini
             </label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Masukkan password lama"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
-                required
-              />
-            </div>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Masukkan password lama"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+              required
+            />
           </div>
 
           <div>

@@ -4,10 +4,12 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
+  TrendingUp, 
+  Building2, 
   Package, 
   BarChart3, 
+  Users, 
   Upload, 
-  Building2, 
   ShieldCheck, 
   Store, 
   Sparkles 
@@ -22,27 +24,40 @@ interface SidebarProps {
 export default function Sidebar({ session, onOpenUpload }: SidebarProps) {
   const pathname = usePathname();
 
+  // 5 exact menus requested by user
   const navItems = [
     {
-      label: 'Stok & Margin',
+      label: 'Cek Margin',
       href: '/',
-      icon: BarChart3,
-      badge: 'Utama',
+      icon: TrendingUp,
+      badge: 'Laporan',
     },
     {
-      label: 'Master Produk',
+      label: 'Cabang',
+      href: '/cabang',
+      icon: Building2,
+      adminOnly: true,
+    },
+    {
+      label: 'Produk',
       href: '/produk',
       icon: Package,
     },
     {
-      label: 'Kelola Cabang',
-      href: '/admin',
-      icon: Building2,
+      label: 'Stok',
+      href: '/stok',
+      icon: BarChart3,
+    },
+    {
+      label: 'User Admin',
+      href: '/user',
+      icon: Users,
+      adminOnly: true,
     },
   ];
 
   return (
-    <aside className="w-64 bg-slate-900 border-r border-slate-800 text-slate-300 flex flex-col justify-between shrink-0 shadow-2xl h-screen sticky top-0">
+    <aside className="w-64 bg-slate-900 border-r border-slate-800 text-slate-300 flex flex-col justify-between shrink-0 shadow-2xl h-screen sticky top-0 z-30">
       <div>
         {/* Header Logo */}
         <div className="p-5 border-b border-slate-800/80 flex items-center justify-between">
@@ -55,7 +70,7 @@ export default function Sidebar({ session, onOpenUpload }: SidebarProps) {
                 Cek Margin
               </h1>
               <span className="text-[11px] text-cyan-400 font-medium">
-                Vercel & Supabase
+                Multi-Cabang System
               </span>
             </div>
           </div>
@@ -79,6 +94,8 @@ export default function Sidebar({ session, onOpenUpload }: SidebarProps) {
         {/* Navigation Items */}
         <nav className="px-3 space-y-1.5 mt-2">
           {navItems.map((item) => {
+            if (item.adminOnly && session.role !== 'admin') return null;
+
             const Icon = item.icon;
             const isActive = pathname === item.href;
 

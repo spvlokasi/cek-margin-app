@@ -23,10 +23,8 @@ export function parseExcelFile(
     const produkList: Produk[] = [];
     const stokList: StokItem[] = [];
 
-    // Parse sheet PRODUK
-    const produkSheetName = sheetNames.find(
-      (s) => s.toUpperCase().includes('PRODUK')
-    );
+    // Parse sheet PRODUK: No, Kode, Nama, Principle, Nama Principle, Supplier, Kode Supplier, Kategori, HPP, Hrg1, Hrg2, Hrg3
+    const produkSheetName = sheetNames.find((s) => s.toUpperCase().includes('PRODUK'));
     if (produkSheetName) {
       const sheet = workbook.Sheets[produkSheetName];
       const rows: any[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
@@ -36,26 +34,25 @@ export function parseExcelFile(
         if (!kode) return;
 
         produkList.push({
-          no: Number(r['No.'] || r['NO'] || index + 1),
+          no: Number(r['No.'] || r['No'] || r['NO'] || index + 1),
           kode,
           nama: String(r['Nama'] || r['NAMA'] || '').trim(),
           principle: String(r['Principle'] || r['PRINCIPLE'] || '').trim(),
           namaPrinciple: String(r['Nama Principle'] || r['NAMA PRINCIPLE'] || '').trim(),
           supplier: String(r['Supplier'] || r['SUPPLIER'] || '').trim(),
-          namaSupplier: String(r['Nama Supplier'] || r['NAMA SUPPLIER'] || '').trim(),
+          kodeSupplier: String(r['Kode Supplier'] || r['KODE SUPPLIER'] || r['Supplier'] || '').trim(),
           kategori: String(r['Kategori'] || r['KATEGORI'] || '').trim(),
           hpp: parseFloat(r['Hpp'] || r['HPP'] || 0) || 0,
           hrg1: parseFloat(r['Hrg1'] || r['HRG1'] || 0) || 0,
           hrg2: parseFloat(r['Hrg2'] || r['HRG2'] || 0) || 0,
           hrg3: parseFloat(r['Hrg3'] || r['HRG3'] || 0) || 0,
+          kodeCabang,
         });
       });
     }
 
-    // Parse sheet STOK (Support 'STOK', 'STOK T&G', 'STOK TG', etc.)
-    const stokSheetName = sheetNames.find(
-      (s) => s.toUpperCase().includes('STOK')
-    );
+    // Parse sheet STOK: No, Kode, Nama, Stok, HPP, Nilai
+    const stokSheetName = sheetNames.find((s) => s.toUpperCase().includes('STOK'));
     if (stokSheetName) {
       const sheet = workbook.Sheets[stokSheetName];
       const rows: any[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
@@ -71,7 +68,7 @@ export function parseExcelFile(
 
         stokList.push({
           id: `stk-${kodeCabang}-${kode}-${index}`,
-          no: Number(r['No.'] || r['NO'] || index + 1),
+          no: Number(r['No.'] || r['No'] || r['NO'] || index + 1),
           kodeCabang,
           namaCabang,
           kode,
@@ -79,12 +76,6 @@ export function parseExcelFile(
           stok,
           hpp,
           nilai,
-          rl1: parseFloat(r['RL1'] || r['Rl1'] || 0) || 0,
-          persenH1: parseFloat(r['%h1'] || r['%H1'] || r['PERSEN_H1'] || 0) || 0,
-          rl2: parseFloat(r['RL2'] || r['Rl2'] || 0) || 0,
-          persenH2: parseFloat(r['%h2'] || r['%H2'] || r['PERSEN_H2'] || 0) || 0,
-          rl3: parseFloat(r['RL3'] || r['Rl3'] || 0) || 0,
-          persenH3: parseFloat(r['%h3'] || r['%H3'] || r['PERSEN_H3'] || 0) || 0,
           updatedAt: timestamp,
         });
       });
