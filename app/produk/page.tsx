@@ -8,7 +8,8 @@ import DataTable, { Column } from '@/components/DataTable';
 import UploadModal from '@/components/UploadModal';
 import { Cabang, Produk, UserSession } from '@/lib/types';
 import { getCabangList, getInitialSession, getProdukList, saveSession } from '@/lib/storage';
-import { Package, Upload, AlertCircle, RotateCcw } from 'lucide-react';
+import { Package, Upload, AlertCircle, RotateCcw, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 export default function ProdukPage() {
   const router = useRouter();
@@ -88,6 +89,16 @@ export default function ProdukPage() {
     return new Intl.NumberFormat('id-ID', {
       maximumFractionDigits: 0,
     }).format(val);
+  };
+
+  const handleDownloadTemplate = () => {
+    const wsProduk = XLSX.utils.json_to_sheet([
+      { No: 1, Kode: '210230', Nama: 'BERAS BUNGA PANDAN 3 KG', Principle: 'UMUM', 'Nama Principle': 'NON BARCODE', Supplier: '-', 'Kode Supplier': 'S201807000823', Kategori: '04', HPP: 44100, Hrg1: 48000, Hrg2: 48000, Hrg3: 48000 },
+      { No: 2, Kode: '8851019020372', Nama: 'ALFIE MILK CHOCOLATE 31 GR', Principle: 'PR000282', 'Nama Principle': 'PT. GLICO INDONESIA', Supplier: '-', 'Kode Supplier': 'S201807000008', Kategori: '07', HPP: 4100, Hrg1: 5000, Hrg2: 4700, Hrg3: 4500 }
+    ]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, wsProduk, 'PRODUK');
+    XLSX.writeFile(wb, 'Template_Upload_Produk.xlsx');
   };
 
   // Exact Requested Column Structure:
@@ -209,66 +220,81 @@ export default function ProdukPage() {
             searchKeys={['kode', 'nama', 'principle', 'namaPrinciple', 'supplier', 'kodeSupplier', 'kategori']}
             title=""
             customHeaderAction={
-              session.role === 'admin' ? (
-                <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
-                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
-                    <path d="M9 22v-4h6v4"></path>
-                    <path d="M8 6h.01"></path>
-                    <path d="M16 6h.01"></path>
-                    <path d="M12 6h.01"></path>
-                    <path d="M12 10h.01"></path>
-                    <path d="M12 14h.01"></path>
-                    <path d="M16 10h.01"></path>
-                    <path d="M16 14h.01"></path>
-                    <path d="M8 10h.01"></path>
-                    <path d="M8 14h.01"></path>
-                  </svg>
-                  <input
-                    id="branch-search"
-                    type="text"
-                    list="cabang-options-table"
-                    placeholder="Ketik & pilih cabang..."
-                    className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-48"
-                    defaultValue={selectedBranch !== 'ALL' && selectedBranch !== '' ? `${selectedBranch} - ${cabangList.find(c => c.kode === selectedBranch)?.nama}` : ''}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      const selectedCabang = cabangList.find(c => 
-                        `${c.kode} - ${c.nama}` === val
-                      );
-                      if (selectedCabang) {
-                        handleBranchSelectChange(selectedCabang.kode);
-                      }
-                    }}
-                  />
-                  {selectedBranch && (
-                    <button
-                      onClick={() => {
-                        const input = document.getElementById('branch-search') as HTMLInputElement;
-                        if (input) input.value = '';
-                        handleBranchSelectChange('');
+              <div className="flex items-center gap-2">
+                {session.role === 'admin' && (
+                  <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
+                      <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                      <path d="M9 22v-4h6v4"></path>
+                      <path d="M8 6h.01"></path>
+                      <path d="M16 6h.01"></path>
+                      <path d="M12 6h.01"></path>
+                      <path d="M12 10h.01"></path>
+                      <path d="M12 14h.01"></path>
+                      <path d="M16 10h.01"></path>
+                      <path d="M16 14h.01"></path>
+                      <path d="M8 10h.01"></path>
+                      <path d="M8 14h.01"></path>
+                    </svg>
+                    <input
+                      id="branch-search"
+                      type="text"
+                      list="cabang-options-table"
+                      placeholder="Ketik & pilih cabang..."
+                      className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-48"
+                      defaultValue={selectedBranch !== 'ALL' && selectedBranch !== '' ? `${selectedBranch} - ${cabangList.find(c => c.kode === selectedBranch)?.nama}` : ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const selectedCabang = cabangList.find(c => 
+                          `${c.kode} - ${c.nama}` === val
+                        );
+                        if (selectedCabang) {
+                          handleBranchSelectChange(selectedCabang.kode);
+                        }
                       }}
-                      className="p-1 rounded-md hover:bg-slate-700/60 text-slate-400 hover:text-rose-400 transition-colors"
-                      title="Reset Cabang"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                  <datalist id="cabang-options-table">
-                    {cabangList.map((c) => (
-                      <option key={c.kode} value={`${c.kode} - ${c.nama}`} />
-                    ))}
-                  </datalist>
-                </div>
-              ) : (
+                    />
+                    {selectedBranch && (
+                      <button
+                        onClick={() => {
+                          const input = document.getElementById('branch-search') as HTMLInputElement;
+                          if (input) input.value = '';
+                          handleBranchSelectChange('');
+                        }}
+                        className="p-1 rounded-md hover:bg-slate-700/60 text-slate-400 hover:text-rose-400 transition-colors"
+                        title="Reset Cabang"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    <datalist id="cabang-options-table">
+                      {cabangList.map((c) => (
+                        <option key={c.kode} value={`${c.kode} - ${c.nama}`} />
+                      ))}
+                    </datalist>
+                  </div>
+                )}
+                
+                <button
+                  onClick={handleDownloadTemplate}
+                  title="Download Template Excel"
+                  className="p-2 rounded-xl bg-slate-800 border border-slate-700 text-cyan-400 hover:bg-cyan-500/10 transition-colors group relative"
+                >
+                  <Download className="w-4 h-4" />
+                  <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-max bg-slate-800 text-slate-200 text-[10px] px-2 py-1 rounded border border-slate-700 z-50">
+                    Download Template
+                  </div>
+                </button>
                 <button
                   onClick={() => setIsUploadOpen(true)}
-                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 font-bold text-xs flex items-center gap-2 cursor-pointer"
+                  title="Upload Excel Produk"
+                  className="p-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 hover:opacity-90 transition-opacity group relative"
                 >
                   <Upload className="w-4 h-4 stroke-[2.5]" />
-                  <span>Upload Excel Produk Cabang Anda</span>
+                  <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-max bg-slate-800 text-slate-200 text-[10px] px-2 py-1 rounded border border-slate-700 z-50">
+                    Upload Excel
+                  </div>
                 </button>
-              )
+              </div>
             }
           />
         </main>
