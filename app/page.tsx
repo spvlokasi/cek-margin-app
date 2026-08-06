@@ -8,6 +8,7 @@ import DataTable, { Column } from '@/components/DataTable';
 import UploadModal from '@/components/UploadModal';
 import { Cabang, CekMarginItem, UserSession } from '@/lib/types';
 import { getCabangList, getCekMarginReport, getInitialSession, saveSession } from '@/lib/storage';
+import { RotateCcw } from 'lucide-react';
 
 export default function CekMarginPage() {
   const router = useRouter();
@@ -65,8 +66,6 @@ export default function CekMarginPage() {
 
   const formatRupiah = (val: number) => {
     return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
       maximumFractionDigits: 0,
     }).format(val);
   };
@@ -241,6 +240,7 @@ export default function CekMarginPage() {
                     <path d="M8 14h.01"></path>
                   </svg>
                   <input
+                    id="branch-search"
                     type="text"
                     list="cabang-options-table"
                     placeholder="Ketik & pilih cabang..."
@@ -260,6 +260,19 @@ export default function CekMarginPage() {
                       }
                     }}
                   />
+                  {session.kodeCabang && (
+                    <button
+                      onClick={() => {
+                        const input = document.getElementById('branch-search') as HTMLInputElement;
+                        if (input) input.value = '';
+                        handleSessionChange({ ...session, kodeCabang: '', namaCabang: '' });
+                      }}
+                      className="p-1 rounded-md hover:bg-slate-700/60 text-slate-400 hover:text-rose-400 transition-colors"
+                      title="Reset Cabang"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                   <datalist id="cabang-options-table">
                     {cabangList.map((c) => (
                       <option key={c.kode} value={`${c.kode} - ${c.nama}`} />

@@ -124,8 +124,6 @@ export default function DataTable<T extends Record<string, any>>({
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          {customHeaderAction}
-          
           {/* Show Entries Dropdown */}
           <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs text-slate-300">
             <select
@@ -142,6 +140,8 @@ export default function DataTable<T extends Record<string, any>>({
               <option value={100}>100</option>
             </select>
           </div>
+
+          {customHeaderAction}
 
           {/* Search Box */}
           <div className="relative flex-1 sm:w-64">
