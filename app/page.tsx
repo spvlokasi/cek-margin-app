@@ -1,69 +1,213 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+import React, { useState, useEffect } from 'react';
+import Sidebar from '@/components/Sidebar';
+import Navbar from '@/components/Navbar';
+import StatsSummary from '@/components/StatsSummary';
+import DataTable, { Column } from '@/components/DataTable';
+import UploadModal from '@/components/UploadModal';
+import { Cabang, StokItem, UserSession } from '@/lib/types';
+import { getCabangList, getInitialSession, getStokList, saveSession } from '@/lib/storage';
+import { ArrowUpRight, TrendingDown, PackageCheck, AlertTriangle } from 'lucide-react';
+
+export default function StokPage() {
+  const [session, setSession] = useState<UserSession>({
+    role: 'admin',
+    kodeCabang: 'ALL',
+    namaCabang: 'Semua Cabang (Admin)',
+  });
+
+  const [cabangList, setCabangList] = useState<Cabang[]>([]);
+  const [stokData, setStokData] = useState<StokItem[]>([]);
+  const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
+
+  // Load initial data from storage
+  const loadData = () => {
+    const loadedCabang = getCabangList();
+    const loadedSession = getInitialSession();
+    setCabangList(loadedCabang);
+    setSession(loadedSession);
+
+    const loadedStok = getStokList(loadedSession.kodeCabang);
+    setStokData(loadedStok);
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleSessionChange = (newSession: UserSession) => {
+    setSession(newSession);
+    saveSession(newSession);
+    const updatedStok = getStokList(newSession.kodeCabang);
+    setStokData(updatedStok);
+  };
+
+  const handleRefresh = () => {
+    const updatedStok = getStokList(session.kodeCabang);
+    setStokData(updatedStok);
+  };
+
+  const formatRupiah = (val: number) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      maximumFractionDigits: 0,
+    }).format(val);
+  };
+
+  // Define Table Columns for Stok & Margin
+  const columns: Column<StokItem>[] = [
+    {
+      key: 'no',
+      label: 'No.',
+      sortable: true,
+      align: 'center',
+      render: (row) => <span className="text-slate-500 font-mono">{row.no}</span>,
+    },
+    {
+      key: 'kode',
+      label: 'Kode SKU',
+      sortable: true,
+      render: (row) => (
+        <span className="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-900/60">
+          {row.kode}
+        </span>
+      ),
+    },
+    {
+      key: 'nama',
+      label: 'Nama Produk',
+      sortable: true,
+      render: (row) => (
+        <div>
+          <p className="font-bold text-white leading-snug">{row.nama}</p>
+          <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+            <span>📍 {row.namaCabang}</span>
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      ),
+    },
+    {
+      key: 'stok',
+      label: 'Stok',
+      sortable: true,
+      align: 'right',
+      render: (row) => {
+        const isLow = row.stok <= 10;
+        return (
+          <div className="flex items-center justify-end gap-1.5">
+            <span
+              className={`font-black text-sm px-2.5 py-0.5 rounded-lg border ${
+                isLow
+                  ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                  : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+              }`}
+            >
+              {row.stok.toLocaleString('id-ID')}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      key: 'hpp',
+      label: 'HPP',
+      sortable: true,
+      align: 'right',
+      render: (row) => <span className="font-medium text-slate-300">{formatRupiah(row.hpp)}</span>,
+    },
+    {
+      key: 'nilai',
+      label: 'Nilai (Stok×HPP)',
+      sortable: true,
+      align: 'right',
+      render: (row) => (
+        <span className="font-bold text-amber-400">{formatRupiah(row.nilai)}</span>
+      ),
+    },
+    {
+      key: 'rl1',
+      label: 'Rugi Laba H1',
+      sortable: true,
+      align: 'right',
+      render: (row) => (
+        <div>
+          <span className="font-bold text-emerald-400 block">{formatRupiah(row.rl1)}</span>
+          <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 inline-block mt-0.5">
+            +{row.persenH1}%
+          </span>
         </div>
-      </main>
+      ),
+    },
+    {
+      key: 'rl2',
+      label: 'Rugi Laba H2',
+      sortable: true,
+      align: 'right',
+      render: (row) => (
+        <div>
+          <span className="font-semibold text-slate-300 block">{formatRupiah(row.rl2)}</span>
+          <span className="text-[10px] text-cyan-400 font-medium bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20 inline-block mt-0.5">
+            +{row.persenH2}%
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: 'rl3',
+      label: 'Rugi Laba H3',
+      sortable: true,
+      align: 'right',
+      render: (row) => (
+        <div>
+          <span className="font-semibold text-slate-400 block">{formatRupiah(row.rl3)}</span>
+          <span className="text-[10px] text-slate-400 font-medium bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 inline-block mt-0.5">
+            +{row.persenH3}%
+          </span>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
+      {/* Sidebar */}
+      <Sidebar session={session} onOpenUpload={() => setIsUploadOpen(true)} />
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        <Navbar
+          session={session}
+          cabangList={cabangList}
+          onSessionChange={handleSessionChange}
+          onRefreshData={handleRefresh}
+          title="Analisis Stok & Margin Cabang"
+        />
+
+        <main className="p-6 space-y-6 flex-1">
+          {/* KPI Cards */}
+          <StatsSummary stokList={stokData} />
+
+          {/* Interactive DataTable */}
+          <DataTable<StokItem>
+            data={stokData}
+            columns={columns}
+            searchKeys={['kode', 'nama', 'namaCabang']}
+            title={`Tabel Stok & Margin (${session.namaCabang})`}
+            subtitle="Hasil analisis dari sheet STOK T&G dengan pencarian, pengurutan, dan paginasi."
+          />
+        </main>
+      </div>
+
+      {/* Upload Modal */}
+      <UploadModal
+        isOpen={isUploadOpen}
+        onClose={() => setIsUploadOpen(false)}
+        session={session}
+        cabangList={cabangList}
+        onUploadSuccess={handleRefresh}
+      />
     </div>
   );
 }
