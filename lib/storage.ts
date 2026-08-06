@@ -338,21 +338,25 @@ export function getCekMarginReport(kodeCabangFilter?: string): CekMarginItem[] {
 export function syncBranchStok(
   targetKodeCabang: string,
   targetNamaCabang: string,
-  newStokItems: StokItem[],
+  newStokItems?: StokItem[],
   newProdukItems?: Produk[]
 ): { totalStokAdded: number; totalProdukUpdated: number } {
-  const allStok = getStokList('ALL');
-  const remainingStok = allStok.filter(item => item.kodeCabang !== targetKodeCabang);
+  let stokAddedCount = 0;
+  if (newStokItems !== undefined) {
+    const allStok = getStokList('ALL');
+    const remainingStok = allStok.filter(item => item.kodeCabang !== targetKodeCabang);
 
-  const formattedNewStok = newStokItems.map(item => ({
-    ...item,
-    kodeCabang: targetKodeCabang,
-    namaCabang: targetNamaCabang,
-  }));
+    const formattedNewStok = newStokItems.map(item => ({
+      ...item,
+      kodeCabang: targetKodeCabang,
+      namaCabang: targetNamaCabang,
+    }));
 
-  const updatedAllStok = [...remainingStok, ...formattedNewStok];
-  if (typeof window !== 'undefined') {
-    safeSetItem(STORAGE_KEYS.STOK, JSON.stringify(updatedAllStok));
+    stokAddedCount = formattedNewStok.length;
+    const updatedAllStok = [...remainingStok, ...formattedNewStok];
+    if (typeof window !== 'undefined') {
+      safeSetItem(STORAGE_KEYS.STOK, JSON.stringify(updatedAllStok));
+    }
   }
 
   let produkUpdatedCount = 0;
@@ -405,7 +409,7 @@ export function syncBranchStok(
   syncToSupabase();
 
   return {
-    totalStokAdded: formattedNewStok.length,
+    totalStokAdded: stokAddedCount,
     totalProdukUpdated: produkUpdatedCount,
   };
 }

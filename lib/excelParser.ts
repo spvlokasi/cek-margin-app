@@ -2,8 +2,8 @@ import * as XLSX from 'xlsx';
 import { Produk, StokItem } from './types';
 
 export interface ParseResult {
-  produkList: Produk[];
-  stokList: StokItem[];
+  produkList?: Produk[];
+  stokList?: StokItem[];
   sheetNames: string[];
   detectedProdukCount: number;
   detectedStokCount: number;
@@ -20,12 +20,13 @@ export function parseExcelFile(
     const workbook = XLSX.read(data, { type: 'array' });
     const sheetNames = workbook.SheetNames;
 
-    const produkList: Produk[] = [];
-    const stokList: StokItem[] = [];
+    let produkList: Produk[] | undefined;
+    let stokList: StokItem[] | undefined;
 
     // Parse sheet PRODUK: No, Kode, Nama, Principle, Nama Principle, Supplier, Kode Supplier, Kategori, HPP, Hrg1, Hrg2, Hrg3
     const produkSheetName = sheetNames.find((s) => s.toUpperCase().includes('PRODUK'));
     if (produkSheetName) {
+      produkList = [];
       const sheet = workbook.Sheets[produkSheetName];
       const rows: any[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
@@ -54,6 +55,7 @@ export function parseExcelFile(
     // Parse sheet STOK: No, Kode, Nama, Stok, HPP, Nilai
     const stokSheetName = sheetNames.find((s) => s.toUpperCase().includes('STOK'));
     if (stokSheetName) {
+      stokList = [];
       const sheet = workbook.Sheets[stokSheetName];
       const rows: any[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
       const timestamp = new Date().toISOString();
@@ -85,8 +87,8 @@ export function parseExcelFile(
       produkList,
       stokList,
       sheetNames,
-      detectedProdukCount: produkList.length,
-      detectedStokCount: stokList.length,
+      detectedProdukCount: produkList?.length || 0,
+      detectedStokCount: stokList?.length || 0,
     };
   } catch (err: any) {
     return {
