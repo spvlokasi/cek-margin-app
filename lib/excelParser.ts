@@ -34,7 +34,7 @@ export function parseExcelFile(
         const kode = String(r['Kode'] || r['KODE'] || r['kode'] || '').trim();
         if (!kode) return;
 
-        produkList.push({
+        produkList!.push({
           no: Number(r['No.'] || r['No'] || r['NO'] || index + 1),
           kode,
           nama: String(r['Nama'] || r['NAMA'] || '').trim(),
@@ -68,7 +68,7 @@ export function parseExcelFile(
         const stok = parseFloat(r['STOK'] || r['Stok'] || 0) || 0;
         const nilai = parseFloat(r['NILAI'] || r['Nilai'] || stok * hpp) || (stok * hpp);
 
-        stokList.push({
+        stokList!.push({
           id: `stk-${kodeCabang}-${kode}-${index}`,
           no: Number(r['No.'] || r['No'] || r['NO'] || index + 1),
           kodeCabang,

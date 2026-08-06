@@ -342,11 +342,12 @@ export function syncBranchStok(
   newProdukItems?: Produk[]
 ): { totalStokAdded: number; totalProdukUpdated: number } {
   let stokAddedCount = 0;
+  let formattedNewStok: StokItem[] = [];
   if (newStokItems !== undefined) {
     const allStok = getStokList('ALL');
     const remainingStok = allStok.filter(item => item.kodeCabang !== targetKodeCabang);
 
-    const formattedNewStok = newStokItems.map(item => ({
+    formattedNewStok = newStokItems.map(item => ({
       ...item,
       kodeCabang: targetKodeCabang,
       namaCabang: targetNamaCabang,
