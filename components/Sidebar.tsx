@@ -18,7 +18,7 @@ import { UserSession } from '@/lib/types';
 
 interface SidebarProps {
   session: UserSession;
-  onOpenUpload: () => void;
+  onOpenUpload?: () => void; // Made optional so existing pages don't break immediately
 }
 
 export default function Sidebar({ session, onOpenUpload }: SidebarProps) {
@@ -105,16 +105,6 @@ export default function Sidebar({ session, onOpenUpload }: SidebarProps) {
         </nav>
       </div>
 
-      {/* Action CTA Button: Upload Excel */}
-      <div className="p-4 border-t border-slate-800/80">
-        <button
-          onClick={onOpenUpload}
-          className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 transform active:scale-95 cursor-pointer"
-        >
-          <Upload className="w-4 h-4 stroke-[2.5]" />
-          <span>Upload File Excel</span>
-        </button>
-      </div>
     </aside>
   );
 }
