@@ -15,7 +15,7 @@ const stokData = xlsx.utils.sheet_to_json(stokSheet);
 // Format Cabang
 // Expects: no, kode, nama cabang, user, password
 const formattedCabang = cabangData.map(c => ({
-  kode: String(c['kode'] || c['Kode'] || c['KODE']).trim(),
+  kode: String(c['kode'] || c['Kode'] || c['KODE']).trim().replace(/^'/, ''),
   nama: String(c['nama'] || c['Nama'] || c['NAMA'] || c['nama cabang'] || c['Nama Cabang'] || c['NAMA CABANG']).trim(),
   wilayah: 'Pusat', // default
   password: String(c['password'] || c['Password'] || c['PASSWORD'] || '123').trim()
@@ -25,7 +25,7 @@ const formattedCabang = cabangData.map(c => ({
 // Expects: no, kode, nama, principle, nama principle, supplier, kode supplier, kategori, hpp, hrg1, hrg2, hrg3
 const formattedProduk = produkData.map(p => ({
   no: p['no'] || p['No'] || p['NO'],
-  kode: String(p['kode'] || p['Kode'] || p['KODE']).trim(),
+  kode: String(p['kode'] || p['Kode'] || p['KODE']).trim().replace(/^'/, ''),
   nama: String(p['nama'] || p['Nama'] || p['NAMA']).trim(),
   principle: String(p['principle'] || p['Principle'] || p['PRINCIPLE']).trim(),
   namaPrinciple: String(p['nama principle'] || p['Nama Principle'] || p['NAMA PRINCIPLE']).trim(),
@@ -42,7 +42,7 @@ const formattedProduk = produkData.map(p => ({
 // Format Stok
 // Expects: no, kode, nama, stok, hpp, nilai
 const formattedStok = stokData.map(s => ({
-  kode: String(s['kode'] || s['Kode'] || s['KODE']).trim(),
+  kode: String(s['kode'] || s['Kode'] || s['KODE']).trim().replace(/^'/, ''),
   nama: String(s['nama'] || s['Nama'] || s['NAMA']).trim(),
   stok: Number(s['stok'] || s['Stok'] || s['STOK'] || 0),
   hpp: Number(s['hpp'] || s['Hpp'] || s['HPP'] || 0),
