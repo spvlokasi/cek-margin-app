@@ -86,8 +86,6 @@ export default function ProdukPage() {
 
   const formatRupiah = (val: number) => {
     return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
       maximumFractionDigits: 0,
     }).format(val);
   };
@@ -134,13 +132,21 @@ export default function ProdukPage() {
       key: 'supplier',
       label: 'SUPPLIER',
       sortable: true,
-      render: (row) => <span className="text-slate-300 text-xs">{row.supplier || '-'}</span>,
+      render: (row) => {
+        let val = row.supplier;
+        if (val === 'undefined' || !val) val = '-';
+        return <span className="text-slate-300 text-xs">{val}</span>;
+      }
     },
     {
       key: 'kodeSupplier',
       label: 'KODE SUPPLIER',
       sortable: true,
-      render: (row) => <span className="text-slate-300 font-mono text-xs">{row.kodeSupplier || '-'}</span>,
+      render: (row) => {
+        let val = row.kodeSupplier || row.namaSupplier;
+        if (val === 'undefined' || !val) val = '-';
+        return <span className="text-slate-300 font-mono text-xs">{val}</span>;
+      }
     },
     {
       key: 'kategori',
