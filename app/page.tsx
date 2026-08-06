@@ -224,8 +224,6 @@ export default function CekMarginPage() {
             data={reportData}
             columns={columns}
             searchKeys={['kode', 'nama', 'namaSupplier']}
-            title={`Laporan Cek Margin (${session.namaCabang})`}
-            subtitle="Menampilkan khusus item produk yang ADA STOK-NYA (Stok > 0) beserta kalkulasi nilai margin (+/-) dan persentase (%)"
           />
         </main>
       </div>
