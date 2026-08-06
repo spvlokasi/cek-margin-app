@@ -246,34 +246,26 @@ export default function CabangPage() {
         />
 
         <main className="p-6 space-y-6 flex-1 max-w-7xl mx-auto w-full">
-          {/* Add Forms */}
-          {/* Excel Actions */}
-          <div className="max-w-md">
-            <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-2">
-                <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
-                <span>Tambah Cabang via Excel</span>
-              </h3>
-
-              {uploadMessage && (
-                <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 shrink-0" />
-                  <span>{uploadMessage}</span>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-3">
+          <DataTable<Cabang>
+            data={cabangList}
+            columns={cabangColumns}
+            searchKeys={['kode', 'nama', 'wilayah', 'password']}
+            title=""
+            customHeaderAction={
+              <div className="flex items-center gap-2">
                 <button
                   onClick={handleDownloadTemplate}
-                  className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  title="Download Template Excel"
+                  className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
                 >
                   <Download className="w-4 h-4" />
-                  <span>Download Template</span>
                 </button>
 
-                <label className="w-full py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer">
+                <label 
+                  title="Upload Data Cabang (Excel)"
+                  className="p-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-500 hover:text-emerald-400 transition-colors cursor-pointer flex items-center justify-center"
+                >
                   <Upload className="w-4 h-4" />
-                  <span>Upload Excel</span>
                   <input
                     type="file"
                     accept=".xlsx, .xls"
@@ -281,15 +273,15 @@ export default function CabangPage() {
                     className="hidden"
                   />
                 </label>
-              </div>
-            </div>
-          </div>
 
-          <DataTable<Cabang>
-            data={cabangList}
-            columns={cabangColumns}
-            searchKeys={['kode', 'nama', 'wilayah', 'password']}
-            title=""
+                {uploadMessage && (
+                  <span className="text-[11px] text-cyan-400 font-semibold ml-1 flex items-center gap-1 bg-cyan-500/10 border border-cyan-500/20 px-2 py-1 rounded-lg">
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    {uploadMessage}
+                  </span>
+                )}
+              </div>
+            }
           />
         </main>
       </div>
