@@ -54,35 +54,31 @@ export default function Navbar({
           {session.role === 'admin' && (
             <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs">
               <Building2 className="w-4 h-4 text-cyan-400" />
-              <span className="text-slate-400 font-medium hidden sm:inline">Cabang View:</span>
-              <select
-                value={session.kodeCabang}
+              <input
+                type="text"
+                list="cabang-options"
+                placeholder="Ketik & pilih cabang..."
+                className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-48"
+                defaultValue={session.kodeCabang !== 'ALL' ? `${session.kodeCabang} - ${session.namaCabang}` : ''}
                 onChange={(e) => {
-                  const selectedKode = e.target.value;
-                  if (selectedKode === 'ALL') {
+                  const val = e.target.value;
+                  const selectedCabang = cabangList.find(c => 
+                    `${c.kode} - ${c.nama}` === val
+                  );
+                  if (selectedCabang) {
                     onSessionChange({
                       ...session,
-                      kodeCabang: 'ALL',
-                      namaCabang: 'Semua Cabang (Admin)',
-                    });
-                  } else {
-                    const target = cabangList.find((c) => c.kode === selectedKode);
-                    onSessionChange({
-                      ...session,
-                      kodeCabang: selectedKode,
-                      namaCabang: target ? target.nama : selectedKode,
+                      kodeCabang: selectedCabang.kode,
+                      namaCabang: selectedCabang.nama,
                     });
                   }
                 }}
-                className="bg-transparent text-white font-semibold focus:outline-none cursor-pointer"
-              >
-                <option value="ALL" className="bg-slate-900 text-white">🏢 Semua Cabang (Admin)</option>
+              />
+              <datalist id="cabang-options">
                 {cabangList.map((c) => (
-                  <option key={c.kode} value={c.kode} className="bg-slate-900 text-white">
-                    📍 {c.nama} ({c.kode})
-                  </option>
+                  <option key={c.kode} value={`${c.kode} - ${c.nama}`} />
                 ))}
-              </select>
+              </datalist>
             </div>
           )}
 
