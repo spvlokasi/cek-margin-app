@@ -118,12 +118,14 @@ export default function DataTable<T extends Record<string, any>>({
     <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
       {/* Table Header Controls */}
       <div className="p-5 border-b border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/60">
-        <div>
-          {title && <h3 className="text-lg font-bold text-white tracking-tight">{title}</h3>}
-          {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
-        </div>
-
         <div className="flex flex-wrap items-center gap-3">
+          {(title || subtitle) && (
+            <div className="mr-4">
+              {title && <h3 className="text-lg font-bold text-white tracking-tight">{title}</h3>}
+              {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+            </div>
+          )}
+
           {/* Show Entries Dropdown */}
           <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs text-slate-300">
             <select
@@ -142,6 +144,9 @@ export default function DataTable<T extends Record<string, any>>({
           </div>
 
           {customHeaderAction}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
 
           {/* Search Box */}
           <div className="relative flex-1 sm:w-64">
