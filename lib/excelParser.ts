@@ -42,7 +42,7 @@ export function parseExcelFile(
           r2[key.toLowerCase().trim()] = r[key];
         }
 
-        const kode = String(r2['kode'] || r2['kode produk'] || r2['kode barang'] || r2['barcode'] || '').trim();
+        const kode = String(r2['kode'] || r2['kode produk'] || r2['kode barang'] || r2['barcode'] || '').trim().replace(/^'+/, '');
         if (!kode) return;
 
         produkList!.push({
@@ -85,7 +85,7 @@ export function parseExcelFile(
           r2[key.toLowerCase().trim()] = r[key];
         }
 
-        const kode = String(r2['kode'] || r2['kode produk'] || r2['kode barang'] || r2['barcode'] || '').trim();
+        const kode = String(r2['kode'] || r2['kode produk'] || r2['kode barang'] || r2['barcode'] || '').trim().replace(/^'+/, '');
         if (!kode) return;
 
         const hpp = parseFloat(r2['hpp'] || 0) || 0;
