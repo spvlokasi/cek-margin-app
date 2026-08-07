@@ -189,8 +189,6 @@ export default function UserAdminPage() {
     },
   ];
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
-
   return (
     <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
       <Sidebar 

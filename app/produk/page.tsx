@@ -27,6 +27,7 @@ export default function ProdukPage() {
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
   const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   const loadData = async () => {
     const loadedSession = getInitialSession();
@@ -214,8 +215,6 @@ export default function ProdukPage() {
       render: (row) => <span className="font-semibold text-slate-400">{formatRupiah(row.hrg3)}</span>,
     },
   ];
-
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   return (
     <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">

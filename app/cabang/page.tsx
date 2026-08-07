@@ -52,6 +52,7 @@ export default function CabangPage() {
   const [editNama, setEditNama] = useState('');
   const [editWilayah, setEditWilayah] = useState('');
   const [editPass, setEditPass] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   const loadData = async () => {
     const loadedSession = getInitialSession();
@@ -236,8 +237,6 @@ export default function CabangPage() {
       ),
     },
   ];
-
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   return (
     <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
