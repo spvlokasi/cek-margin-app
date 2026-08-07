@@ -262,7 +262,11 @@ export function getProdukList(kodeCabangFilter?: string): Produk[] {
 
   if (!kodeCabangFilter || kodeCabangFilter === '') return []; // Admin MUST select branch first!
   if (kodeCabangFilter === 'ALL') return list;
-  return list.filter(p => !p.kodeCabang || p.kodeCabang === kodeCabangFilter);
+  
+  const branchData = list.filter(p => p.kodeCabang === kodeCabangFilter);
+  if (branchData.length > 0) return branchData;
+  
+  return list.filter(p => !p.kodeCabang);
 }
 
 export function getStokList(kodeCabangFilter?: string): StokItem[] {
@@ -280,7 +284,11 @@ export function getStokList(kodeCabangFilter?: string): StokItem[] {
 
   if (!kodeCabangFilter || kodeCabangFilter === '') return []; // Admin MUST select branch first!
   if (kodeCabangFilter === 'ALL') return list;
-  return list.filter(item => !item.kodeCabang || item.kodeCabang === kodeCabangFilter);
+  
+  const branchData = list.filter(p => p.kodeCabang === kodeCabangFilter);
+  if (branchData.length > 0) return branchData;
+  
+  return list.filter(p => !p.kodeCabang);
 }
 
 /**
@@ -363,14 +371,16 @@ export function syncBranchStok(
   let produkUpdatedCount = 0;
   if (newProdukItems && newProdukItems.length > 0) {
     const currentProduk = getProdukList('ALL');
-    const produkMap = new Map<string, Produk>();
-    currentProduk.forEach(p => produkMap.set(p.kode, p));
-    newProdukItems.forEach(p => {
-      produkMap.set(p.kode, { ...p, kodeCabang: targetKodeCabang });
-      produkUpdatedCount++;
-    });
+    const remainingProduk = currentProduk.filter(p => p.kodeCabang !== targetKodeCabang);
+    
+    const formattedNewProduk = newProdukItems.map(p => ({
+      ...p,
+      kodeCabang: targetKodeCabang
+    }));
+    
+    produkUpdatedCount = formattedNewProduk.length;
+    const updatedAllProduk = [...remainingProduk, ...formattedNewProduk];
 
-    const updatedAllProduk = Array.from(produkMap.values());
     if (typeof window !== 'undefined') {
       safeSetItem(STORAGE_KEYS.PRODUK, JSON.stringify(updatedAllProduk));
     }
