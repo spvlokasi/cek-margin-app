@@ -12,6 +12,7 @@ import {
   X
 } from 'lucide-react';
 import { UserSession } from '@/lib/types';
+import Logo from './Logo';
 
 interface SidebarProps {
   session: UserSession;
@@ -59,7 +60,7 @@ export default function Sidebar({ session, onOpenUpload, isOpenMobile, onCloseMo
         {/* Header Logo */}
         <div className="p-5 border-b border-slate-800/80 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="Logo DC02" className="w-10 h-10 object-contain rounded-xl" />
+            <Logo size="md" />
             <div>
               <h1 className="font-bold text-white tracking-wide text-base leading-tight">
                 DC02

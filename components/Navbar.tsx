@@ -10,6 +10,7 @@ import {
 import { Cabang, UserSession } from '@/lib/types';
 import { logoutUser } from '@/lib/storage';
 import ChangePasswordModal from './ChangePasswordModal';
+import Logo from './Logo';
 
 interface NavbarProps {
   session: UserSession;
@@ -53,7 +54,7 @@ export default function Navbar({
 
           {/* Logo on Mobile Navbar */}
           <div className="flex items-center gap-2.5 md:hidden">
-            <img src="/logo.png" alt="Logo DC02" className="w-8 h-8 object-contain rounded-lg" />
+            <Logo size="sm" />
             <span className="font-bold text-white text-sm">DC02</span>
           </div>
 

@@ -13,7 +13,7 @@ import {
   Building2,
   ShieldCheck
 } from 'lucide-react';
-import { authenticateUser } from '@/lib/storage';
+import Logo from '@/components/Logo';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -54,7 +54,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xl relative z-10 space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <img src="/logo.png" alt="Logo DC02" className="w-16 h-16 mx-auto object-contain rounded-2xl" />
+          <Logo size="lg" className="mx-auto" />
           <h1 className="text-2xl font-black text-white tracking-tight">DC02 MANAGEMENT</h1>
         </div>
 
