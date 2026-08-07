@@ -199,10 +199,10 @@ export async function getProdukList(kodeCabangFilter?: string): Promise<Produk[]
     const { data, error } = await supabase.from('produk').select('*').order('nama_produk', { ascending: true });
     if (error) {
       console.error('Error fetching produk from Supabase:', error);
-      return MOCK_PRODUK;
+      return [];
     }
     
-    if (data && data.length > 0) {
+    if (data) {
       return data.map((p: any, index: number) => ({
         no: index + 1,
         kode: p.kode_produk,
@@ -221,7 +221,7 @@ export async function getProdukList(kodeCabangFilter?: string): Promise<Produk[]
   } catch (err) {
     console.error('Exception fetching produk from Supabase:', err);
   }
-  return MOCK_PRODUK;
+  return [];
 }
 
 export async function getStokList(kodeCabangFilter?: string): Promise<StokItem[]> {
@@ -233,11 +233,11 @@ export async function getStokList(kodeCabangFilter?: string): Promise<StokItem[]
     }
     const { data, error } = await query;
     if (error) {
-      console.error('Error fetching stok from Supabase:', error);
-      return MOCK_STOK; // Fallback
+      console.error('Error fetching stok_cabang:', error);
+      return [];
     }
     
-    if (data && data.length > 0) {
+    if (data) {
       return data.map((s: any, index: number) => ({
         no: index + 1,
         kodeCabang: s.kode_cabang,
@@ -249,9 +249,9 @@ export async function getStokList(kodeCabangFilter?: string): Promise<StokItem[]
       }));
     }
   } catch (err) {
-    console.error('Exception fetching stok from Supabase:', err);
+    console.error('Exception fetching stok_cabang:', err);
   }
-  return MOCK_STOK;
+  return [];
 }
 
 /**
