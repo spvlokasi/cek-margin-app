@@ -58,7 +58,6 @@ export default function LoginPage() {
             <Sparkles className="w-7 h-7 fill-slate-950" />
           </div>
           <h1 className="text-2xl font-black text-white tracking-tight">Cek Margin Multi-Cabang</h1>
-          <p className="text-xs text-slate-400">Masuk ke sistem manajemen stok & analisis margin 400 cabang</p>
         </div>
 
         {/* Universal Single Login Form */}
@@ -73,7 +72,7 @@ export default function LoginPage() {
           <div>
             <label className="block text-xs font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5">
               <User className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Username / Kode Cabang:</span>
+              <span>Username:</span>
             </label>
             <input
               type="text"
@@ -114,24 +113,11 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 hover:scale-[1.01] transition-all cursor-pointer disabled:opacity-50"
           >
-            <span>{loading ? 'Memeriksa...' : 'Masuk ke Sistem'}</span>
+            <span>{loading ? 'Memeriksa...' : 'Login'}</span>
             <ArrowRight className="w-4 h-4 stroke-[2.5]" />
           </button>
         </form>
 
-        {/* Quick Helper Notes */}
-        <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400 space-y-1">
-          <p className="font-bold text-slate-300 flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-            <span>Petunjuk Akses Login:</span>
-          </p>
-          <p className="text-slate-400">
-            • 🔑 <strong>Admin Pusat:</strong> User: <code className="text-amber-400 font-mono">admin</code> | Pass: <code className="text-amber-400 font-mono">admin123</code>
-          </p>
-          <p className="text-slate-400">
-            • 📍 <strong>Tim Cabang:</strong> User: Kode Cabang (misal: <code className="text-cyan-400 font-mono">CBG-001</code>) | Pass: <code className="text-cyan-400 font-mono">123</code>
-          </p>
-        </div>
       </div>
     </div>
   );
