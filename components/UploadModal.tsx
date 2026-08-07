@@ -154,20 +154,32 @@ export default function UploadModal({
             </label>
 
             {session.role === 'admin' ? (
-              <select
-                value={selectedKodeCabang}
-                onChange={(e) => {
-                  setSelectedKodeCabang(e.target.value);
-                  setParseResult(null);
-                }}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-cyan-500"
-              >
-                {cabangList.map((c) => (
-                  <option key={c.kode} value={c.kode}>
-                    📍 {c.nama} ({c.kode})
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <input
+                  id="upload-cabang-input"
+                  type="text"
+                  list="upload-cabang-datalist"
+                  placeholder="Ketik kode atau nama cabang..."
+                  defaultValue={selectedKodeCabang ? `${selectedKodeCabang} - ${cabangList.find(c => c.kode === selectedKodeCabang)?.nama || ''}` : ''}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    const found = cabangList.find(c => `${c.kode} - ${c.nama}` === val);
+                    if (found) {
+                      setSelectedKodeCabang(found.kode);
+                      setParseResult(null);
+                    } else if (val === '') {
+                      setSelectedKodeCabang('');
+                    }
+                  }}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-semibold text-white focus:outline-none focus:border-cyan-500 placeholder:text-slate-500 transition-colors"
+                  autoComplete="off"
+                />
+                <datalist id="upload-cabang-datalist">
+                  {cabangList.map((c) => (
+                    <option key={c.kode} value={`${c.kode} - ${c.nama}`} />
+                  ))}
+                </datalist>
+              </div>
             ) : (
               <div className="flex items-center justify-between text-xs font-bold text-white bg-slate-900 px-3 py-2 rounded-xl border border-slate-700">
                 <span>📍 {activeCabangObj.nama} ({activeCabangObj.kode})</span>
