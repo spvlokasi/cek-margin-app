@@ -27,7 +27,8 @@ export default function LoginPage() {
         return;
       }
       setLoading(false);
-      router.push('/');
+      // Force hard navigation to bust any stale Next.js router cache
+      window.location.href = '/';
     } catch (err) {
       console.error(err);
       setError('Terjadi kesalahan pada server login.');
