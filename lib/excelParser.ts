@@ -13,7 +13,8 @@ export interface ParseResult {
 export function parseExcelFile(
   fileBuffer: ArrayBuffer,
   kodeCabang: string,
-  namaCabang: string
+  namaCabang: string,
+  mode: 'margin' | 'produk' | 'stok' = 'margin'
 ): ParseResult {
   try {
     const data = new Uint8Array(fileBuffer);
@@ -24,7 +25,11 @@ export function parseExcelFile(
     let stokList: StokItem[] | undefined;
 
     // Parse sheet PRODUK: No, Kode, Nama, Principle, Nama Principle, Supplier, Kode Supplier, Kategori, HPP, Hrg1, Hrg2, Hrg3
-    const produkSheetName = sheetNames.find((s) => s.toUpperCase().includes('PRODUK'));
+    let produkSheetName = sheetNames.find((s) => s.toUpperCase().includes('PRODUK'));
+    if (!produkSheetName && mode === 'produk' && sheetNames.length > 0) {
+      produkSheetName = sheetNames[0];
+    }
+    
     if (produkSheetName) {
       produkList = [];
       const sheet = workbook.Sheets[produkSheetName];
@@ -53,7 +58,11 @@ export function parseExcelFile(
     }
 
     // Parse sheet STOK: No, Kode, Nama, Stok, HPP, Nilai
-    const stokSheetName = sheetNames.find((s) => s.toUpperCase().includes('STOK'));
+    let stokSheetName = sheetNames.find((s) => s.toUpperCase().includes('STOK'));
+    if (!stokSheetName && mode === 'stok' && sheetNames.length > 0) {
+      stokSheetName = sheetNames[0];
+    }
+    
     if (stokSheetName) {
       stokList = [];
       const sheet = workbook.Sheets[stokSheetName];

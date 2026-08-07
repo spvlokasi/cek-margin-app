@@ -73,7 +73,7 @@ export default function UploadModal({
 
     try {
       const buffer = await file.arrayBuffer();
-      const result = parseExcelFile(buffer, activeCabangObj.kode, activeCabangObj.nama);
+      const result = parseExcelFile(buffer, activeCabangObj.kode, activeCabangObj.nama, mode);
       setParseResult(result);
     } catch (err: any) {
       setParseResult({
