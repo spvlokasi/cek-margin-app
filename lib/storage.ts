@@ -47,7 +47,7 @@ export async function addAdminUser(newAdmin: AdminUser): Promise<AdminUser[]> {
     username: newAdmin.username.toLowerCase(),
     nama: newAdmin.nama,
     password: newAdmin.password
-  }, { onConflict: 'username' });
+  }, { onConflict: 'username', ignoreDuplicates: false });
   return await getAdminUserList();
 }
 
