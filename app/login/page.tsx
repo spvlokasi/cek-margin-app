@@ -14,6 +14,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import Logo from '@/components/Logo';
+import { authenticateUser } from '@/lib/storage';
 
 export default function LoginPage() {
   const router = useRouter();
