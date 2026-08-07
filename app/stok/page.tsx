@@ -8,7 +8,7 @@ import DataTable, { Column } from '@/components/DataTable';
 import UploadModal from '@/components/UploadModal';
 import { Cabang, StokItem, UserSession } from '@/lib/types';
 import { getCabangList, getInitialSession, getStokList, saveSession } from '@/lib/storage';
-import { BarChart3, Upload, AlertCircle } from 'lucide-react';
+import { RotateCcw, Upload } from 'lucide-react';
 
 export default function StokPage() {
   const router = useRouter();
@@ -98,30 +98,27 @@ export default function StokPage() {
     }
   };
 
-  const formatRupiah = (val: number) => {
-    return new Intl.NumberFormat('id-ID', {
+  const formatRupiah = (val: number) =>
+    new Intl.NumberFormat('id-ID', {
       style: 'currency',
       currency: 'IDR',
       maximumFractionDigits: 0,
     }).format(val);
-  };
 
-  // Exact Requested Column Structure:
-  // No, Kode, Nama, Stok, HPP, Nilai
   const columns: Column<StokItem>[] = [
     {
       key: 'no',
       label: 'NO',
       sortable: false,
       align: 'center',
-      render: (row, index) => <span className="text-slate-500 font-mono">{index}</span>,
+      render: (_row, index) => <span className="text-slate-500 font-mono text-xs">{index}</span>,
     },
     {
       key: 'kode',
       label: 'KODE',
       sortable: true,
       render: (row) => (
-        <span className="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-900/60">
+        <span className="font-mono text-cyan-400 font-bold text-xs bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-900/60">
           {row.kode}
         </span>
       ),
@@ -132,7 +129,8 @@ export default function StokPage() {
       sortable: true,
       render: (row) => (
         <div className="flex flex-col">
-          <span className="font-bold text-white mb-0.5">{row.nama}</span>
+          <span className="font-bold text-white leading-snug">{row.nama}</span>
+          <span className="text-[10px] text-slate-400">{row.namaCabang}</span>
         </div>
       ),
     },
@@ -184,7 +182,7 @@ export default function StokPage() {
           cabangList={cabangList}
           onSessionChange={handleSessionChange}
           onRefreshData={handleRefresh}
-          title="Data Stok Fisik Cabang"
+          title=""
         />
 
         <main className="p-6 space-y-6 flex-1 relative">
@@ -194,54 +192,80 @@ export default function StokPage() {
               <p className="text-cyan-400 font-bold animate-pulse">Mengambil Data dari Supabase...</p>
             </div>
           )}
-          {/* Branch Selector Bar (Required for Admin) */}
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-end gap-4">
-            {session.role === 'admin' ? (
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-slate-400">Pilih Cabang:</span>
-                <select
-                  value={selectedBranch}
-                  onChange={(e) => handleBranchSelectChange(e.target.value)}
-                  className="bg-slate-950 border border-slate-700 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none focus:border-cyan-500 cursor-pointer"
-                >
-                  <option value="">-- Pilih Cabang (Tabel Kosong) --</option>
-                  <option value="ALL">🏢 Semua Cabang</option>
-                  {cabangList.map((c) => (
-                    <option key={c.kode} value={c.kode}>
-                      📍 {c.nama} ({c.kode})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ) : (
-              <button
-                onClick={() => setIsUploadOpen(true)}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 font-bold text-xs flex items-center gap-2 cursor-pointer"
-              >
-                <Upload className="w-4 h-4 stroke-[2.5]" />
-                <span>Upload Excel Stok Cabang Anda</span>
-              </button>
-            )}
-          </div>
 
-          {/* Empty Table Warning if No Branch Selected by Admin */}
-          {!selectedBranch && session.role === 'admin' ? (
-            <div className="p-12 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-3">
-              <AlertCircle className="w-10 h-10 text-cyan-400 mx-auto opacity-60" />
-              <h4 className="text-base font-bold text-white">Tabel Masih Kosong</h4>
-              <p className="text-xs text-slate-400 max-w-md mx-auto">
-                Silakan pilih salah satu cabang pada dropdown di atas untuk melihat data stok cabang tersebut.
-              </p>
-            </div>
-          ) : (
-            <DataTable<StokItem>
-              data={stokData}
-              columns={columns}
-              searchKeys={['kode', 'nama', 'namaCabang']}
-              title="Tabel Stok"
-              subtitle="Kolom: No, Kode, Nama, Stok, HPP, Nilai"
-            />
-          )}
+          <DataTable<StokItem>
+            data={stokData}
+            columns={columns}
+            searchKeys={['kode', 'nama', 'namaCabang']}
+            title=""
+            customHeaderAction={
+              <div className="flex items-center gap-2">
+                {session.role === 'admin' && (
+                  <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
+                      <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                      <path d="M9 22v-4h6v4"></path>
+                      <path d="M8 6h.01"></path>
+                      <path d="M16 6h.01"></path>
+                      <path d="M12 6h.01"></path>
+                      <path d="M12 10h.01"></path>
+                      <path d="M12 14h.01"></path>
+                      <path d="M16 10h.01"></path>
+                      <path d="M16 14h.01"></path>
+                      <path d="M8 10h.01"></path>
+                      <path d="M8 14h.01"></path>
+                    </svg>
+                    <input
+                      id="stok-branch-search"
+                      type="text"
+                      list="stok-cabang-options"
+                      placeholder="Ketik & pilih cabang..."
+                      className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-48"
+                      defaultValue={selectedBranch !== 'ALL' && selectedBranch !== '' ? `${selectedBranch} - ${cabangList.find(c => c.kode === selectedBranch)?.nama}` : ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const selectedCabang = cabangList.find(c =>
+                          `${c.kode} - ${c.nama}` === val
+                        );
+                        if (selectedCabang) {
+                          handleBranchSelectChange(selectedCabang.kode);
+                        }
+                      }}
+                    />
+                    {selectedBranch && (
+                      <button
+                        onClick={() => {
+                          const input = document.getElementById('stok-branch-search') as HTMLInputElement;
+                          if (input) input.value = '';
+                          handleBranchSelectChange('');
+                        }}
+                        className="p-1 rounded-md hover:bg-slate-700/60 text-slate-400 hover:text-rose-400 transition-colors"
+                        title="Reset Cabang"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    <datalist id="stok-cabang-options">
+                      {cabangList.map((c) => (
+                        <option key={c.kode} value={`${c.kode} - ${c.nama}`} />
+                      ))}
+                    </datalist>
+                  </div>
+                )}
+
+                <button
+                  onClick={() => setIsUploadOpen(true)}
+                  title="Upload Excel Stok"
+                  className="p-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 hover:opacity-90 transition-opacity group relative"
+                >
+                  <Upload className="w-4 h-4 stroke-[2.5]" />
+                  <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-max bg-slate-800 text-slate-200 text-[10px] px-2 py-1 rounded border border-slate-700 z-50">
+                    Upload Excel Stok
+                  </div>
+                </button>
+              </div>
+            }
+          />
         </main>
       </div>
 
