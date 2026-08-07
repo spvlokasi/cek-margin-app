@@ -61,6 +61,10 @@ export function parseExcelFile(
           kodeCabang,
         });
       });
+
+      if (produkList!.length === 0 && rows.length > 0) {
+        throw new Error('Gagal mendeteksi kolom "Kode". Harap gunakan format tabel dari Template Excel!');
+      }
     }
 
     // Parse sheet STOK: No, Kode, Nama, Stok, HPP, Nilai
@@ -101,6 +105,10 @@ export function parseExcelFile(
           updatedAt: timestamp,
         });
       });
+
+      if (stokList!.length === 0 && rows.length > 0) {
+        throw new Error('Gagal mendeteksi kolom "Kode". Harap gunakan format tabel dari Template Excel!');
+      }
     }
 
     return {
