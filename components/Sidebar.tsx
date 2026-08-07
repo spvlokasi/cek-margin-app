@@ -61,12 +61,10 @@ export default function Sidebar({ session, onOpenUpload }: SidebarProps) {
         {/* Header Logo */}
         <div className="p-5 border-b border-slate-800/80 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-emerald-400 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-cyan-500/20">
-              <Sparkles className="w-5 h-5 fill-slate-950" />
-            </div>
+            <img src="/logo.png" alt="Logo DC02" className="w-10 h-10 object-contain rounded-xl" />
             <div>
               <h1 className="font-bold text-white tracking-wide text-base leading-tight">
-                Cek Margin
+                DC02
               </h1>
               <span className="text-[11px] text-cyan-400 font-medium">
                 {session.role === 'admin' ? 'Admin Pusat' : session.namaCabang}

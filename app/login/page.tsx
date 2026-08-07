@@ -54,9 +54,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xl relative z-10 space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-500 to-emerald-400 flex items-center justify-center text-slate-950 shadow-xl shadow-cyan-500/25">
-            <Sparkles className="w-7 h-7 fill-slate-950" />
-          </div>
+          <img src="/logo.png" alt="Logo DC02" className="w-16 h-16 mx-auto object-contain rounded-2xl" />
           <h1 className="text-2xl font-black text-white tracking-tight">DC02 MANAGEMENT</h1>
         </div>
 
