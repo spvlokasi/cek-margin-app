@@ -196,7 +196,7 @@ export async function deleteCabang(kode: string): Promise<Cabang[]> {
 
 export async function getProdukList(kodeCabangFilter?: string): Promise<Produk[]> {
   try {
-    const { data, error } = await supabase.from('produk').select('*').order('nama_produk', { ascending: true });
+    const { data, error } = await supabase.from('produk').select('*').limit(20000).order('nama_produk', { ascending: true });
     if (error) {
       console.error('Error fetching produk from Supabase:', error);
       return [];
@@ -227,7 +227,7 @@ export async function getProdukList(kodeCabangFilter?: string): Promise<Produk[]
 export async function getStokList(kodeCabangFilter?: string): Promise<StokItem[]> {
   if (!kodeCabangFilter || kodeCabangFilter === '') return []; // Admin MUST select branch first!
   try {
-    let query = supabase.from('stok_cabang').select('*');
+    let query = supabase.from('stok_cabang').select('*').limit(20000);
     if (kodeCabangFilter !== 'ALL') {
       query = query.eq('kode_cabang', kodeCabangFilter);
     }
@@ -346,7 +346,10 @@ export async function syncBranchStok(
       const chunkSize = 500;
       for (let i = 0; i < dbStokRows.length; i += chunkSize) {
         const chunk = dbStokRows.slice(i, i + chunkSize);
-        await supabase.from('stok_cabang').insert(chunk);
+        const { error } = await supabase.from('stok_cabang').upsert(chunk, { onConflict: 'id' });
+        if (error) {
+          throw new Error(`Gagal menyimpan stok: ${error.message}`);
+        }
       }
       stokAddedCount = dbStokRows.length;
     }
@@ -369,7 +372,10 @@ export async function syncBranchStok(
       const chunkSize = 500;
       for (let i = 0; i < dbProdukRows.length; i += chunkSize) {
         const chunk = dbProdukRows.slice(i, i + chunkSize);
-        await supabase.from('produk').upsert(chunk, { onConflict: 'kode_produk' });
+        const { error } = await supabase.from('produk').upsert(chunk, { onConflict: 'kode_produk' });
+        if (error) {
+          throw new Error(`Gagal menyimpan produk: ${error.message}`);
+        }
       }
       produkUpdatedCount = dbProdukRows.length;
     }
