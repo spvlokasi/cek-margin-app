@@ -107,8 +107,8 @@ export default function ProdukPage() {
 
   const handleDownloadTemplate = () => {
     const wsProduk = XLSX.utils.json_to_sheet([
-      { No: 1, Kode: '210230', Nama: 'BERAS BUNGA PANDAN 3 KG', Principle: 'UMUM', 'Nama Principle': 'NON BARCODE', Supplier: '-', 'Kode Supplier': 'S201807000823', Kategori: '04', HPP: 44100, Hrg1: 48000, Hrg2: 48000, Hrg3: 48000 },
-      { No: 2, Kode: '8851019020372', Nama: 'ALFIE MILK CHOCOLATE 31 GR', Principle: 'PR000282', 'Nama Principle': 'PT. GLICO INDONESIA', Supplier: '-', 'Kode Supplier': 'S201807000008', Kategori: '07', HPP: 4100, Hrg1: 5000, Hrg2: 4700, Hrg3: 4500 }
+      { No: 1, Kode: '210230', Nama: 'BERAS BUNGA PANDAN 3 KG', Principle: 'UMUM', 'Nama Principle': 'NON BARCODE', Supplier: 'S201807000823', 'Nama Supplier': '-', Kategori: '04', HPP: 44100, Hrg1: 48000, Hrg2: 48000, Hrg3: 48000 },
+      { No: 2, Kode: '8851019020372', Nama: 'ALFIE MILK CHOCOLATE 31 GR', Principle: 'PR000282', 'Nama Principle': 'PT. GLICO INDONESIA', Supplier: 'S201807000008', 'Nama Supplier': '-', Kategori: '07', HPP: 4100, Hrg1: 5000, Hrg2: 4700, Hrg3: 4500 }
     ]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, wsProduk, 'PRODUK');
@@ -160,17 +160,17 @@ export default function ProdukPage() {
       render: (row) => {
         let val = row.supplier;
         if (val === 'undefined' || !val) val = '-';
-        return <span className="text-slate-300 text-xs">{val}</span>;
+        return <span className="text-slate-400 font-mono text-[11px]">{val}</span>;
       }
     },
     {
-      key: 'kodeSupplier',
-      label: 'KODE SUPPLIER',
+      key: 'namaSupplier',
+      label: 'NAMA SUPPLIER',
       sortable: true,
       render: (row) => {
-        let val = row.kodeSupplier || row.namaSupplier;
+        let val = row.namaSupplier;
         if (val === 'undefined' || !val) val = '-';
-        return <span className="text-slate-300 font-mono text-xs">{val}</span>;
+        return <span className="text-slate-300 font-medium text-xs">{val}</span>;
       }
     },
     {
