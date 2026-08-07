@@ -160,7 +160,7 @@ export default function UploadModal({
                   type="text"
                   list="upload-cabang-datalist"
                   placeholder="Ketik kode atau nama cabang..."
-                  defaultValue={selectedKodeCabang ? `${selectedKodeCabang} - ${cabangList.find(c => c.kode === selectedKodeCabang)?.nama || ''}` : ''}
+                  defaultValue=""
                   onChange={(e) => {
                     const val = e.target.value;
                     const found = cabangList.find(c => `${c.kode} - ${c.nama}` === val);
