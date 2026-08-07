@@ -115,9 +115,9 @@ export default function UploadModal({
         setSyncStatus(null);
         setIsSyncing(false);
       }, 1500);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setSyncStatus("Gagal sinkronisasi ke Supabase. Periksa koneksi internet Anda.");
+      setSyncStatus(err.message || "Gagal sinkronisasi ke Supabase. Periksa koneksi internet Anda.");
       setIsSyncing(false);
     }
   };
