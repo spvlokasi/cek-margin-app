@@ -41,7 +41,7 @@ export default function UserAdminPage() {
   const [editNama, setEditNama] = useState('');
   const [editPassword, setEditPassword] = useState('');
 
-  const loadData = () => {
+  const loadData = async () => {
     const loadedSession = getInitialSession();
     if (!loadedSession.isLoggedIn) {
       router.push('/login');
@@ -53,8 +53,10 @@ export default function UserAdminPage() {
     }
 
     setSession(loadedSession);
-    setCabangList(getCabangList());
-    setAdminList(getAdminUserList());
+    const cb = await getCabangList();
+    const ad = await getAdminUserList();
+    setCabangList(cb);
+    setAdminList(ad);
     setIsCheckingAuth(false);
   };
 
@@ -75,11 +77,11 @@ export default function UserAdminPage() {
     saveSession(newSession);
   };
 
-  const handleAddAdmin = (e: React.FormEvent) => {
+  const handleAddAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newUsername.trim() || !newNama.trim() || !newPassword.trim()) return;
 
-    const updated = addAdminUser({
+    const updated = await addAdminUser({
       id: `adm-${Date.now()}`,
       username: newUsername.trim().toLowerCase(),
       nama: newNama.trim(),
@@ -92,22 +94,22 @@ export default function UserAdminPage() {
     setNewPassword('');
   };
 
-  const handleDeleteAdmin = (id: string, username: string) => {
+  const handleDeleteAdmin = async (id: string, username: string) => {
     if (username === 'admin') {
       alert('Akun Super Admin "admin" utama tidak boleh dihapus!');
       return;
     }
 
     if (confirm(`Apakah Anda yakin ingin menghapus user admin [${username}]?`)) {
-      const updated = deleteAdminUser(id);
+      const updated = await deleteAdminUser(id);
       setAdminList(updated);
     }
   };
 
-  const handleSaveEditAdmin = () => {
+  const handleSaveEditAdmin = async () => {
     if (!editingAdmin) return;
 
-    const updated = addAdminUser({
+    const updated = await addAdminUser({
       ...editingAdmin,
       nama: editNama || editingAdmin.nama,
       password: editPassword || editingAdmin.password,

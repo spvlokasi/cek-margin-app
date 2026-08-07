@@ -61,7 +61,7 @@ export default function AdminPage() {
   const [editWilayah, setEditWilayah] = useState('');
   const [editPass, setEditPass] = useState('');
 
-  const loadData = () => {
+  const loadData = async () => {
     const loadedSession = getInitialSession();
     if (!loadedSession.isLoggedIn) {
       router.push('/login');
@@ -69,7 +69,8 @@ export default function AdminPage() {
     }
 
     setSession(loadedSession);
-    setCabangList(getCabangList());
+    const cb = await getCabangList();
+    setCabangList(cb);
     setIsCheckingAuth(false);
   };
 
@@ -90,11 +91,11 @@ export default function AdminPage() {
     saveSession(newSession);
   };
 
-  const handleAddCabang = (e: React.FormEvent) => {
+  const handleAddCabang = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newKode.trim() || !newNama.trim()) return;
 
-    const added = addCabang({
+    const added = await addCabang({
       kode: newKode.trim().toUpperCase(),
       nama: newNama.trim(),
       wilayah: newWilayah.trim() || 'Jawa Timur',
@@ -108,7 +109,7 @@ export default function AdminPage() {
     setNewPassword('');
   };
 
-  const handleBulkProcess = () => {
+  const handleBulkProcess = async () => {
     if (!bulkText.trim()) return;
 
     const lines = bulkText.split('\n');
@@ -131,7 +132,7 @@ export default function AdminPage() {
       return;
     }
 
-    const updated = bulkAddCabang(parsedCabang);
+    const updated = await bulkAddCabang(parsedCabang);
     setCabangList(updated);
     setBulkMessage(`Berhasil menambahkan ${parsedCabang.length} cabang sekaligus!`);
     setBulkText('');
@@ -164,7 +165,7 @@ export default function AdminPage() {
       });
 
       if (parsedCabang.length > 0) {
-        const updated = bulkAddCabang(parsedCabang);
+        const updated = await bulkAddCabang(parsedCabang);
         setCabangList(updated);
         setBulkMessage(`Berhasil mengimpor ${parsedCabang.length} cabang dari Excel!`);
         setTimeout(() => setBulkMessage(null), 3000);
@@ -174,16 +175,16 @@ export default function AdminPage() {
     }
   };
 
-  const handleDeleteBranch = (kode: string, nama: string) => {
+  const handleDeleteBranch = async (kode: string, nama: string) => {
     if (confirm(`Apakah Anda yakin ingin menghapus cabang [${nama}] (${kode})?`)) {
-      const updated = deleteCabang(kode);
+      const updated = await deleteCabang(kode);
       setCabangList(updated);
     }
   };
 
-  const handleSaveEditBranch = () => {
+  const handleSaveEditBranch = async () => {
     if (!editingCabang) return;
-    const updated = addCabang({
+    const updated = await addCabang({
       kode: editingCabang.kode,
       nama: editNama || editingCabang.nama,
       wilayah: editWilayah || editingCabang.wilayah,

@@ -23,13 +23,13 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    setTimeout(() => {
-      const res = authenticateUser(username, password);
+    try {
+      const res = await authenticateUser(username, password);
       if (!res.success) {
         setError(res.message || 'Login gagal.');
         setLoading(false);
@@ -38,7 +38,11 @@ export default function LoginPage() {
 
       setLoading(false);
       router.push('/');
-    }, 400);
+    } catch (err) {
+      console.error(err);
+      setError('Terjadi kesalahan pada server login.');
+      setLoading(false);
+    }
   };
 
   return (

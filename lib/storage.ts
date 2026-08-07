@@ -26,41 +26,34 @@ const DEFAULT_ADMIN_USERS: AdminUser[] = [
   { id: 'adm-02', username: 'spv', nama: 'SPV Bisnis', password: 'spv123' },
 ];
 
-export function getAdminUserList(): AdminUser[] {
-  if (typeof window === 'undefined') return DEFAULT_ADMIN_USERS;
-  const saved = localStorage.getItem(STORAGE_KEYS.ADMIN_USERS);
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    } catch {}
+export async function getAdminUserList(): Promise<AdminUser[]> {
+  try {
+    const { data, error } = await supabase.from('admin_users').select('*').order('created_at', { ascending: true });
+    if (error) {
+      console.error('Error fetching admin users from Supabase:', error);
+      return DEFAULT_ADMIN_USERS;
+    }
+    if (data && data.length > 0) {
+      return data;
+    }
+  } catch (err) {
+    console.error('Exception fetching admin users from Supabase:', err);
   }
-  safeSetItem(STORAGE_KEYS.ADMIN_USERS, JSON.stringify(DEFAULT_ADMIN_USERS));
   return DEFAULT_ADMIN_USERS;
 }
 
-export function addAdminUser(newAdmin: AdminUser): AdminUser[] {
-  const current = getAdminUserList();
-  const exists = current.find(a => a.username.toLowerCase() === newAdmin.username.toLowerCase());
-  let updated: AdminUser[];
-  if (exists) {
-    updated = current.map(a => a.username.toLowerCase() === newAdmin.username.toLowerCase() ? { ...a, ...newAdmin } : a);
-  } else {
-    updated = [...current, { ...newAdmin, id: `adm-${Date.now()}` }];
-  }
-  if (typeof window !== 'undefined') {
-    safeSetItem(STORAGE_KEYS.ADMIN_USERS, JSON.stringify(updated));
-  }
-  return updated;
+export async function addAdminUser(newAdmin: AdminUser): Promise<AdminUser[]> {
+  await supabase.from('admin_users').upsert({
+    username: newAdmin.username.toLowerCase(),
+    nama: newAdmin.nama,
+    password: newAdmin.password
+  }, { onConflict: 'username' });
+  return await getAdminUserList();
 }
 
-export function deleteAdminUser(id: string): AdminUser[] {
-  const current = getAdminUserList();
-  const updated = current.filter(a => a.id !== id && a.username !== 'admin');
-  if (typeof window !== 'undefined') {
-    safeSetItem(STORAGE_KEYS.ADMIN_USERS, JSON.stringify(updated));
-  }
-  return updated;
+export async function deleteAdminUser(id: string): Promise<AdminUser[]> {
+  await supabase.from('admin_users').delete().eq('id', id).neq('username', 'admin');
+  return await getAdminUserList();
 }
 
 export function getInitialSession(): UserSession {
@@ -94,7 +87,7 @@ export function logoutUser(): UserSession {
   return emptySession;
 }
 
-export function authenticateUser(usernameInput: string, passwordInput: string): { success: boolean; session?: UserSession; message?: string } {
+export async function authenticateUser(usernameInput: string, passwordInput: string): Promise<{ success: boolean; session?: UserSession; message?: string }> {
   const cleanUsername = usernameInput.trim();
   const cleanPass = passwordInput.trim();
 
@@ -103,7 +96,7 @@ export function authenticateUser(usernameInput: string, passwordInput: string): 
   }
 
   // 1. Check in Admin Users List
-  const adminList = getAdminUserList();
+  const adminList = await getAdminUserList();
   const matchedAdmin = adminList.find(a => a.username.toLowerCase() === cleanUsername.toLowerCase());
   if (matchedAdmin) {
     if (cleanPass !== (matchedAdmin.password || 'admin123')) {
@@ -121,7 +114,7 @@ export function authenticateUser(usernameInput: string, passwordInput: string): 
   }
 
   // 2. Check in Cabang List
-  const cabangList = getCabangList();
+  const cabangList = await getCabangList();
   const targetCabang = cabangList.find(
     (c) =>
       c.kode.toUpperCase() === cleanUsername.toUpperCase() ||
@@ -148,103 +141,57 @@ export function authenticateUser(usernameInput: string, passwordInput: string): 
   return { success: true, session: branchSession };
 }
 
-export function getCabangList(): Cabang[] {
-  let list = MOCK_CABANG;
-  
-  if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem(STORAGE_KEYS.CABANG);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          list = parsed;
-        }
-      } catch {}
+export async function getCabangList(): Promise<Cabang[]> {
+  try {
+    const { data, error } = await supabase.from('cabang').select('*').order('kode_cabang', { ascending: true });
+    if (error) {
+      console.error('Error fetching cabang from Supabase:', error);
+      return MOCK_CABANG;
     }
-  }
-
-  // MIGRATION: Update passwords to match kode
-  let hasChanges = false;
-  const migratedList = list.map(c => {
-    // If the password is 'M1002' but the kode is different, OR if we want to force all passwords to match kode:
-    // User requested: "kalau user M1003 maka password ya M1003".
-    if (c.password === 'M1002' && c.kode !== 'M1002') {
-      hasChanges = true;
-      return { ...c, password: c.kode };
+    if (data && data.length > 0) {
+      return data.map((c: any) => ({
+        kode: c.kode_cabang,
+        nama: c.nama_cabang,
+        wilayah: c.wilayah || 'Jawa Timur',
+        password: c.password || c.kode_cabang,
+      }));
     }
-    return c;
-  });
-
-  if (hasChanges && typeof window !== 'undefined') {
-    safeSetItem(STORAGE_KEYS.CABANG, JSON.stringify(migratedList));
+  } catch (err) {
+    console.error('Exception fetching cabang from Supabase:', err);
   }
-
-  return migratedList;
+  return MOCK_CABANG;
 }
 
-export function addCabang(newCabang: Cabang): Cabang[] {
-  const current = getCabangList();
-  const exists = current.find(c => c.kode.toUpperCase() === newCabang.kode.toUpperCase());
-  let updated: Cabang[];
-  if (exists) {
-    updated = current.map(c => c.kode.toUpperCase() === newCabang.kode.toUpperCase() ? { ...c, ...newCabang } : c);
-  } else {
-    updated = [...current, { ...newCabang, password: newCabang.password || newCabang.kode }];
-  }
-  if (typeof window !== 'undefined') {
-    safeSetItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
-  }
-
-  supabase.from('cabang').upsert({
+export async function addCabang(newCabang: Cabang): Promise<Cabang[]> {
+  await supabase.from('cabang').upsert({
     kode_cabang: newCabang.kode,
     nama_cabang: newCabang.nama,
     wilayah: newCabang.wilayah || 'Jawa Timur',
     password: newCabang.password || newCabang.kode,
-  }).then();
-
-  return updated;
+  }, { onConflict: 'kode_cabang' });
+  return await getCabangList();
 }
 
-export function bulkAddCabang(newCabangList: Cabang[]): Cabang[] {
-  let current = getCabangList();
-  const map = new Map<string, Cabang>();
-  current.forEach(c => map.set(c.kode.toUpperCase(), c));
-
-  newCabangList.forEach(nc => {
-    const key = nc.kode.toUpperCase();
-    const existing = map.get(key);
-    map.set(key, {
-      kode: nc.kode,
-      nama: nc.nama,
-      wilayah: nc.wilayah || existing?.wilayah || 'Jawa Timur',
-      password: nc.password || existing?.password || nc.kode,
-    });
-  });
-
-  const updated = Array.from(map.values());
-  if (typeof window !== 'undefined') {
-    safeSetItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
-  }
-
-  const dbRows = updated.map(c => ({
+export async function bulkAddCabang(newCabangList: Cabang[]): Promise<Cabang[]> {
+  const dbRows = newCabangList.map(c => ({
     kode_cabang: c.kode,
     nama_cabang: c.nama,
-    wilayah: c.wilayah,
+    wilayah: c.wilayah || 'Jawa Timur',
     password: c.password || c.kode,
   }));
-  supabase.from('cabang').upsert(dbRows).then();
-
-  return updated;
+  
+  const chunkSize = 500;
+  for (let i = 0; i < dbRows.length; i += chunkSize) {
+    const chunk = dbRows.slice(i, i + chunkSize);
+    await supabase.from('cabang').upsert(chunk, { onConflict: 'kode_cabang' });
+  }
+  
+  return await getCabangList();
 }
 
-export function deleteCabang(kodeCabang: string): Cabang[] {
-  const current = getCabangList();
-  const updated = current.filter(c => c.kode.toUpperCase() !== kodeCabang.toUpperCase());
-  if (typeof window !== 'undefined') {
-    safeSetItem(STORAGE_KEYS.CABANG, JSON.stringify(updated));
-  }
-  supabase.from('cabang').delete().eq('kode_cabang', kodeCabang).then();
-  return updated;
+export async function deleteCabang(kode: string): Promise<Cabang[]> {
+  await supabase.from('cabang').delete().eq('kode_cabang', kode);
+  return await getCabangList();
 }
 
 export async function getProdukList(kodeCabangFilter?: string): Promise<Produk[]> {

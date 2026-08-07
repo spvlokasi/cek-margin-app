@@ -26,7 +26,7 @@ export default function ChangePasswordModal({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
@@ -42,7 +42,7 @@ export default function ChangePasswordModal({
     }
 
     if (session.role === 'admin') {
-      const adminList = getAdminUserList();
+      const adminList = await getAdminUserList();
       const currentAdmin = adminList.find(a => a.username.toLowerCase() === session.username?.toLowerCase() || a.username === 'admin');
       if (currentAdmin && oldPassword !== (currentAdmin.password || 'admin123')) {
         setError('Password lama Admin salah!');
@@ -50,11 +50,11 @@ export default function ChangePasswordModal({
       }
 
       if (currentAdmin) {
-        addAdminUser({ ...currentAdmin, password: newPassword });
+        await addAdminUser({ ...currentAdmin, password: newPassword });
         setSuccess('Password Admin berhasil diperbarui!');
       }
     } else {
-      const cabangList = getCabangList();
+      const cabangList = await getCabangList();
       const targetCabang = cabangList.find(c => c.kode.toUpperCase() === session.kodeCabang.toUpperCase());
       if (targetCabang && oldPassword !== (targetCabang.password || '123')) {
         setError('Password lama cabang salah!');
@@ -62,7 +62,7 @@ export default function ChangePasswordModal({
       }
 
       if (targetCabang) {
-        addCabang({ ...targetCabang, password: newPassword });
+        await addCabang({ ...targetCabang, password: newPassword });
         setSuccess(`Password untuk [${session.namaCabang}] berhasil diperbarui!`);
       }
     }

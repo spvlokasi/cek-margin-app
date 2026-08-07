@@ -33,7 +33,7 @@ export default function CekMarginPage() {
     }
 
     setSession(loadedSession);
-    const loadedCabang = getCabangList();
+    const loadedCabang = await getCabangList();
     setCabangList(loadedCabang);
 
     if (loadedSession.kodeCabang) {

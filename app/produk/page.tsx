@@ -35,7 +35,7 @@ export default function ProdukPage() {
     }
 
     setSession(loadedSession);
-    const loadedCabang = getCabangList();
+    const loadedCabang = await getCabangList();
     setCabangList(loadedCabang);
 
     const initialBranch = loadedSession.role === 'admin' ? '' : loadedSession.kodeCabang;

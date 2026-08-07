@@ -51,7 +51,7 @@ export default function CabangPage() {
   const [editWilayah, setEditWilayah] = useState('');
   const [editPass, setEditPass] = useState('');
 
-  const loadData = () => {
+  const loadData = async () => {
     const loadedSession = getInitialSession();
     if (!loadedSession.isLoggedIn) {
       router.push('/login');
@@ -63,7 +63,8 @@ export default function CabangPage() {
     }
 
     setSession(loadedSession);
-    setCabangList(getCabangList());
+    const cb = await getCabangList();
+    setCabangList(cb);
     setIsCheckingAuth(false);
   };
 
@@ -119,7 +120,7 @@ export default function CabangPage() {
       });
 
       if (parsedCabang.length > 0) {
-        const updated = bulkAddCabang(parsedCabang);
+        const updated = await bulkAddCabang(parsedCabang);
         setCabangList(updated);
         setUploadMessage(`Berhasil mengimpor ${parsedCabang.length} cabang dari Excel!`);
         setTimeout(() => setUploadMessage(null), 3000);
@@ -129,16 +130,16 @@ export default function CabangPage() {
     }
   };
 
-  const handleDeleteBranch = (kode: string, nama: string) => {
+  const handleDeleteBranch = async (kode: string, nama: string) => {
     if (confirm(`Apakah Anda yakin ingin menghapus cabang [${nama}] (${kode})?`)) {
-      const updated = deleteCabang(kode);
+      const updated = await deleteCabang(kode);
       setCabangList(updated);
     }
   };
 
-  const handleSaveEditBranch = () => {
+  const handleSaveEditBranch = async () => {
     if (!editingCabang) return;
-    const updated = addCabang({
+    const updated = await addCabang({
       kode: editingCabang.kode,
       nama: editNama || editingCabang.nama,
       wilayah: editWilayah || editingCabang.wilayah,
