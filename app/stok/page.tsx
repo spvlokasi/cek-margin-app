@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import Navbar from '@/components/Navbar';
 import DataTable, { Column } from '@/components/DataTable';
-import UploadModal from '@/components/UploadModal';
+import dynamic from 'next/dynamic';
 import { Cabang, StokItem, UserSession } from '@/lib/types';
 import { getCabangList, getInitialSession, getStokList, saveSession } from '@/lib/storage';
-import { RotateCcw, Upload } from 'lucide-react';
+import { BarChart3, Upload, AlertCircle, RotateCcw, Download } from 'lucide-react';
+
+const UploadModal = dynamic(() => import('@/components/UploadModal'), { ssr: false });
 
 export default function StokPage() {
   const router = useRouter();

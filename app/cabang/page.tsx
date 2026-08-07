@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import Navbar from '@/components/Navbar';
-import UploadModal from '@/components/UploadModal';
+import dynamic from 'next/dynamic';
 import DataTable, { Column } from '@/components/DataTable';
 import { Cabang, UserSession } from '@/lib/types';
 import { 
@@ -25,9 +25,11 @@ import {
   CheckCircle, 
   FileSpreadsheet, 
   Sparkles,
-  Download
+  Download,
+  AlertCircle
 } from 'lucide-react';
-import * as XLSX from 'xlsx';
+
+const UploadModal = dynamic(() => import('@/components/UploadModal'), { ssr: false });
 
 export default function CabangPage() {
   const router = useRouter();
@@ -85,14 +87,15 @@ export default function CabangPage() {
     saveSession(newSession);
   };
 
-  const handleDownloadTemplate = () => {
+  const handleDownloadTemplate = async () => {
+    const XLSX = await import('xlsx');
     const ws = XLSX.utils.json_to_sheet([
-      { Kode: 'M3001', Nama: 'Basmalah Pasean', Wilayah: 'Pamekasan', Password: 'M3001' },
-      { Kode: 'M3002', Nama: 'Basmalah Pakong', Wilayah: 'Pamekasan', Password: 'M3002' }
+      { 'Kode Cabang': 'CBG-003', 'Nama Cabang': 'Cabang Sudirman', 'Password': '123' },
+      { 'Kode Cabang': 'CBG-004', 'Nama Cabang': 'Cabang Thamrin', 'Password': '123' }
     ]);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'TemplateCabang');
-    XLSX.writeFile(wb, 'Template_Tambah_Cabang.xlsx');
+    XLSX.utils.book_append_sheet(wb, ws, 'CABANG');
+    XLSX.writeFile(wb, 'Template_Upload_Cabang.xlsx');
   };
 
   const handleExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,6 +103,7 @@ export default function CabangPage() {
     if (!file) return;
 
     try {
+      const XLSX = await import('xlsx');
       const buffer = await file.arrayBuffer();
       const workbook = XLSX.read(new Uint8Array(buffer), { type: 'array' });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];

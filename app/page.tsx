@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import Navbar from '@/components/Navbar';
 import DataTable, { Column } from '@/components/DataTable';
-import UploadModal from '@/components/UploadModal';
+import dynamic from 'next/dynamic';
 import { Cabang, CekMarginItem, UserSession } from '@/lib/types';
 import { getCabangList, getCekMarginReport, getInitialSession, saveSession } from '@/lib/storage';
 import { RotateCcw } from 'lucide-react';
+
+const UploadModal = dynamic(() => import('@/components/UploadModal'), { ssr: false });
 
 export default function CekMarginPage() {
   const router = useRouter();

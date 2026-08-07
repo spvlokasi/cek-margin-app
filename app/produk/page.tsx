@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import Navbar from '@/components/Navbar';
 import DataTable, { Column } from '@/components/DataTable';
-import UploadModal from '@/components/UploadModal';
+import dynamic from 'next/dynamic';
 import { Cabang, Produk, UserSession } from '@/lib/types';
 import { getCabangList, getInitialSession, getProdukList, saveSession } from '@/lib/storage';
 import { Package, Upload, AlertCircle, RotateCcw, Download } from 'lucide-react';
-import * as XLSX from 'xlsx';
+
+const UploadModal = dynamic(() => import('@/components/UploadModal'), { ssr: false });
 
 export default function ProdukPage() {
   const router = useRouter();
@@ -105,7 +106,8 @@ export default function ProdukPage() {
     }).format(val);
   };
 
-  const handleDownloadTemplate = () => {
+  const handleDownloadTemplate = async () => {
+    const XLSX = await import('xlsx');
     const wsProduk = XLSX.utils.json_to_sheet([
       { No: 1, Kode: '210230', Nama: 'BERAS BUNGA PANDAN 3 KG', Principle: 'UMUM', 'Nama Principle': 'NON BARCODE', Supplier: 'S201807000823', 'Nama Supplier': '-', Kategori: '04', HPP: 44100, Hrg1: 48000, Hrg2: 48000, Hrg3: 48000 },
       { No: 2, Kode: '8851019020372', Nama: 'ALFIE MILK CHOCOLATE 31 GR', Principle: 'PR000282', 'Nama Principle': 'PT. GLICO INDONESIA', Supplier: 'S201807000008', 'Nama Supplier': '-', Kategori: '07', HPP: 4100, Hrg1: 5000, Hrg2: 4700, Hrg3: 4500 }
