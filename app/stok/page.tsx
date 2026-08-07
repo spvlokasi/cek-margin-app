@@ -172,9 +172,16 @@ export default function StokPage() {
     },
   ];
 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+
   return (
     <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
-      <Sidebar session={session} onOpenUpload={() => setIsUploadOpen(true)} />
+      <Sidebar 
+        session={session} 
+        onOpenUpload={() => setIsUploadOpen(true)}
+        isOpenMobile={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
+      />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <Navbar
@@ -183,9 +190,10 @@ export default function StokPage() {
           onSessionChange={handleSessionChange}
           onRefreshData={handleRefresh}
           title=""
+          onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         />
 
-        <main className="p-6 space-y-6 flex-1 relative">
+        <main className="p-3 sm:p-6 space-y-4 sm:space-y-6 flex-1 relative">
           {isLoadingData && (
             <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6">
               <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mb-4"></div>
