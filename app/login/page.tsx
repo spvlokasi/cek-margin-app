@@ -57,7 +57,7 @@ export default function LoginPage() {
           <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-500 to-emerald-400 flex items-center justify-center text-slate-950 shadow-xl shadow-cyan-500/25">
             <Sparkles className="w-7 h-7 fill-slate-950" />
           </div>
-          <h1 className="text-2xl font-black text-white tracking-tight">Cek Margin Multi-Cabang</h1>
+          <h1 className="text-2xl font-black text-white tracking-tight">DC02 MANAGEMENT</h1>
         </div>
 
         {/* Universal Single Login Form */}
