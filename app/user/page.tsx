@@ -31,6 +31,7 @@ export default function UserAdminPage() {
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   // Form tambah
   const [showForm, setShowForm] = useState(false);
