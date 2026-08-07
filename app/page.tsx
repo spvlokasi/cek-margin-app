@@ -246,7 +246,7 @@ export default function CekMarginPage() {
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         />
 
-        <main className="p-3 sm:p-6 space-y-4 sm:space-y-6 flex-1 relative">
+        <main className="p-3 sm:p-6 flex-1 relative">
           {isLoadingData && (
             <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6">
               <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mb-4"></div>
