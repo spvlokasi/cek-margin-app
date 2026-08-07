@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   UploadCloud, 
@@ -8,9 +8,10 @@ import {
   CheckCircle, 
   AlertCircle, 
   Building2, 
-  ShieldCheck, 
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  PackageSearch,
+  LineChart
 } from 'lucide-react';
 import { Cabang, UserSession } from '@/lib/types';
 import { parseExcelFile, ParseResult } from '@/lib/excelParser';
@@ -35,23 +36,35 @@ export default function UploadModal({
 }: UploadModalProps) {
   const title = mode === 'produk' ? 'Upload Excel Master Produk' 
               : mode === 'stok' ? 'Upload Excel Stok' 
-              : 'Upload Excel Cek Margin';
+              : 'Sinkronisasi Cek Margin';
   
   const subtitle = mode === 'produk' ? 'Pembaruan master produk cabang' 
                  : mode === 'stok' ? 'Pembaruan data stok gudang' 
-                 : 'Pembaruan data otomatis per cabang';
+                 : 'Upload File Produk & Stok secara bersamaan';
 
-  const instructionText = mode === 'produk' ? 'Pilih atau Drag File Excel PRODUK.xlsx'
-                        : mode === 'stok' ? 'Pilih atau Drag File Excel STOK.xlsx'
-                        : 'Pilih atau Drag File Excel CEK MARGIN.xlsx';
+  const [selectedKodeCabang, setSelectedKodeCabang] = useState<string>('');
 
-  const [selectedKodeCabang, setSelectedKodeCabang] = useState<string>(
-    session.role === 'admin' ? (cabangList[0]?.kode || 'CBG-001') : session.kodeCabang
-  );
+  // Set default branch when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      if (session.role === 'admin') {
+        setSelectedKodeCabang(cabangList[0]?.kode || 'CBG-001');
+      } else {
+        setSelectedKodeCabang(session.kodeCabang);
+      }
+    }
+  }, [isOpen, session, cabangList]);
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [parseResult, setParseResult] = useState<ParseResult | null>(null);
-  const [isParsing, setIsParsing] = useState<boolean>(false);
+  // File States
+  const [produkFile, setProdukFile] = useState<File | null>(null);
+  const [stokFile, setStokFile] = useState<File | null>(null);
+  
+  const [parseResultProduk, setParseResultProduk] = useState<ParseResult | null>(null);
+  const [parseResultStok, setParseResultStok] = useState<ParseResult | null>(null);
+  
+  const [isParsingProduk, setIsParsingProduk] = useState<boolean>(false);
+  const [isParsingStok, setIsParsingStok] = useState<boolean>(false);
+
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
 
@@ -62,35 +75,77 @@ export default function UploadModal({
     nama: session.namaCabang,
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProdukFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setSelectedFile(file);
-    setIsParsing(true);
-    setParseResult(null);
+    setProdukFile(file);
+    setIsParsingProduk(true);
+    setParseResultProduk(null);
     setSyncStatus(null);
 
     try {
       const buffer = await file.arrayBuffer();
-      const result = parseExcelFile(buffer, activeCabangObj.kode, activeCabangObj.nama, mode);
-      setParseResult(result);
+      const result = parseExcelFile(buffer, activeCabangObj.kode, activeCabangObj.nama, 'produk');
+      setParseResultProduk(result);
     } catch (err: any) {
-      setParseResult({
+      setParseResultProduk({
         produkList: [],
         stokList: [],
         sheetNames: [],
         detectedProdukCount: 0,
         detectedStokCount: 0,
-        error: err?.message || 'Gagal membaca file Excel',
+        error: err?.message || 'Gagal membaca file Produk',
       });
     } finally {
-      setIsParsing(false);
+      setIsParsingProduk(false);
+    }
+  };
+
+  const handleStokFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setStokFile(file);
+    setIsParsingStok(true);
+    setParseResultStok(null);
+    setSyncStatus(null);
+
+    try {
+      const buffer = await file.arrayBuffer();
+      const result = parseExcelFile(buffer, activeCabangObj.kode, activeCabangObj.nama, 'stok');
+      setParseResultStok(result);
+    } catch (err: any) {
+      setParseResultStok({
+        produkList: [],
+        stokList: [],
+        sheetNames: [],
+        detectedProdukCount: 0,
+        detectedStokCount: 0,
+        error: err?.message || 'Gagal membaca file Stok',
+      });
+    } finally {
+      setIsParsingStok(false);
     }
   };
 
   const handleExecuteSync = async () => {
-    if (!parseResult || parseResult.error) return;
+    // Collect data to sync based on what was uploaded and successfully parsed
+    let produkToSync: any[] = [];
+    let stokToSync: any[] = [];
+
+    if (parseResultProduk && !parseResultProduk.error && parseResultProduk.produkList) {
+      produkToSync = parseResultProduk.produkList;
+    }
+    
+    if (parseResultStok && !parseResultStok.error && parseResultStok.stokList) {
+      stokToSync = parseResultStok.stokList;
+    }
+
+    if (produkToSync.length === 0 && stokToSync.length === 0) {
+      setSyncStatus("Tidak ada data valid yang bisa disinkronkan.");
+      return;
+    }
 
     setIsSyncing(true);
     setSyncStatus(null);
@@ -99,19 +154,21 @@ export default function UploadModal({
       const { totalStokAdded, totalProdukUpdated } = await syncBranchStok(
         activeCabangObj.kode,
         activeCabangObj.nama,
-        parseResult.stokList,
-        parseResult.produkList
+        stokToSync,
+        produkToSync
       );
 
       setSyncStatus(
-        `Berhasil mengunggah ${totalStokAdded} baris stok dan ${totalProdukUpdated} master produk untuk cabang [${activeCabangObj.nama}] ke Supabase!`
+        `Berhasil memproses data! (${totalProdukUpdated} Produk & ${totalStokAdded} Stok untuk cabang ${activeCabangObj.nama})`
       );
 
       setTimeout(() => {
         onUploadSuccess();
         onClose();
-        setSelectedFile(null);
-        setParseResult(null);
+        setProdukFile(null);
+        setStokFile(null);
+        setParseResultProduk(null);
+        setParseResultStok(null);
         setSyncStatus(null);
         setIsSyncing(false);
       }, 1500);
@@ -122,9 +179,16 @@ export default function UploadModal({
     }
   };
 
+  const isSyncDisabled = isSyncing || 
+    (
+      (!parseResultProduk && !parseResultStok) || 
+      (parseResultProduk?.error) || 
+      (parseResultStok?.error)
+    );
+
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
         {/* Modal Header */}
         <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
           <div className="flex items-center gap-3">
@@ -145,7 +209,7 @@ export default function UploadModal({
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 space-y-5">
+        <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
           {/* Target Branch Selector */}
           <div className="p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60">
             <label className="block text-xs font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5">
@@ -160,15 +224,17 @@ export default function UploadModal({
                   type="text"
                   list="upload-cabang-datalist"
                   placeholder="Ketik kode atau nama cabang..."
-                  defaultValue=""
+                  value={selectedKodeCabang ? `${selectedKodeCabang} - ${activeCabangObj.nama}` : ''}
                   onChange={(e) => {
                     const val = e.target.value;
                     const found = cabangList.find(c => `${c.kode} - ${c.nama}` === val);
                     if (found) {
                       setSelectedKodeCabang(found.kode);
-                      setParseResult(null);
-                    } else if (val === '') {
-                      setSelectedKodeCabang('');
+                      setParseResultProduk(null);
+                      setParseResultStok(null);
+                    } else {
+                      // Allow typing but don't set invalid code
+                      // In a real app we might handle this better
                     }
                   }}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-semibold text-white focus:outline-none focus:border-cyan-500 placeholder:text-slate-500 transition-colors"
@@ -190,58 +256,97 @@ export default function UploadModal({
             )}
           </div>
 
-          {/* File Dropzone */}
-          <div className="relative border-2 border-dashed border-slate-700 hover:border-cyan-500 rounded-2xl p-6 text-center transition-all bg-slate-950/40 group">
-            <input
-              type="file"
-              accept=".xlsx, .xls"
-              onChange={handleFileChange}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-            />
-            <div className="flex flex-col items-center">
-              <div className="p-3 rounded-full bg-slate-800 text-cyan-400 group-hover:scale-110 transition-transform duration-200">
-                <FileSpreadsheet className="w-8 h-8" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* File Dropzone - PRODUK */}
+            {(mode === 'margin' || mode === 'produk') && (
+              <div className="relative border-2 border-dashed border-slate-700 hover:border-emerald-500 rounded-2xl p-5 text-center transition-all bg-slate-950/40 group flex flex-col h-full">
+                <input
+                  type="file"
+                  accept=".xlsx, .xls"
+                  onChange={handleProdukFileChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                />
+                <div className="flex flex-col items-center flex-1 justify-center">
+                  <div className="p-3 rounded-full bg-slate-800 text-emerald-400 group-hover:scale-110 transition-transform duration-200">
+                    <PackageSearch className="w-7 h-7" />
+                  </div>
+                  <p className="mt-3 text-xs font-bold text-white">
+                      <span className="font-bold text-emerald-300 block mb-1">FILE PRODUK (HPP)</span>
+                      <span className="font-semibold text-slate-300 block truncate w-full max-w-[200px]">
+                        {produkFile ? produkFile.name : 'Pilih/Drag File Excel'}
+                      </span>
+                  </p>
+                </div>
+                
+                {/* Parse Status Indicator Produk */}
+                {isParsingProduk && (
+                  <div className="flex items-center justify-center gap-1.5 text-[10px] text-emerald-400 font-semibold mt-3">
+                    <RefreshCw className="w-3 h-3 animate-spin" />
+                    <span>Membaca file...</span>
+                  </div>
+                )}
+                {parseResultProduk && !isParsingProduk && (
+                  <div className="mt-3">
+                    {parseResultProduk.error ? (
+                      <div className="p-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3 shrink-0" />
+                        <span>{parseResultProduk.error}</span>
+                      </div>
+                    ) : (
+                      <div className="p-2 rounded-lg bg-emerald-900/20 border border-emerald-800/60 text-[10px]">
+                        <span className="text-emerald-400 font-bold">{parseResultProduk.detectedProdukCount} data produk</span> siap disinkron.
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-              <p className="mt-3 text-xs font-bold text-white">
-                  <span className="font-bold text-slate-200 mt-2 block">{selectedFile ? selectedFile.name : instructionText}</span>
-                  <span className="text-slate-500 mt-1 block">Format yang didukung: .xlsx atau .xls (Sheet PRODUK & STOK T&G)</span>
-              </p>
-            </div>
+            )}
+
+            {/* File Dropzone - STOK */}
+            {(mode === 'margin' || mode === 'stok') && (
+              <div className="relative border-2 border-dashed border-slate-700 hover:border-cyan-500 rounded-2xl p-5 text-center transition-all bg-slate-950/40 group flex flex-col h-full">
+                <input
+                  type="file"
+                  accept=".xlsx, .xls"
+                  onChange={handleStokFileChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                />
+                <div className="flex flex-col items-center flex-1 justify-center">
+                  <div className="p-3 rounded-full bg-slate-800 text-cyan-400 group-hover:scale-110 transition-transform duration-200">
+                    <LineChart className="w-7 h-7" />
+                  </div>
+                  <p className="mt-3 text-xs font-bold text-white">
+                      <span className="font-bold text-cyan-300 block mb-1">FILE STOK (Harga Jual)</span>
+                      <span className="font-semibold text-slate-300 block truncate w-full max-w-[200px]">
+                        {stokFile ? stokFile.name : 'Pilih/Drag File Excel'}
+                      </span>
+                  </p>
+                </div>
+
+                {/* Parse Status Indicator Stok */}
+                {isParsingStok && (
+                  <div className="flex items-center justify-center gap-1.5 text-[10px] text-cyan-400 font-semibold mt-3">
+                    <RefreshCw className="w-3 h-3 animate-spin" />
+                    <span>Membaca file...</span>
+                  </div>
+                )}
+                {parseResultStok && !isParsingStok && (
+                  <div className="mt-3">
+                    {parseResultStok.error ? (
+                      <div className="p-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3 shrink-0" />
+                        <span>{parseResultStok.error}</span>
+                      </div>
+                    ) : (
+                      <div className="p-2 rounded-lg bg-cyan-900/20 border border-cyan-800/60 text-[10px]">
+                        <span className="text-cyan-400 font-bold">{parseResultStok.detectedStokCount} data stok</span> siap disinkron.
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-
-          {/* Parse Status Indicator */}
-          {isParsing && (
-            <div className="flex items-center justify-center gap-2 text-xs text-cyan-400 font-semibold py-2">
-              <RefreshCw className="w-4 h-4 animate-spin" />
-              <span>Membaca file Excel & mendeteksi sheet...</span>
-            </div>
-          )}
-
-          {parseResult && !isParsing && (
-            <div className="space-y-3">
-              {parseResult.error ? (
-                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>{parseResult.error}</span>
-                </div>
-              ) : (
-                <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-2 text-xs">
-                  <div className="flex items-center justify-between text-slate-300">
-                    <span>Sheet Terdeteksi:</span>
-                    <strong className="text-white">{parseResult.sheetNames.join(', ')}</strong>
-                  </div>
-                  <div className="flex items-center justify-between text-slate-300">
-                    <span>Baris Produk:</span>
-                    <strong className="text-emerald-400">{parseResult.detectedProdukCount} data</strong>
-                  </div>
-                  <div className="flex items-center justify-between text-slate-300">
-                    <span>Baris Stok & Margin:</span>
-                    <strong className="text-cyan-400">{parseResult.detectedStokCount} data</strong>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
 
           {syncStatus && (
             <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold flex items-center gap-2">
@@ -262,18 +367,18 @@ export default function UploadModal({
 
           <button
             onClick={handleExecuteSync}
-            disabled={!parseResult || !!parseResult.error || isSyncing}
+            disabled={isSyncDisabled}
             className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-cyan-500/20 transition-all cursor-pointer"
           >
             {isSyncing ? (
               <>
                 <RefreshCw className="w-4 h-4 animate-spin" />
-                <span>Mengganti Data Lama...</span>
+                <span>Memproses Data...</span>
               </>
             ) : (
               <>
                 <Sparkles className="w-4 h-4" />
-                <span>Simpan & Timpa Data Cabang</span>
+                <span>Simpan & Kawinkan Data</span>
               </>
             )}
           </button>

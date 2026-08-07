@@ -259,62 +259,77 @@ export default function CekMarginPage() {
             columns={columns}
             searchKeys={['kode', 'nama', 'namaSupplier']}
             customHeaderAction={
-              session.role === 'admin' ? (
-                <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
-                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
-                    <path d="M9 22v-4h6v4"></path>
-                    <path d="M8 6h.01"></path>
-                    <path d="M16 6h.01"></path>
-                    <path d="M12 6h.01"></path>
-                    <path d="M12 10h.01"></path>
-                    <path d="M12 14h.01"></path>
-                    <path d="M16 10h.01"></path>
-                    <path d="M16 14h.01"></path>
-                    <path d="M8 10h.01"></path>
-                    <path d="M8 14h.01"></path>
-                  </svg>
-                  <input
-                    id="branch-search"
-                    type="text"
-                    list="cabang-options-table"
-                    placeholder="Ketik & pilih cabang..."
-                    className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-48"
-                    defaultValue={(session.kodeCabang && session.kodeCabang !== 'ALL') ? `${session.kodeCabang} - ${session.namaCabang}` : ''}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      const selectedCabang = cabangList.find(c => 
-                        `${c.kode} - ${c.nama}` === val
-                      );
-                      if (selectedCabang) {
-                        handleSessionChange({
-                          ...session,
-                          kodeCabang: selectedCabang.kode,
-                          namaCabang: selectedCabang.nama,
-                        });
-                      }
-                    }}
-                  />
-                  {session.kodeCabang && (
-                    <button
-                      onClick={() => {
-                        const input = document.getElementById('branch-search') as HTMLInputElement;
-                        if (input) input.value = '';
-                        handleSessionChange({ ...session, kodeCabang: '', namaCabang: '' });
+              <div className="flex items-center gap-2">
+                {session.role === 'admin' && (
+                  <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
+                      <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                      <path d="M9 22v-4h6v4"></path>
+                      <path d="M8 6h.01"></path>
+                      <path d="M16 6h.01"></path>
+                      <path d="M12 6h.01"></path>
+                      <path d="M12 10h.01"></path>
+                      <path d="M12 14h.01"></path>
+                      <path d="M16 10h.01"></path>
+                      <path d="M16 14h.01"></path>
+                      <path d="M8 10h.01"></path>
+                      <path d="M8 14h.01"></path>
+                    </svg>
+                    <input
+                      id="branch-search"
+                      type="text"
+                      list="cabang-options-table"
+                      placeholder="Ketik & pilih cabang..."
+                      className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-48"
+                      defaultValue={(session.kodeCabang && session.kodeCabang !== 'ALL') ? `${session.kodeCabang} - ${session.namaCabang}` : ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const selectedCabang = cabangList.find(c => 
+                          `${c.kode} - ${c.nama}` === val
+                        );
+                        if (selectedCabang) {
+                          handleSessionChange({
+                            ...session,
+                            kodeCabang: selectedCabang.kode,
+                            namaCabang: selectedCabang.nama,
+                          });
+                        }
                       }}
-                      className="p-1 rounded-md hover:bg-slate-700/60 text-slate-400 hover:text-rose-400 transition-colors"
-                      title="Reset Cabang"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                  <datalist id="cabang-options-table">
-                    {cabangList.map((c) => (
-                      <option key={c.kode} value={`${c.kode} - ${c.nama}`} />
-                    ))}
-                  </datalist>
-                </div>
-              ) : null
+                    />
+                    {session.kodeCabang && (
+                      <button
+                        onClick={() => {
+                          const input = document.getElementById('branch-search') as HTMLInputElement;
+                          if (input) input.value = '';
+                          handleSessionChange({ ...session, kodeCabang: '', namaCabang: '' });
+                        }}
+                        className="p-1 rounded-md hover:bg-slate-700/60 text-slate-400 hover:text-rose-400 transition-colors"
+                        title="Reset Cabang"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    <datalist id="cabang-options-table">
+                      {cabangList.map((c) => (
+                        <option key={c.kode} value={`${c.kode} - ${c.nama}`} />
+                      ))}
+                    </datalist>
+                  </div>
+                )}
+                
+                <button
+                  onClick={() => setIsUploadOpen(true)}
+                  title="Upload Excel Cek Margin"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer text-xs font-semibold"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <span>Upload Data</span>
+                </button>
+              </div>
             }
           />
         </main>
