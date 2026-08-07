@@ -271,7 +271,7 @@ export default function CekMarginPage() {
                     list="cabang-options-table"
                     placeholder="Ketik & pilih cabang..."
                     className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-48"
-                    defaultValue={session.kodeCabang !== 'ALL' ? `${session.kodeCabang} - ${session.namaCabang}` : ''}
+                    defaultValue={(session.kodeCabang && session.kodeCabang !== 'ALL') ? `${session.kodeCabang} - ${session.namaCabang}` : ''}
                     onChange={(e) => {
                       const val = e.target.value;
                       const selectedCabang = cabangList.find(c => 
