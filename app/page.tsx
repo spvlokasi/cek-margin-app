@@ -23,8 +23,9 @@ export default function CekMarginPage() {
   const [reportData, setReportData] = useState<CekMarginItem[]>([]);
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
+  const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
 
-  const loadData = () => {
+  const loadData = async () => {
     const loadedSession = getInitialSession();
     if (!loadedSession.isLoggedIn) {
       router.push('/login');
@@ -35,8 +36,14 @@ export default function CekMarginPage() {
     const loadedCabang = getCabangList();
     setCabangList(loadedCabang);
 
-    const report = getCekMarginReport(loadedSession.kodeCabang);
-    setReportData(report);
+    if (loadedSession.kodeCabang) {
+      setIsLoadingData(true);
+      const report = await getCekMarginReport(loadedSession.kodeCabang);
+      setReportData(report);
+      setIsLoadingData(false);
+    } else {
+      setReportData([]);
+    }
     setIsCheckingAuth(false);
   };
 
@@ -52,16 +59,28 @@ export default function CekMarginPage() {
     );
   }
 
-  const handleSessionChange = (newSession: UserSession) => {
+  const handleSessionChange = async (newSession: UserSession) => {
     setSession(newSession);
     saveSession(newSession);
-    const updatedReport = getCekMarginReport(newSession.kodeCabang);
-    setReportData(updatedReport);
+    if (newSession.kodeCabang) {
+      setIsLoadingData(true);
+      const updatedReport = await getCekMarginReport(newSession.kodeCabang);
+      setReportData(updatedReport);
+      setIsLoadingData(false);
+    } else {
+      setReportData([]);
+    }
   };
 
-  const handleRefresh = () => {
-    const updatedReport = getCekMarginReport(session.kodeCabang);
-    setReportData(updatedReport);
+  const handleRefresh = async () => {
+    if (session.kodeCabang) {
+      setIsLoadingData(true);
+      const updatedReport = await getCekMarginReport(session.kodeCabang);
+      setReportData(updatedReport);
+      setIsLoadingData(false);
+    } else {
+      setReportData([]);
+    }
   };
 
   const formatRupiah = (val: number) => {
@@ -218,7 +237,14 @@ export default function CekMarginPage() {
           title=""
         />
 
-        <main className="p-6 flex-1">
+        <main className="p-6 space-y-6 flex-1 relative">
+          {isLoadingData && (
+            <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6">
+              <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mb-4"></div>
+              <p className="text-cyan-400 font-bold animate-pulse">Mengambil Data dari Supabase...</p>
+            </div>
+          )}
+          
           <DataTable<CekMarginItem>
             data={reportData}
             columns={columns}

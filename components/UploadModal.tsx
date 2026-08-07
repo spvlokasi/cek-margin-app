@@ -89,23 +89,22 @@ export default function UploadModal({
     }
   };
 
-  const handleExecuteSync = () => {
+  const handleExecuteSync = async () => {
     if (!parseResult || parseResult.error) return;
 
     setIsSyncing(true);
     setSyncStatus(null);
 
-    setTimeout(() => {
-      const { totalStokAdded, totalProdukUpdated } = syncBranchStok(
+    try {
+      const { totalStokAdded, totalProdukUpdated } = await syncBranchStok(
         activeCabangObj.kode,
         activeCabangObj.nama,
         parseResult.stokList,
         parseResult.produkList
       );
 
-      setIsSyncing(false);
       setSyncStatus(
-        `Berhasil mengosongkan data lama & mengunggah ${totalStokAdded} baris stok baru untuk cabang [${activeCabangObj.nama}]!`
+        `Berhasil mengunggah ${totalStokAdded} baris stok dan ${totalProdukUpdated} master produk untuk cabang [${activeCabangObj.nama}] ke Supabase!`
       );
 
       setTimeout(() => {
@@ -114,8 +113,13 @@ export default function UploadModal({
         setSelectedFile(null);
         setParseResult(null);
         setSyncStatus(null);
+        setIsSyncing(false);
       }, 1500);
-    }, 600);
+    } catch (err) {
+      console.error(err);
+      setSyncStatus("Gagal sinkronisasi ke Supabase. Periksa koneksi internet Anda.");
+      setIsSyncing(false);
+    }
   };
 
   return (

@@ -247,81 +247,61 @@ export function deleteCabang(kodeCabang: string): Cabang[] {
   return updated;
 }
 
-export async function getProdukList(kodeCabangFilter?: string): Promise<Produk[]> {
-  try {
-    const { data, error } = await supabase.from('produk').select('*').order('nama_produk', { ascending: true });
-    if (error) {
-      console.error('Error fetching produk from Supabase:', error);
-      return MOCK_PRODUK;
+export function getProdukList(kodeCabangFilter?: string): Produk[] {
+  let list: Produk[] = [...MOCK_PRODUK];
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem(STORAGE_KEYS.PRODUK);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) list = [...MOCK_PRODUK, ...parsed];
+      } catch {}
     }
-    
-    if (data && data.length > 0) {
-      return data.map((p: any, index: number) => ({
-        no: index + 1,
-        kode: p.kode_produk,
-        nama: p.nama_produk,
-        kategori: p.kategori || '',
-        principle: p.principle || '',
-        supplier: p.supplier || '',
-        hpp: p.hpp || 0,
-        hrg1: p.hrg1 || 0,
-        hrg2: p.hrg2 || 0,
-        hrg3: p.hrg3 || 0,
-      }));
-    }
-  } catch (err) {
-    console.error('Exception fetching produk from Supabase:', err);
   }
-  return MOCK_PRODUK;
+
+  if (!kodeCabangFilter || kodeCabangFilter === '') return []; // Admin MUST select branch first!
+  if (kodeCabangFilter === 'ALL') return list;
+  
+  const branchData = list.filter(p => p.kodeCabang === kodeCabangFilter);
+  if (branchData.length > 0) return branchData;
+  
+  return list.filter(p => !p.kodeCabang);
 }
 
-export async function getStokList(kodeCabangFilter?: string): Promise<StokItem[]> {
-  if (!kodeCabangFilter || kodeCabangFilter === '') return []; // Admin MUST select branch first!
-  try {
-    let query = supabase.from('stok_cabang').select('*');
-    if (kodeCabangFilter !== 'ALL') {
-      query = query.eq('kode_cabang', kodeCabangFilter);
+export function getStokList(kodeCabangFilter?: string): StokItem[] {
+  let list: StokItem[] = [...MOCK_STOK];
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem(STORAGE_KEYS.STOK);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) list = [...MOCK_STOK, ...parsed];
+      } catch {}
     }
-    const { data, error } = await query;
-    if (error) {
-      console.error('Error fetching stok from Supabase:', error);
-      return MOCK_STOK; // Fallback
-    }
-    
-    if (data && data.length > 0) {
-      return data.map((s: any, index: number) => ({
-        no: index + 1,
-        kodeCabang: s.kode_cabang,
-        kode: s.kode_produk,
-        nama: s.nama_produk,
-        stok: s.stok || 0,
-        hpp: s.hpp || 0,
-        nilai: s.nilai || 0,
-      }));
-    }
-  } catch (err) {
-    console.error('Exception fetching stok from Supabase:', err);
   }
-  return MOCK_STOK;
+
+  if (!kodeCabangFilter || kodeCabangFilter === '') return []; // Admin MUST select branch first!
+  if (kodeCabangFilter === 'ALL') return list;
+  
+  const branchData = list.filter(p => p.kodeCabang === kodeCabangFilter);
+  if (branchData.length > 0) return branchData;
+  
+  return list.filter(p => !p.kodeCabang);
 }
 
 /**
  * Generate Cek Margin Report combining Produk & Stok
  * FILTERED strictly to ONLY show items where STOK > 0!
  */
-export async function getCekMarginReport(kodeCabangFilter?: string): Promise<CekMarginItem[]> {
-  if (!kodeCabangFilter || kodeCabangFilter === '') return [];
-
-  const [stokList, produkList] = await Promise.all([
-    getStokList(kodeCabangFilter),
-    getProdukList()
-  ]);
+export function getCekMarginReport(kodeCabangFilter?: string): CekMarginItem[] {
+  const allStok = getStokList(kodeCabangFilter);
+  const allProduk = getProdukList('ALL');
 
   const produkMap = new Map<string, Produk>();
-  produkList.forEach(p => produkMap.set(p.kode, p));
+  allProduk.forEach(p => produkMap.set(p.kode, p));
 
   // Only include items with Stok > 0!
-  const filteredStok = stokList.filter(s => (s.stok || 0) > 0);
+  const filteredStok = allStok.filter(s => (s.stok || 0) > 0);
 
   return filteredStok.map((stk, index) => {
     const prd = produkMap.get(stk.kode);
@@ -361,71 +341,83 @@ export async function getCekMarginReport(kodeCabangFilter?: string): Promise<Cek
   });
 }
 
-export async function syncBranchStok(
+export function syncBranchStok(
   targetKodeCabang: string,
   targetNamaCabang: string,
   newStokItems?: StokItem[],
   newProdukItems?: Produk[]
-): Promise<{ totalStokAdded: number; totalProdukUpdated: number }> {
+): { totalStokAdded: number; totalProdukUpdated: number } {
   let stokAddedCount = 0;
+  let formattedNewStok: StokItem[] = [];
+  if (newStokItems !== undefined) {
+    const allStok = getStokList('ALL');
+    // Only keep uploaded stok (must have kodeCabang) from other branches
+    const remainingStok = allStok.filter(item => item.kodeCabang && item.kodeCabang !== targetKodeCabang);
+
+    formattedNewStok = newStokItems.map(item => ({
+      ...item,
+      kodeCabang: targetKodeCabang,
+      namaCabang: targetNamaCabang,
+    }));
+
+    stokAddedCount = formattedNewStok.length;
+    const updatedAllStok = [...remainingStok, ...formattedNewStok];
+    if (typeof window !== 'undefined') {
+      safeSetItem(STORAGE_KEYS.STOK, JSON.stringify(updatedAllStok));
+    }
+  }
+
   let produkUpdatedCount = 0;
+  if (newProdukItems && newProdukItems.length > 0) {
+    const currentProduk = getProdukList('ALL');
+    // Only keep uploaded produk (must have kodeCabang) from other branches
+    const remainingProduk = currentProduk.filter(p => p.kodeCabang && p.kodeCabang !== targetKodeCabang);
+    
+    const formattedNewProduk = newProdukItems.map(p => ({
+      ...p,
+      kodeCabang: targetKodeCabang
+    }));
+    
+    produkUpdatedCount = formattedNewProduk.length;
+    const updatedAllProduk = [...remainingProduk, ...formattedNewProduk];
 
-  try {
-    await supabase.from('cabang').upsert({
-      kode_cabang: targetKodeCabang,
-      nama_cabang: targetNamaCabang,
-    });
+    if (typeof window !== 'undefined') {
+      safeSetItem(STORAGE_KEYS.PRODUK, JSON.stringify(updatedAllProduk));
+    }
+  }
 
-    if (newStokItems && newStokItems.length > 0) {
+  async function syncToSupabase() {
+    try {
+      await supabase.from('cabang').upsert({
+        kode_cabang: targetKodeCabang,
+        nama_cabang: targetNamaCabang,
+      });
+
       await supabase.from('stok_cabang').delete().eq('kode_cabang', targetKodeCabang);
 
-      const dbStokRows = newStokItems.map(s => ({
-        kode_cabang: targetKodeCabang,
-        kode_produk: s.kode,
-        nama_produk: s.nama,
-        stok: s.stok,
-        hpp: s.hpp,
-        nilai: s.nilai,
-        rl1: 0,
-        persen_h1: 0,
-        rl2: 0,
-        persen_h2: 0,
-        rl3: 0,
-        persen_h3: 0,
-      }));
-
-      const chunkSize = 500;
-      for (let i = 0; i < dbStokRows.length; i += chunkSize) {
-        const chunk = dbStokRows.slice(i, i + chunkSize);
-        await supabase.from('stok_cabang').insert(chunk);
+      if (formattedNewStok.length > 0) {
+        const dbStokRows = formattedNewStok.map(s => ({
+          kode_cabang: s.kodeCabang,
+          kode_produk: s.kode,
+          nama_produk: s.nama,
+          stok: s.stok,
+          hpp: s.hpp,
+          nilai: s.nilai,
+          rl1: 0,
+          persen_h1: 0,
+          rl2: 0,
+          persen_h2: 0,
+          rl3: 0,
+          persen_h3: 0,
+        }));
+        await supabase.from('stok_cabang').insert(dbStokRows);
       }
-      stokAddedCount = dbStokRows.length;
+    } catch (e) {
+      console.error('Supabase Cloud Sync Error:', e);
     }
-
-    if (newProdukItems && newProdukItems.length > 0) {
-      const dbProdukRows = newProdukItems.map(p => ({
-        kode_produk: p.kode,
-        nama_produk: p.nama,
-        kategori: p.kategori,
-        principle: p.principle,
-        supplier: p.supplier,
-        hpp: p.hpp,
-        hrg1: p.hrg1,
-        hrg2: p.hrg2,
-        hrg3: p.hrg3,
-      }));
-
-      const chunkSize = 500;
-      for (let i = 0; i < dbProdukRows.length; i += chunkSize) {
-        const chunk = dbProdukRows.slice(i, i + chunkSize);
-        await supabase.from('produk').upsert(chunk, { onConflict: 'kode_produk' });
-      }
-      produkUpdatedCount = dbProdukRows.length;
-    }
-  } catch (e) {
-    console.error('Supabase Cloud Sync Error:', e);
-    throw e;
   }
+
+  syncToSupabase();
 
   return {
     totalStokAdded: stokAddedCount,

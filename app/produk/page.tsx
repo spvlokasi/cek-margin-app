@@ -25,8 +25,9 @@ export default function ProdukPage() {
   const [produkData, setProdukData] = useState<Produk[]>([]);
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
+  const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
 
-  const loadData = () => {
+  const loadData = async () => {
     const loadedSession = getInitialSession();
     if (!loadedSession.isLoggedIn) {
       router.push('/login');
@@ -41,7 +42,10 @@ export default function ProdukPage() {
     setSelectedBranch(initialBranch);
 
     if (initialBranch) {
-      setProdukData(getProdukList(initialBranch));
+      setIsLoadingData(true);
+      const data = await getProdukList(initialBranch);
+      setProdukData(data);
+      setIsLoadingData(false);
     } else {
       setProdukData([]);
     }
@@ -60,26 +64,36 @@ export default function ProdukPage() {
     );
   }
 
-  const handleBranchSelectChange = (branchCode: string) => {
+  const handleBranchSelectChange = async (branchCode: string) => {
     setSelectedBranch(branchCode);
     if (!branchCode) {
       setProdukData([]);
     } else {
-      setProdukData(getProdukList(branchCode));
+      setIsLoadingData(true);
+      setProdukData(await getProdukList(branchCode));
+      setIsLoadingData(false);
     }
   };
 
-  const handleSessionChange = (newSession: UserSession) => {
+  const handleSessionChange = async (newSession: UserSession) => {
     setSession(newSession);
     saveSession(newSession);
     const target = newSession.role === 'admin' ? '' : newSession.kodeCabang;
     setSelectedBranch(target);
-    setProdukData(target ? getProdukList(target) : []);
+    if (target) {
+      setIsLoadingData(true);
+      setProdukData(await getProdukList(target));
+      setIsLoadingData(false);
+    } else {
+      setProdukData([]);
+    }
   };
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     if (selectedBranch) {
-      setProdukData(getProdukList(selectedBranch));
+      setIsLoadingData(true);
+      setProdukData(await getProdukList(selectedBranch));
+      setIsLoadingData(false);
     } else {
       setProdukData([]);
     }
@@ -212,7 +226,13 @@ export default function ProdukPage() {
           title=""
         />
 
-        <main className="p-6 space-y-6 flex-1">
+        <main className="p-6 space-y-6 flex-1 relative">
+          {isLoadingData && (
+            <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6">
+              <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mb-4"></div>
+              <p className="text-cyan-400 font-bold animate-pulse">Mengambil Data dari Supabase...</p>
+            </div>
+          )}
           {/* Branch Search Datalist hidden if not admin */}
           <DataTable<Produk>
             data={produkData}
