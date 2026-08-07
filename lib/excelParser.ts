@@ -36,22 +36,28 @@ export function parseExcelFile(
       const rows: any[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
       rows.forEach((r, index) => {
-        const kode = String(r['Kode'] || r['KODE'] || r['kode'] || '').trim();
+        // Normalize keys to lowercase, remove extra spaces
+        const r2: any = {};
+        for (const key in r) {
+          r2[key.toLowerCase().trim()] = r[key];
+        }
+
+        const kode = String(r2['kode'] || r2['kode produk'] || r2['kode barang'] || r2['barcode'] || '').trim();
         if (!kode) return;
 
         produkList!.push({
-          no: Number(r['No.'] || r['No'] || r['NO'] || index + 1),
+          no: Number(r2['no.'] || r2['no'] || index + 1),
           kode,
-          nama: String(r['Nama'] || r['NAMA'] || '').trim(),
-          principle: String(r['Principle'] || r['PRINCIPLE'] || '').trim(),
-          namaPrinciple: String(r['Nama Principle'] || r['NAMA PRINCIPLE'] || '').trim(),
-          supplier: String(r['Supplier'] || r['SUPPLIER'] || '').trim(),
-          kodeSupplier: String(r['Kode Supplier'] || r['KODE SUPPLIER'] || r['Supplier'] || '').trim(),
-          kategori: String(r['Kategori'] || r['KATEGORI'] || '').trim(),
-          hpp: parseFloat(r['Hpp'] || r['HPP'] || 0) || 0,
-          hrg1: parseFloat(r['Hrg1'] || r['HRG1'] || 0) || 0,
-          hrg2: parseFloat(r['Hrg2'] || r['HRG2'] || 0) || 0,
-          hrg3: parseFloat(r['Hrg3'] || r['HRG3'] || 0) || 0,
+          nama: String(r2['nama'] || r2['nama produk'] || r2['nama barang'] || '').trim(),
+          principle: String(r2['principle'] || r2['principal'] || '').trim(),
+          namaPrinciple: String(r2['nama principle'] || r2['nama principal'] || '').trim(),
+          supplier: String(r2['supplier'] || r2['nama supplier'] || '').trim(),
+          kodeSupplier: String(r2['kode supplier'] || r2['kodesupplier'] || '').trim(),
+          kategori: String(r2['kategori'] || '').trim(),
+          hpp: parseFloat(r2['hpp'] || 0) || 0,
+          hrg1: parseFloat(r2['hrg1'] || r2['harga 1'] || r2['harga1'] || 0) || 0,
+          hrg2: parseFloat(r2['hrg2'] || r2['harga 2'] || r2['harga2'] || 0) || 0,
+          hrg3: parseFloat(r2['hrg3'] || r2['harga 3'] || r2['harga3'] || 0) || 0,
           kodeCabang,
         });
       });
@@ -70,20 +76,25 @@ export function parseExcelFile(
       const timestamp = new Date().toISOString();
 
       rows.forEach((r, index) => {
-        const kode = String(r['KODE'] || r['Kode'] || r['kode'] || '').trim();
+        const r2: any = {};
+        for (const key in r) {
+          r2[key.toLowerCase().trim()] = r[key];
+        }
+
+        const kode = String(r2['kode'] || r2['kode produk'] || r2['kode barang'] || r2['barcode'] || '').trim();
         if (!kode) return;
 
-        const hpp = parseFloat(r['HPP'] || r['Hpp'] || 0) || 0;
-        const stok = parseFloat(r['STOK'] || r['Stok'] || 0) || 0;
-        const nilai = parseFloat(r['NILAI'] || r['Nilai'] || stok * hpp) || (stok * hpp);
+        const hpp = parseFloat(r2['hpp'] || 0) || 0;
+        const stok = parseFloat(r2['stok'] || r2['qty'] || 0) || 0;
+        const nilai = parseFloat(r2['nilai'] || stok * hpp) || (stok * hpp);
 
         stokList!.push({
           id: `stk-${kodeCabang}-${kode}-${index}`,
-          no: Number(r['No.'] || r['No'] || r['NO'] || index + 1),
+          no: Number(r2['no.'] || r2['no'] || index + 1),
           kodeCabang,
           namaCabang,
           kode,
-          nama: String(r['NAMA'] || r['Nama'] || '').trim(),
+          nama: String(r2['nama'] || r2['nama produk'] || '').trim(),
           stok,
           hpp,
           nilai,
