@@ -198,7 +198,7 @@ export async function getProdukList(kodeCabangFilter?: string): Promise<Produk[]
   // Admin harus pilih cabang dulu - data produk per cabang
   if (!kodeCabangFilter || kodeCabangFilter === '') return [];
   try {
-    let query = supabase.from('produk').select('*').limit(20000).order('nama_produk', { ascending: true });
+    let query = supabase.from('produk').select('*').limit(1000).order('nama_produk', { ascending: true });
     if (kodeCabangFilter !== 'ALL') {
       query = query.eq('kode_cabang', kodeCabangFilter);
     }
@@ -233,7 +233,7 @@ export async function getProdukList(kodeCabangFilter?: string): Promise<Produk[]
 export async function getStokList(kodeCabangFilter?: string): Promise<StokItem[]> {
   if (!kodeCabangFilter || kodeCabangFilter === '') return []; // Admin MUST select branch first!
   try {
-    let query = supabase.from('stok_cabang').select('*').limit(20000);
+    let query = supabase.from('stok_cabang').select('*').limit(1000);
     if (kodeCabangFilter !== 'ALL') {
       query = query.eq('kode_cabang', kodeCabangFilter);
     }
