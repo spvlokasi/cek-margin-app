@@ -195,8 +195,14 @@ export async function deleteCabang(kode: string): Promise<Cabang[]> {
 }
 
 export async function getProdukList(kodeCabangFilter?: string): Promise<Produk[]> {
+  // Admin harus pilih cabang dulu - data produk per cabang
+  if (!kodeCabangFilter || kodeCabangFilter === '') return [];
   try {
-    const { data, error } = await supabase.from('produk').select('*').limit(20000).order('nama_produk', { ascending: true });
+    let query = supabase.from('produk').select('*').limit(20000).order('nama_produk', { ascending: true });
+    if (kodeCabangFilter !== 'ALL') {
+      query = query.eq('kode_cabang', kodeCabangFilter);
+    }
+    const { data, error } = await query;
     if (error) {
       console.error('Error fetching produk from Supabase:', error);
       return [];
@@ -355,8 +361,12 @@ export async function syncBranchStok(
     }
 
     if (newProdukItems && newProdukItems.length > 0) {
+      // Hapus data produk lama untuk cabang ini, lalu insert fresh
+      await supabase.from('produk').delete().eq('kode_cabang', targetKodeCabang);
+
       const dbProdukRows = newProdukItems.map(p => ({
         kode_produk: p.kode,
+        kode_cabang: targetKodeCabang,
         nama_produk: p.nama,
         kategori: p.kategori,
         principle: p.principle,
@@ -372,7 +382,7 @@ export async function syncBranchStok(
       const chunkSize = 500;
       for (let i = 0; i < dbProdukRows.length; i += chunkSize) {
         const chunk = dbProdukRows.slice(i, i + chunkSize);
-        const { error } = await supabase.from('produk').upsert(chunk, { onConflict: 'kode_produk' });
+        const { error } = await supabase.from('produk').upsert(chunk, { onConflict: 'kode_produk,kode_cabang' });
         if (error) {
           throw new Error(`Gagal menyimpan produk: ${error.message}`);
         }
