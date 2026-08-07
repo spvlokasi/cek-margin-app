@@ -169,6 +169,10 @@ export async function addCabang(newCabang: Cabang): Promise<Cabang[]> {
     wilayah: newCabang.wilayah || 'Jawa Timur',
     password: newCabang.password || newCabang.kode,
   }, { onConflict: 'kode_cabang' });
+
+  // Trigger Schema Creation
+  await supabase.rpc('create_branch_infrastructure', { branch_code: newCabang.kode });
+
   return await getCabangList();
 }
 
@@ -186,6 +190,11 @@ export async function bulkAddCabang(newCabangList: Cabang[]): Promise<Cabang[]> 
     await supabase.from('cabang').upsert(chunk, { onConflict: 'kode_cabang' });
   }
   
+  // Trigger Schema Creation for all new branches
+  for (const c of newCabangList) {
+    await supabase.rpc('create_branch_infrastructure', { branch_code: c.kode });
+  }
+  
   return await getCabangList();
 }
 
@@ -196,15 +205,13 @@ export async function deleteCabang(kode: string): Promise<Cabang[]> {
 
 export async function getProdukList(kodeCabangFilter?: string): Promise<Produk[]> {
   // Admin harus pilih cabang dulu - data produk per cabang
-  if (!kodeCabangFilter || kodeCabangFilter === '') return [];
+  if (!kodeCabangFilter || kodeCabangFilter === 'ALL') return [];
   try {
-    let query = supabase.from('produk').select('*').limit(20000).order('nama_produk', { ascending: true });
-    if (kodeCabangFilter !== 'ALL') {
-      query = query.eq('kode_cabang', kodeCabangFilter);
-    }
+    const query = supabase.schema(kodeCabangFilter).from('produk').select('*').limit(20000).order('nama_produk', { ascending: true });
+    
     const { data, error } = await query;
     if (error) {
-      console.error('Error fetching produk from Supabase:', error);
+      console.error('Error fetching produk from Supabase schema', kodeCabangFilter, ':', error);
       return [];
     }
     
@@ -231,15 +238,13 @@ export async function getProdukList(kodeCabangFilter?: string): Promise<Produk[]
 }
 
 export async function getStokList(kodeCabangFilter?: string): Promise<StokItem[]> {
-  if (!kodeCabangFilter || kodeCabangFilter === '') return []; // Admin MUST select branch first!
+  if (!kodeCabangFilter || kodeCabangFilter === 'ALL') return []; // Admin MUST select branch first!
   try {
-    let query = supabase.from('stok_cabang').select('*').limit(20000);
-    if (kodeCabangFilter !== 'ALL') {
-      query = query.eq('kode_cabang', kodeCabangFilter);
-    }
+    const query = supabase.schema(kodeCabangFilter).from('stok_cabang').select('*').limit(20000);
+    
     const { data, error } = await query;
     if (error) {
-      console.error('Error fetching stok_cabang:', error);
+      console.error('Error fetching stok_cabang from schema', kodeCabangFilter, ':', error);
       return [];
     }
     
@@ -269,7 +274,7 @@ export async function getCekMarginReport(kodeCabangFilter?: string): Promise<Cek
 
   const [stokList, produkList] = await Promise.all([
     getStokList(kodeCabangFilter),
-    getProdukList()
+    getProdukList(kodeCabangFilter)
   ]);
 
   const produkMap = new Map<string, Produk>();
@@ -332,7 +337,7 @@ export async function syncBranchStok(
     });
 
     if (newStokItems && newStokItems.length > 0) {
-      await supabase.from('stok_cabang').delete().eq('kode_cabang', targetKodeCabang);
+      await supabase.schema(targetKodeCabang).from('stok_cabang').delete().eq('kode_cabang', targetKodeCabang);
 
       const dbStokRows = newStokItems.map(s => ({
         kode_cabang: targetKodeCabang,
@@ -352,7 +357,7 @@ export async function syncBranchStok(
       const chunkSize = 500;
       for (let i = 0; i < dbStokRows.length; i += chunkSize) {
         const chunk = dbStokRows.slice(i, i + chunkSize);
-        const { error } = await supabase.from('stok_cabang').upsert(chunk, { onConflict: 'id' });
+        const { error } = await supabase.schema(targetKodeCabang).from('stok_cabang').upsert(chunk, { onConflict: 'id' });
         if (error) {
           throw new Error(`Gagal menyimpan stok: ${error.message}`);
         }
@@ -362,7 +367,7 @@ export async function syncBranchStok(
 
     if (newProdukItems && newProdukItems.length > 0) {
       // Hapus data produk lama untuk cabang ini, lalu insert fresh
-      await supabase.from('produk').delete().eq('kode_cabang', targetKodeCabang);
+      await supabase.schema(targetKodeCabang).from('produk').delete().eq('kode_cabang', targetKodeCabang);
 
       const dbProdukRows = newProdukItems.map(p => ({
         kode_produk: p.kode,
@@ -382,7 +387,7 @@ export async function syncBranchStok(
       const chunkSize = 500;
       for (let i = 0; i < dbProdukRows.length; i += chunkSize) {
         const chunk = dbProdukRows.slice(i, i + chunkSize);
-        const { error } = await supabase.from('produk').upsert(chunk, { onConflict: 'kode_produk,kode_cabang' });
+        const { error } = await supabase.schema(targetKodeCabang).from('produk').upsert(chunk, { onConflict: 'kode_produk,kode_cabang' });
         if (error) {
           throw new Error(`Gagal menyimpan produk: ${error.message}`);
         }
