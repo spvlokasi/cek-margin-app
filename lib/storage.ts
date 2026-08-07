@@ -357,7 +357,7 @@ export async function syncBranchStok(
       const chunkSize = 500;
       for (let i = 0; i < dbStokRows.length; i += chunkSize) {
         const chunk = dbStokRows.slice(i, i + chunkSize);
-        const { error } = await supabase.schema(targetKodeCabang).from('stok_cabang').upsert(chunk, { onConflict: 'id' });
+        const { error } = await supabase.schema(targetKodeCabang).from('stok_cabang').upsert(chunk, { onConflict: 'kode_produk,kode_cabang' });
         if (error) {
           throw new Error(`Gagal menyimpan stok: ${error.message}`);
         }
