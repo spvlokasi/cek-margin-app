@@ -105,7 +105,7 @@ export async function authenticateUser(usernameInput: string, passwordInput: str
     const adminSession: UserSession = {
       isLoggedIn: true,
       role: 'admin',
-      kodeCabang: 'ALL',
+      kodeCabang: '',
       namaCabang: 'Semua Cabang (Admin)',
       username: matchedAdmin.username,
     };

@@ -36,7 +36,7 @@ export default function CekMarginPage() {
     const loadedCabang = await getCabangList();
     setCabangList(loadedCabang);
 
-    if (loadedSession.kodeCabang) {
+    if (loadedSession.kodeCabang && loadedSession.kodeCabang !== 'ALL') {
       setIsLoadingData(true);
       const report = await getCekMarginReport(loadedSession.kodeCabang);
       setReportData(report);
@@ -62,7 +62,7 @@ export default function CekMarginPage() {
   const handleSessionChange = async (newSession: UserSession) => {
     setSession(newSession);
     saveSession(newSession);
-    if (newSession.kodeCabang) {
+    if (newSession.kodeCabang && newSession.kodeCabang !== 'ALL') {
       setIsLoadingData(true);
       const updatedReport = await getCekMarginReport(newSession.kodeCabang);
       setReportData(updatedReport);
@@ -73,7 +73,7 @@ export default function CekMarginPage() {
   };
 
   const handleRefresh = async () => {
-    if (session.kodeCabang) {
+    if (session.kodeCabang && session.kodeCabang !== 'ALL') {
       setIsLoadingData(true);
       const updatedReport = await getCekMarginReport(session.kodeCabang);
       setReportData(updatedReport);
