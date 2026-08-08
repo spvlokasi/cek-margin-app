@@ -27,7 +27,18 @@ const DEFAULT_ADMIN_USERS: AdminUser[] = [
 ];
 
 export async function getAdminUserList(): Promise<AdminUser[]> {
-  // 100% STANDALONE (Bypass Supabase)
+  try {
+    const { data, error } = await supabase.from('admin_users').select('*').order('created_at', { ascending: true });
+    if (error) {
+      console.error('Error fetching admin users from Supabase:', error);
+      return DEFAULT_ADMIN_USERS;
+    }
+    if (data && data.length > 0) {
+      return data;
+    }
+  } catch (err) {
+    console.error('Exception fetching admin users from Supabase:', err);
+  }
   return DEFAULT_ADMIN_USERS;
 }
 
@@ -131,7 +142,23 @@ export async function authenticateUser(usernameInput: string, passwordInput: str
 }
 
 export async function getCabangList(): Promise<Cabang[]> {
-  // 100% STANDALONE (Bypass Supabase)
+  try {
+    const { data, error } = await supabase.from('cabang').select('*').order('kode_cabang', { ascending: true });
+    if (error) {
+      console.error('Error fetching cabang from Supabase:', error);
+      return MOCK_CABANG;
+    }
+    if (data && data.length > 0) {
+      return data.map((c: any) => ({
+        kode: c.kode_cabang,
+        nama: c.nama_cabang,
+        wilayah: c.wilayah || 'Jawa Timur',
+        password: c.password || c.kode_cabang,
+      }));
+    }
+  } catch (err) {
+    console.error('Exception fetching cabang from Supabase:', err);
+  }
   return MOCK_CABANG;
 }
 
