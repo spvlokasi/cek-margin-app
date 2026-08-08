@@ -43,12 +43,14 @@ export default function UploadModal({
                  : 'Upload File Produk & Stok secara bersamaan';
 
   const [selectedKodeCabang, setSelectedKodeCabang] = useState<string>('');
+  const [adminInputText, setAdminInputText] = useState<string>('');
 
   // Set default branch when modal opens
   useEffect(() => {
     if (isOpen) {
       if (session.role === 'admin') {
-        setSelectedKodeCabang(cabangList[0]?.kode || 'CBG-001');
+        setSelectedKodeCabang('');
+        setAdminInputText('');
       } else {
         setSelectedKodeCabang(session.kodeCabang);
       }
@@ -218,17 +220,17 @@ export default function UploadModal({
                   type="text"
                   list="upload-cabang-datalist"
                   placeholder="Ketik kode atau nama cabang..."
-                  value={selectedKodeCabang ? `${selectedKodeCabang} - ${activeCabangObj.nama}` : ''}
+                  value={adminInputText}
                   onChange={(e) => {
                     const val = e.target.value;
+                    setAdminInputText(val);
                     const found = cabangList.find(c => `${c.kode} - ${c.nama}` === val);
                     if (found) {
                       setSelectedKodeCabang(found.kode);
                       setParseResultProduk(null);
                       setParseResultStok(null);
                     } else {
-                      // Allow typing but don't set invalid code
-                      // In a real app we might handle this better
+                      setSelectedKodeCabang('');
                     }
                   }}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-semibold text-white focus:outline-none focus:border-cyan-500 placeholder:text-slate-500 transition-colors"
