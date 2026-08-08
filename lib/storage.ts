@@ -1,6 +1,6 @@
 import { AdminUser, Cabang, CekMarginItem, Produk, StokItem, UserSession } from './types';
 import { MOCK_CABANG, MOCK_PRODUK, MOCK_STOK } from './sampleData';
-import { supabase } from './supabase';
+import { supabaseAuthAndStok, supabaseProduk } from './supabase';
 
 const STORAGE_KEYS = {
   PRODUK: 'cek_margin_produk_v3',
@@ -28,7 +28,7 @@ const DEFAULT_ADMIN_USERS: AdminUser[] = [
 
 export async function getAdminUserList(): Promise<AdminUser[]> {
   try {
-    const { data, error } = await supabase.from('admin_users').select('*').order('created_at', { ascending: true });
+    const { data, error } = await supabaseAuthAndStok.from('admin_users').select('*').order('created_at', { ascending: true });
     if (error) {
       console.error('Error fetching admin users from Supabase:', error);
       return DEFAULT_ADMIN_USERS;
@@ -43,7 +43,7 @@ export async function getAdminUserList(): Promise<AdminUser[]> {
 }
 
 export async function addAdminUser(newAdmin: AdminUser): Promise<AdminUser[]> {
-  await supabase.from('admin_users').upsert({
+  await supabaseAuthAndStok.from('admin_users').upsert({
     username: newAdmin.username.toLowerCase(),
     nama: newAdmin.nama,
     password: newAdmin.password
@@ -52,7 +52,7 @@ export async function addAdminUser(newAdmin: AdminUser): Promise<AdminUser[]> {
 }
 
 export async function deleteAdminUser(id: string): Promise<AdminUser[]> {
-  await supabase.from('admin_users').delete().eq('id', id).neq('username', 'admin');
+  await supabaseAuthAndStok.from('admin_users').delete().eq('id', id).neq('username', 'admin');
   return await getAdminUserList();
 }
 
@@ -143,7 +143,7 @@ export async function authenticateUser(usernameInput: string, passwordInput: str
 
 export async function getCabangList(): Promise<Cabang[]> {
   try {
-    const { data, error } = await supabase.from('cabang').select('*').order('kode_cabang', { ascending: true });
+    const { data, error } = await supabaseAuthAndStok.from('cabang').select('*').order('kode_cabang', { ascending: true });
     if (error) {
       console.error('Error fetching cabang from Supabase:', error);
       return MOCK_CABANG;
@@ -163,7 +163,7 @@ export async function getCabangList(): Promise<Cabang[]> {
 }
 
 export async function addCabang(newCabang: Cabang): Promise<Cabang[]> {
-  await supabase.from('cabang').upsert({
+  await supabaseAuthAndStok.from('cabang').upsert({
     kode_cabang: newCabang.kode,
     nama_cabang: newCabang.nama,
     wilayah: newCabang.wilayah || 'Jawa Timur',
@@ -184,14 +184,14 @@ export async function bulkAddCabang(newCabangList: Cabang[]): Promise<Cabang[]> 
   const chunkSize = 500;
   for (let i = 0; i < dbRows.length; i += chunkSize) {
     const chunk = dbRows.slice(i, i + chunkSize);
-    await supabase.from('cabang').upsert(chunk, { onConflict: 'kode_cabang' });
+    await supabaseAuthAndStok.from('cabang').upsert(chunk, { onConflict: 'kode_cabang' });
   }
   
   return await getCabangList();
 }
 
 export async function deleteCabang(kode: string): Promise<Cabang[]> {
-  await supabase.from('cabang').delete().eq('kode_cabang', kode);
+  await supabaseAuthAndStok.from('cabang').delete().eq('kode_cabang', kode);
   return await getCabangList();
 }
 
@@ -199,7 +199,7 @@ export async function getProdukList(kodeCabangFilter?: string): Promise<Produk[]
   // Admin harus pilih cabang dulu - data produk per cabang
   if (!kodeCabangFilter || kodeCabangFilter === 'ALL') return [];
   try {
-    const query = supabase.schema(kodeCabangFilter).from('produk').select('*').limit(20000).order('nama_produk', { ascending: true });
+    const query = supabaseProduk.from('produk').select('*').eq('kode_cabang', kodeCabangFilter).limit(20000).order('nama_produk', { ascending: true });
     
     const { data, error } = await query;
     if (error) {
@@ -232,7 +232,7 @@ export async function getProdukList(kodeCabangFilter?: string): Promise<Produk[]
 export async function getStokList(kodeCabangFilter?: string): Promise<StokItem[]> {
   if (!kodeCabangFilter || kodeCabangFilter === 'ALL') return []; // Admin MUST select branch first!
   try {
-    const query = supabase.schema(kodeCabangFilter).from('stok_cabang').select('*').limit(20000);
+    const query = supabaseAuthAndStok.from('stok').select('*').eq('kode_cabang', kodeCabangFilter).limit(20000);
     
     const { data, error } = await query;
     if (error) {
@@ -323,13 +323,13 @@ export async function syncBranchStok(
   let produkUpdatedCount = 0;
 
   try {
-    await supabase.from('cabang').upsert({
+    await supabaseAuthAndStok.from('cabang').upsert({
       kode_cabang: targetKodeCabang,
       nama_cabang: targetNamaCabang,
     });
 
     if (newStokItems && newStokItems.length > 0) {
-      await supabase.schema(targetKodeCabang).from('stok_cabang').delete().eq('kode_cabang', targetKodeCabang);
+      await supabaseAuthAndStok.from('stok').delete().eq('kode_cabang', targetKodeCabang);
 
       const dbStokRows = newStokItems.map(s => ({
         kode_cabang: targetKodeCabang,
@@ -349,7 +349,7 @@ export async function syncBranchStok(
       const chunkSize = 500;
       for (let i = 0; i < dbStokRows.length; i += chunkSize) {
         const chunk = dbStokRows.slice(i, i + chunkSize);
-        const { error } = await supabase.schema(targetKodeCabang).from('stok_cabang').upsert(chunk, { onConflict: 'kode_produk,kode_cabang' });
+        const { error } = await supabaseAuthAndStok.from('stok').upsert(chunk, { onConflict: 'kode_cabang,kode_produk' });
         if (error) {
           throw new Error(`Gagal menyimpan stok: ${error.message}`);
         }
@@ -358,8 +358,7 @@ export async function syncBranchStok(
     }
 
     if (newProdukItems && newProdukItems.length > 0) {
-      // Hapus data produk lama untuk cabang ini, lalu insert fresh
-      await supabase.schema(targetKodeCabang).from('produk').delete().eq('kode_cabang', targetKodeCabang);
+      await supabaseProduk.from('produk').delete().eq('kode_cabang', targetKodeCabang);
 
       const dbProdukRows = newProdukItems.map(p => ({
         kode_produk: p.kode,
@@ -379,7 +378,7 @@ export async function syncBranchStok(
       const chunkSize = 500;
       for (let i = 0; i < dbProdukRows.length; i += chunkSize) {
         const chunk = dbProdukRows.slice(i, i + chunkSize);
-        const { error } = await supabase.schema(targetKodeCabang).from('produk').upsert(chunk, { onConflict: 'kode_produk,kode_cabang' });
+        const { error } = await supabaseProduk.from('produk').upsert(chunk, { onConflict: 'kode_cabang,kode_produk' });
         if (error) {
           throw new Error(`Gagal menyimpan produk: ${error.message}`);
         }
