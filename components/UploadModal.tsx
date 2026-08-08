@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { Cabang, UserSession } from '@/lib/types';
 import { parseExcelFile, ParseResult } from '@/lib/excelParser';
-import { calculateLocalMargin } from '@/lib/memoryCalc';
+import { syncBranchStok } from '@/lib/storage';
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -152,14 +152,20 @@ export default function UploadModal({
     setSyncStatus(null);
 
     try {
-      const hasilKalkulasi = calculateLocalMargin(produkToSync, stokToSync);
+      setSyncStatus('Menyimpan data ke Cloud Database Supabase...');
+      const syncResult = await syncBranchStok(
+        activeCabangObj.kode, 
+        activeCabangObj.nama, 
+        stokToSync, 
+        produkToSync
+      );
 
       setSyncStatus(
-        `Berhasil menghitung margin! (${produkToSync.length} Produk & ${stokToSync.length} Stok diproses lokal)`
+        `Berhasil menyimpan data! (${syncResult.totalProdukUpdated} Produk & ${syncResult.totalStokAdded} Stok ditambahkan ke database)`
       );
 
       setTimeout(() => {
-        onUploadSuccess(hasilKalkulasi);
+        onUploadSuccess();
         onClose();
         setProdukFile(null);
         setStokFile(null);
