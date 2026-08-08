@@ -15,14 +15,14 @@ import {
 } from 'lucide-react';
 import { Cabang, UserSession } from '@/lib/types';
 import { parseExcelFile, ParseResult } from '@/lib/excelParser';
-import { syncBranchStok } from '@/lib/storage';
+import { calculateLocalMargin } from '@/lib/memoryCalc';
 
 interface UploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   session: UserSession;
   cabangList: Cabang[];
-  onUploadSuccess: () => void;
+  onUploadSuccess: (data?: any[]) => void;
   mode?: 'margin' | 'produk' | 'stok';
 }
 
@@ -130,7 +130,6 @@ export default function UploadModal({
   };
 
   const handleExecuteSync = async () => {
-    // Collect data to sync based on what was uploaded and successfully parsed
     let produkToSync: any[] = [];
     let stokToSync: any[] = [];
 
@@ -143,7 +142,7 @@ export default function UploadModal({
     }
 
     if (produkToSync.length === 0 && stokToSync.length === 0) {
-      setSyncStatus("Tidak ada data valid yang bisa disinkronkan.");
+      setSyncStatus("Tidak ada data valid yang bisa diproses.");
       return;
     }
 
@@ -151,19 +150,14 @@ export default function UploadModal({
     setSyncStatus(null);
 
     try {
-      const { totalStokAdded, totalProdukUpdated } = await syncBranchStok(
-        activeCabangObj.kode,
-        activeCabangObj.nama,
-        stokToSync,
-        produkToSync
-      );
+      const hasilKalkulasi = calculateLocalMargin(produkToSync, stokToSync);
 
       setSyncStatus(
-        `Berhasil memproses data! (${totalProdukUpdated} Produk & ${totalStokAdded} Stok untuk cabang ${activeCabangObj.nama})`
+        `Berhasil menghitung margin! (${produkToSync.length} Produk & ${stokToSync.length} Stok diproses lokal)`
       );
 
       setTimeout(() => {
-        onUploadSuccess();
+        onUploadSuccess(hasilKalkulasi);
         onClose();
         setProdukFile(null);
         setStokFile(null);
@@ -174,17 +168,17 @@ export default function UploadModal({
       }, 1500);
     } catch (err: any) {
       console.error(err);
-      setSyncStatus(err.message || "Gagal sinkronisasi ke Supabase. Periksa koneksi internet Anda.");
+      setSyncStatus(err.message || "Gagal memproses data. Pastikan format file benar.");
       setIsSyncing(false);
     }
   };
 
-  const isSyncDisabled = isSyncing || 
-    (
-      (!parseResultProduk && !parseResultStok) || 
-      (parseResultProduk?.error) || 
-      (parseResultStok?.error)
-    );
+  const isSyncDisabled = Boolean(
+    isSyncing || 
+    (!parseResultProduk && !parseResultStok) || 
+    (parseResultProduk?.error) || 
+    (parseResultStok?.error)
+  );
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
