@@ -170,9 +170,6 @@ export async function addCabang(newCabang: Cabang): Promise<Cabang[]> {
     password: newCabang.password || newCabang.kode,
   }, { onConflict: 'kode_cabang' });
 
-  // Trigger Schema Creation
-  await supabase.rpc('create_branch_infrastructure', { branch_code: newCabang.kode });
-
   return await getCabangList();
 }
 
@@ -188,11 +185,6 @@ export async function bulkAddCabang(newCabangList: Cabang[]): Promise<Cabang[]> 
   for (let i = 0; i < dbRows.length; i += chunkSize) {
     const chunk = dbRows.slice(i, i + chunkSize);
     await supabase.from('cabang').upsert(chunk, { onConflict: 'kode_cabang' });
-  }
-  
-  // Trigger Schema Creation for all new branches
-  for (const c of newCabangList) {
-    await supabase.rpc('create_branch_infrastructure', { branch_code: c.kode });
   }
   
   return await getCabangList();
