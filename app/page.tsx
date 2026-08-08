@@ -39,10 +39,27 @@ export default function CekMarginPage() {
     const loadedCabang = await getCabangList();
     setCabangList(loadedCabang);
 
-    // IN-MEMORY HACK: We no longer fetch from Supabase on load!
-    // Data only exists when the user uploads Excel in the current session.
-    setReportData([]);
     setIsCheckingAuth(false);
+    if (loadedSession.isLoggedIn) {
+      await fetchReportData(loadedSession.kodeCabang);
+    }
+  };
+
+  const fetchReportData = async (kodeCabang: string) => {
+    if (!kodeCabang || kodeCabang === 'ALL') {
+      setReportData([]);
+      return;
+    }
+    setIsLoadingData(true);
+    try {
+      const data = await getCekMarginReport(kodeCabang);
+      setReportData(data);
+    } catch (e) {
+      console.error(e);
+      setReportData([]);
+    } finally {
+      setIsLoadingData(false);
+    }
   };
 
   useEffect(() => {
@@ -60,13 +77,11 @@ export default function CekMarginPage() {
   const handleSessionChange = async (newSession: UserSession) => {
     setSession(newSession);
     saveSession(newSession);
-    // Jika ganti cabang, data di memori dihapus (harus upload Excel cabang tsb)
-    setReportData([]);
+    await fetchReportData(newSession.kodeCabang);
   };
 
   const handleRefresh = async () => {
-    // Tombol refresh menghapus data di memori (reset)
-    setReportData([]);
+    await fetchReportData(session.kodeCabang);
   };
 
   const formatRupiah = (val: number) => {
@@ -319,16 +334,14 @@ export default function CekMarginPage() {
       </div>
 
         <UploadModal
-        isOpen={isUploadOpen}
-        onClose={() => setIsUploadOpen(false)}
-        session={session}
-        cabangList={cabangList}
-        onUploadSuccess={(data?: any[]) => {
-          if (data) {
-            setReportData(data);
-          }
-        }}
-      />
+          isOpen={isUploadOpen}
+          onClose={() => setIsUploadOpen(false)}
+          session={session}
+          cabangList={cabangList}
+          onUploadSuccess={async (data?: any[]) => {
+            await fetchReportData(session.kodeCabang);
+          }}
+        />
     </div>
   );
 }
