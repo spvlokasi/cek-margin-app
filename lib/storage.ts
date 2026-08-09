@@ -323,12 +323,34 @@ export async function syncBranchStok(
   let produkUpdatedCount = 0;
 
   try {
+    // 1. FILTERING TAHAP AWAL (IDE GILA)
+    // Filter stok: Hanya ambil yang stok > 0
+    let filteredStokItems = newStokItems;
+    if (newStokItems) {
+      filteredStokItems = newStokItems.filter(s => (s.stok || 0) > 0);
+    }
+
+    // Filter produk: Hanya ambil produk yang ada di stok aktif (stok > 0)
+    let filteredProdukItems = newProdukItems;
+    if (newProdukItems) {
+      const activeStokCodes = new Set<string>();
+      
+      if (filteredStokItems) {
+        filteredStokItems.forEach(s => activeStokCodes.add(s.kode));
+      } else {
+        const existingStok = await getStokList(targetKodeCabang);
+        existingStok.forEach(s => { if ((s.stok || 0) > 0) activeStokCodes.add(s.kode); });
+      }
+
+      filteredProdukItems = newProdukItems.filter(p => activeStokCodes.has(p.kode));
+    }
+
     await supabaseAuthAndStok.from('cabang').upsert({
       kode_cabang: targetKodeCabang,
       nama_cabang: targetNamaCabang,
     });
 
-    if (newStokItems && newStokItems.length > 0) {
+    if (filteredStokItems && filteredStokItems.length > 0) {
       const existingStok = await getStokList(targetKodeCabang);
       const existingMap = new Map<string, StokItem>();
       existingStok.forEach(s => existingMap.set(s.kode, s));
@@ -337,7 +359,7 @@ export async function syncBranchStok(
       const toDelete: string[] = [];
       const newMap = new Map<string, boolean>();
 
-      for (const s of newStokItems) {
+      for (const s of filteredStokItems) {
         newMap.set(s.kode, true);
         const ex = existingMap.get(s.kode);
         if (!ex || ex.stok !== s.stok || ex.hpp !== s.hpp || ex.nilai !== s.nilai || ex.nama !== s.nama) {
@@ -391,7 +413,7 @@ export async function syncBranchStok(
       stokAddedCount = toUpsert.length;
     }
 
-    if (newProdukItems && newProdukItems.length > 0) {
+    if (filteredProdukItems && filteredProdukItems.length > 0) {
       const existingProduk = await getProdukList(targetKodeCabang);
       const existingMap = new Map<string, Produk>();
       existingProduk.forEach(p => existingMap.set(p.kode, p));
@@ -400,7 +422,7 @@ export async function syncBranchStok(
       const toDelete: string[] = [];
       const newMap = new Map<string, boolean>();
 
-      for (const p of newProdukItems) {
+      for (const p of filteredProdukItems) {
         newMap.set(p.kode, true);
         const ex = existingMap.get(p.kode);
         
