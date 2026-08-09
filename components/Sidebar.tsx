@@ -37,16 +37,6 @@ export default function Sidebar({ session, onOpenUpload, isOpenMobile, onCloseMo
       adminOnly: true,
     },
     {
-      label: 'Produk',
-      href: '/produk',
-      icon: Package,
-    },
-    {
-      label: 'Stok',
-      href: '/stok',
-      icon: BarChart3,
-    },
-    {
       label: 'User Admin',
       href: '/user',
       icon: Users,
