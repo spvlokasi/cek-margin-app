@@ -219,44 +219,13 @@ export default function BandingHargaPage() {
             if (s.role === 'cabang') setBaseCabang(s.kodeCabang);
           }}
           onRefreshData={handleCompare}
-          title="Banding Harga" 
+          title="" 
           onToggleMobileMenu={() => setIsMobileMenuOpen(true)}
         />
 
         <main className="flex-1 overflow-auto p-4 md:p-6 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative">
           <div className="max-w-7xl mx-auto space-y-6">
             
-            <div className="flex flex-col md:flex-row gap-4 bg-slate-900/50 p-4 rounded-2xl border border-slate-800/50 backdrop-blur-sm relative z-20">
-              <div className="flex-1">
-                <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Cabang Acuan (Dasar)</label>
-                <select
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors disabled:opacity-50 appearance-none"
-                  value={baseCabang}
-                  onChange={(e) => setBaseCabang(e.target.value)}
-                  disabled={session.role === 'cabang'}
-                >
-                  <option value="" disabled>Pilih Cabang Acuan</option>
-                  {cabangList.filter(c => c.kode !== 'ALL').map(c => (
-                    <option key={c.kode} value={c.kode}>{c.nama} ({c.kode})</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div className="flex-1">
-                <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Cabang Pembanding (Target)</label>
-                <select
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors appearance-none"
-                  value={targetCabang}
-                  onChange={(e) => setTargetCabang(e.target.value)}
-                >
-                  <option value="" disabled>Pilih Cabang Pembanding</option>
-                  {cabangList.filter(c => c.kode !== 'ALL' && c.kode !== baseCabang).map(c => (
-                    <option key={c.kode} value={c.kode}>{c.nama} ({c.kode})</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
             <div className="bg-slate-900/50 rounded-2xl border border-slate-800/50 backdrop-blur-sm overflow-hidden flex flex-col relative min-h-[500px] shadow-2xl z-10">
               
               {isLoadingData && (
@@ -266,20 +235,65 @@ export default function BandingHargaPage() {
                 </div>
               )}
 
-              {!baseCabang || !targetCabang ? (
-                <div className="flex-1 flex flex-col items-center justify-center p-12 text-center opacity-50">
-                  <Scale className="w-16 h-16 text-slate-600 mb-4" />
-                  <p className="text-slate-400 font-medium text-lg">Pilih kedua cabang untuk melihat perbandingan harga</p>
-                </div>
-              ) : (
-                <div className="p-4 md:p-6 flex-1 flex flex-col">
-                  <DataTable 
-                    columns={columns} 
-                    data={bandingData}
-                    searchKeys={['kode', 'nama', 'namaSupplier']}
-                  />
-                </div>
-              )}
+              <div className="p-4 md:p-6 flex-1 flex flex-col">
+                <DataTable 
+                  columns={columns} 
+                  data={bandingData}
+                  searchKeys={['kode', 'nama', 'namaSupplier']}
+                  customHeaderAction={
+                    <div className="flex flex-wrap items-center gap-2 mr-2">
+                      {/* Cabang Acuan */}
+                      <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs">
+                        <span className="font-bold text-slate-500 uppercase">Acuan</span>
+                        <input
+                          id="base-branch-search"
+                          type="text"
+                          list="base-cabang-options"
+                          placeholder="Ketik cabang..."
+                          className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-32 sm:w-40"
+                          defaultValue={baseCabang ? `${baseCabang} - ${cabangList.find(c => c.kode === baseCabang)?.nama || ''}` : ''}
+                          disabled={session.role === 'cabang'}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const selected = cabangList.find(c => `${c.kode} - ${c.nama}` === val);
+                            if (selected) setBaseCabang(selected.kode);
+                          }}
+                        />
+                        <datalist id="base-cabang-options">
+                          {cabangList.filter(c => c.kode !== 'ALL').map(c => (
+                            <option key={c.kode} value={`${c.kode} - ${c.nama}`} />
+                          ))}
+                        </datalist>
+                      </div>
+
+                      <span className="text-slate-600 font-bold px-1 text-xs">VS</span>
+
+                      {/* Cabang Target */}
+                      <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs">
+                        <span className="font-bold text-slate-500 uppercase">Target</span>
+                        <input
+                          id="target-branch-search"
+                          type="text"
+                          list="target-cabang-options"
+                          placeholder="Ketik cabang..."
+                          className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-32 sm:w-40"
+                          defaultValue={targetCabang ? `${targetCabang} - ${cabangList.find(c => c.kode === targetCabang)?.nama || ''}` : ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const selected = cabangList.find(c => `${c.kode} - ${c.nama}` === val);
+                            if (selected) setTargetCabang(selected.kode);
+                          }}
+                        />
+                        <datalist id="target-cabang-options">
+                          {cabangList.filter(c => c.kode !== 'ALL' && c.kode !== baseCabang).map(c => (
+                            <option key={c.kode} value={`${c.kode} - ${c.nama}`} />
+                          ))}
+                        </datalist>
+                      </div>
+                    </div>
+                  }
+                />
+              </div>
             </div>
           </div>
         </main>
