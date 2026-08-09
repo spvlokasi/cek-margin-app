@@ -346,13 +346,27 @@ export async function syncBranchStok(
         persen_h3: 0,
       }));
 
-      const chunkSize = 500;
+      const chunkSize = 1500;
       for (let i = 0; i < dbStokRows.length; i += chunkSize) {
         const chunk = dbStokRows.slice(i, i + chunkSize);
-        const { error } = await supabaseAuthAndStok.from('stok').upsert(chunk, { onConflict: 'kode_cabang,kode_produk' });
-        if (error) {
-          throw new Error(`Gagal menyimpan stok: ${error.message}`);
+        
+        let attempts = 0;
+        while (attempts < 3) {
+          try {
+            const { error } = await supabaseAuthAndStok.from('stok').upsert(chunk, { onConflict: 'kode_cabang,kode_produk' });
+            if (error) throw new Error(error.message);
+            break; // Success, break retry loop
+          } catch (err: any) {
+            attempts++;
+            if (attempts >= 3) {
+              throw new Error(`Gagal menyimpan stok: ${err.message || err}`);
+            }
+            // Wait 1.5 seconds before retrying
+            await new Promise(res => setTimeout(res, 1500));
+          }
         }
+        // Small delay between successful chunks to avoid overwhelming the network
+        await new Promise(res => setTimeout(res, 300));
       }
       stokAddedCount = dbStokRows.length;
     }
@@ -375,13 +389,27 @@ export async function syncBranchStok(
         hrg3: p.hrg3,
       }));
 
-      const chunkSize = 500;
+      const chunkSize = 1500;
       for (let i = 0; i < dbProdukRows.length; i += chunkSize) {
         const chunk = dbProdukRows.slice(i, i + chunkSize);
-        const { error } = await supabaseProduk.from('produk').upsert(chunk, { onConflict: 'kode_cabang,kode_produk' });
-        if (error) {
-          throw new Error(`Gagal menyimpan produk: ${error.message}`);
+        
+        let attempts = 0;
+        while (attempts < 3) {
+          try {
+            const { error } = await supabaseProduk.from('produk').upsert(chunk, { onConflict: 'kode_cabang,kode_produk' });
+            if (error) throw new Error(error.message);
+            break; // Success, break retry loop
+          } catch (err: any) {
+            attempts++;
+            if (attempts >= 3) {
+              throw new Error(`Gagal menyimpan produk: ${err.message || err}`);
+            }
+            // Wait 1.5 seconds before retrying
+            await new Promise(res => setTimeout(res, 1500));
+          }
         }
+        // Small delay between successful chunks
+        await new Promise(res => setTimeout(res, 300));
       }
       produkUpdatedCount = dbProdukRows.length;
     }
