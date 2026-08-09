@@ -161,7 +161,7 @@ export default function UploadModal({
       );
 
       setSyncStatus(
-        `Berhasil menyimpan data! (${syncResult.totalProdukUpdated} Produk & ${syncResult.totalStokAdded} Stok ditambahkan ke database)`
+        `Proses berhasil....!!!`
       );
 
       setTimeout(() => {
