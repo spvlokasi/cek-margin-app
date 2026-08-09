@@ -272,12 +272,12 @@ export default function UploadModal({
                   <div className="p-3 rounded-full bg-slate-800 text-emerald-400 group-hover:scale-110 transition-transform duration-200">
                     <PackageSearch className="w-7 h-7" />
                   </div>
-                  <p className="mt-3 text-xs font-bold text-white">
-                      <span className="font-bold text-emerald-300 block mb-1">FILE PRODUK (HPP)</span>
+                    <p className="mt-3 text-xs font-bold text-white">
+                      <span className="font-bold text-emerald-300 block mb-1">FILE PRODUK</span>
                       <span className="font-semibold text-slate-300 block truncate w-full max-w-[200px]">
-                        {produkFile ? produkFile.name : 'Pilih/Drag File Excel'}
+                        {produkFile ? produkFile.name : 'Pilih File Produk Excel'}
                       </span>
-                  </p>
+                    </p>
                 </div>
                 
                 {/* Parse Status Indicator Produk */}
@@ -317,12 +317,12 @@ export default function UploadModal({
                   <div className="p-3 rounded-full bg-slate-800 text-cyan-400 group-hover:scale-110 transition-transform duration-200">
                     <LineChart className="w-7 h-7" />
                   </div>
-                  <p className="mt-3 text-xs font-bold text-white">
-                      <span className="font-bold text-cyan-300 block mb-1">FILE STOK (Harga Jual)</span>
+                    <p className="mt-3 text-xs font-bold text-white">
+                      <span className="font-bold text-cyan-300 block mb-1">FILE STOK</span>
                       <span className="font-semibold text-slate-300 block truncate w-full max-w-[200px]">
-                        {stokFile ? stokFile.name : 'Pilih/Drag File Excel'}
+                        {stokFile ? stokFile.name : 'Pilih File StokTokoGudang Excel'}
                       </span>
-                  </p>
+                    </p>
                 </div>
 
                 {/* Parse Status Indicator Stok */}
