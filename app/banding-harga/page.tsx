@@ -229,7 +229,7 @@ export default function BandingHargaPage() {
           onToggleMobileMenu={() => setIsMobileMenuOpen(true)}
         />
 
-        <main className="flex-1 overflow-auto p-4 md:p-6 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative pb-24 md:pb-6">
+        <main className="flex-1 overflow-auto p-4 md:p-6 relative pb-24 md:pb-6">
           <div className="max-w-7xl mx-auto space-y-6">
             
             <div className="bg-white/50 rounded-2xl border border-slate-200/50 backdrop-blur-sm overflow-hidden flex flex-col relative min-h-[500px] shadow-lg z-10">
