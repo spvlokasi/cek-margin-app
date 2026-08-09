@@ -152,7 +152,7 @@ export default function UploadModal({
     setSyncStatus(null);
 
     try {
-      setSyncStatus('Menyimpan data ke Cloud Database Supabase...');
+      setSyncStatus('Proses data...');
       const syncResult = await syncBranchStok(
         activeCabangObj.kode, 
         activeCabangObj.nama, 
