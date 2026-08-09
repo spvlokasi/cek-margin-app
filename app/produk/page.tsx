@@ -61,7 +61,7 @@ export default function ProdukPage() {
   if (isCheckingAuth) {
     return (
       <div className="h-screen bg-slate-950 flex items-center justify-center text-cyan-400 font-bold text-sm">
-        Memeriksa Autentikasi...
+        Loading...
       </div>
     );
   }
