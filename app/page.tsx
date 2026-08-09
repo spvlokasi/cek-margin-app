@@ -28,6 +28,7 @@ export default function CekMarginPage() {
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
   const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+  const [showMinusOnly, setShowMinusOnly] = useState<boolean>(false);
 
   const loadData = async () => {
     const loadedSession = getInitialSession();
@@ -259,11 +260,25 @@ export default function CekMarginPage() {
           )}
           
           <DataTable<CekMarginItem>
-            data={reportData}
+            data={showMinusOnly ? reportData.filter(item => item.mrg1 < 0 || item.mrg2 < 0 || item.mrg3 < 0) : reportData}
             columns={columns}
             searchKeys={['kode', 'nama', 'namaSupplier']}
             customHeaderAction={
               <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowMinusOnly(!showMinusOnly)}
+                  title="Tampilkan Minus Saja"
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-colors cursor-pointer mr-1 ${
+                    showMinusOnly 
+                      ? 'bg-rose-500/20 border-rose-500/50 text-rose-400 hover:bg-rose-500/30' 
+                      : 'bg-slate-800/80 border-slate-700/60 text-slate-400 hover:text-slate-300 hover:bg-slate-700/80'
+                  }`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  <span className="hidden sm:inline">{showMinusOnly ? 'Filter: Minus' : 'Minus Saja'}</span>
+                </button>
                 {session.role === 'admin' && (
                   <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs mr-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">

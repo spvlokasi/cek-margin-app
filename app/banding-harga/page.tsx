@@ -39,6 +39,7 @@ export default function BandingHargaPage() {
   const [targetCabang, setTargetCabang] = useState<string>('');
   
   const [bandingData, setBandingData] = useState<BandingItem[]>([]);
+  const [filterHppSamaHargaBeda, setFilterHppSamaHargaBeda] = useState<boolean>(false);
 
   const loadData = async () => {
     const loadedSession = getInitialSession();
@@ -249,10 +250,24 @@ export default function BandingHargaPage() {
                 )}
                 <DataTable 
                   columns={columns} 
-                  data={bandingData}
+                  data={filterHppSamaHargaBeda ? bandingData.filter(item => item.hppDiff === 0 && (item.hrg1Diff !== 0 || item.hrg2Diff !== 0 || item.hrg3Diff !== 0)) : bandingData}
                   searchKeys={['kode', 'nama', 'namaSupplier']}
                   customHeaderAction={
                     <div className="flex flex-wrap items-center gap-2 mr-2">
+                      <button
+                        onClick={() => setFilterHppSamaHargaBeda(!filterHppSamaHargaBeda)}
+                        title="HPP Sama Harga Beda"
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-colors cursor-pointer ${
+                          filterHppSamaHargaBeda 
+                            ? 'bg-amber-500/20 border-amber-500/50 text-amber-400 hover:bg-amber-500/30' 
+                            : 'bg-slate-800/80 border-slate-700/60 text-slate-400 hover:text-slate-300 hover:bg-slate-700/80'
+                        }`}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                        </svg>
+                        <span className="hidden sm:inline">{filterHppSamaHargaBeda ? 'Filter: Anomali' : 'Cari Anomali'}</span>
+                      </button>
                       {/* Cabang Acuan */}
                       <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs">
                         <span className="font-bold text-slate-500 uppercase">Acuan</span>
@@ -309,6 +324,7 @@ export default function BandingHargaPage() {
           </div>
         </main>
       </div>
+      <BottomNav session={session} />
     </div>
   );
 }
