@@ -19,7 +19,7 @@
 }
 
 html, body {
-  background: linear-gradient(135deg, #e8f5e9 0%, #f1fdf4 40%, #e0f2f1 100%);
+  background: linear-gradient(135deg, #b8dfc8 0%, #5aaa78 40%, #3d9960 100%);
   background-attachment: fixed;
   color: #1e293b;
   min-height: 100vh;

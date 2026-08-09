@@ -111,7 +111,7 @@ export default function Sidebar({ session, onOpenUpload, isOpenMobile, onCloseMo
   );
 
   return (
-    <aside className="hidden md:flex w-64 bg-white/80 border-r border-green-100/80 text-slate-600 backdrop-blur-sm flex-col justify-between shrink-0 shadow-lg h-screen sticky top-0 z-30">
+    <aside className="hidden md:flex w-64 bg-white border-r border-slate-200 text-slate-700 shadow-xl flex-col justify-between shrink-0 shadow-lg h-screen sticky top-0 z-30">
       {sidebarContent}
     </aside>
   );
