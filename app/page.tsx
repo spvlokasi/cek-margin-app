@@ -117,7 +117,6 @@ export default function CekMarginPage() {
       render: (row) => (
         <div>
           <p className="font-bold text-white leading-snug">{row.nama}</p>
-          <span className="text-[10px] text-slate-400">Stok: {row.stok.toLocaleString('id-ID')} | {row.namaCabang}</span>
         </div>
       ),
     },
@@ -126,6 +125,12 @@ export default function CekMarginPage() {
       label: 'NAMA SUPPLIER',
       sortable: true,
       render: (row) => <span className="text-slate-300 font-medium text-xs">{row.namaSupplier}</span>,
+    },
+    {
+      key: 'stok',
+      label: 'STOK',
+      sortable: true,
+      render: (row) => <span className="text-white font-bold">{row.stok.toLocaleString('id-ID')}</span>,
     },
     {
       key: 'hrg1',
