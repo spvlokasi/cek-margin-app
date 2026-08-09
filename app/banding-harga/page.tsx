@@ -115,15 +115,15 @@ export default function BandingHargaPage() {
 
   if (isCheckingAuth) {
     return (
-      <div className="h-screen bg-slate-950 flex items-center justify-center text-cyan-400 font-bold text-sm">
+      <div className="h-screen bg-slate-50 flex items-center justify-center text-[#209452] font-bold text-sm">
         Loading...
       </div>
     );
   }
 
   const formatDiff = (diff: number | null) => {
-    if (diff === null) return <span className="text-slate-500 font-bold">-</span>;
-    if (diff === 0) return <span className="text-slate-300 font-bold">0</span>;
+    if (diff === null) return <span className="text-slate-400 font-bold">-</span>;
+    if (diff === 0) return <span className="text-slate-600 font-bold">0</span>;
     
     const formatted = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(Math.abs(diff));
     
@@ -143,14 +143,14 @@ export default function BandingHargaPage() {
       label: 'NO',
       sortable: false,
       align: 'center',
-      render: (row, index) => <span className="text-slate-500 font-mono">{index}</span>,
+      render: (row, index) => <span className="text-slate-400 font-mono">{index}</span>,
     },
     {
       key: 'kode',
       label: 'KODE',
       sortable: true,
       render: (row) => (
-        <span className="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-900/60">
+        <span className="font-mono text-[#209452] font-bold bg-green-50 px-2 py-0.5 rounded border border-cyan-900/60">
           {row.kode}
         </span>
       ),
@@ -161,7 +161,7 @@ export default function BandingHargaPage() {
       sortable: true,
       render: (row) => (
         <div>
-          <p className="font-bold text-white leading-snug">{row.nama}</p>
+          <p className="font-bold text-slate-900 leading-snug">{row.nama}</p>
         </div>
       ),
     },
@@ -169,13 +169,13 @@ export default function BandingHargaPage() {
       key: 'namaSupplier',
       label: 'NAMA SUPPLIER',
       sortable: true,
-      render: (row) => <span className="text-slate-300 font-medium text-xs">{row.namaSupplier}</span>,
+      render: (row) => <span className="text-slate-600 font-medium text-xs">{row.namaSupplier}</span>,
     },
     {
       key: 'stok',
       label: 'STOK',
       sortable: true,
-      render: (row) => <span className="text-white font-bold">{row.stok.toLocaleString('id-ID')}</span>,
+      render: (row) => <span className="text-slate-900 font-bold">{row.stok.toLocaleString('id-ID')}</span>,
     },
     {
       key: 'hppDiff',
@@ -208,7 +208,7 @@ export default function BandingHargaPage() {
   ];
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden font-sans selection:bg-cyan-500/30">
+    <div className="flex h-screen bg-slate-50 text-slate-800 overflow-hidden font-sans">
       <Sidebar 
         session={session} 
         onOpenUpload={() => {}} // Dummy as upload is not used here
@@ -232,18 +232,18 @@ export default function BandingHargaPage() {
         <main className="flex-1 overflow-auto p-4 md:p-6 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative pb-24 md:pb-6">
           <div className="max-w-7xl mx-auto space-y-6">
             
-            <div className="bg-slate-900/50 rounded-2xl border border-slate-800/50 backdrop-blur-sm overflow-hidden flex flex-col relative min-h-[500px] shadow-2xl z-10">
+            <div className="bg-white/50 rounded-2xl border border-slate-200/50 backdrop-blur-sm overflow-hidden flex flex-col relative min-h-[500px] shadow-lg z-10">
               
               {isLoadingData && (
-                <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6 mt-6 mb-6">
-                  <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mb-4"></div>
-                  <p className="text-cyan-400 font-bold animate-pulse">Loading...</p>
+                <div className="absolute inset-0 bg-slate-50/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6 mt-6 mb-6">
+                  <div className="w-12 h-12 border-4 border-[#a7dfc0] border-t-cyan-500 rounded-full animate-spin mb-4"></div>
+                  <p className="text-[#209452] font-bold animate-pulse">Loading...</p>
                 </div>
               )}
 
               <div className="p-4 md:p-6 flex-1 flex flex-col relative">
                 {baseCabang && targetCabang && baseCabang === targetCabang && (
-                  <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-40 flex flex-col items-center justify-center rounded-xl mx-4 my-4 border border-rose-500/30">
+                  <div className="absolute inset-0 bg-slate-50/80 backdrop-blur-sm z-40 flex flex-col items-center justify-center rounded-xl mx-4 my-4 border border-rose-500/30">
                     <Scale className="w-12 h-12 text-rose-500 mb-4 animate-bounce" />
                     <p className="text-rose-400 font-bold text-lg px-4 text-center">Cabang Acuan dan Target tidak boleh sama!</p>
                   </div>
@@ -260,7 +260,7 @@ export default function BandingHargaPage() {
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-colors cursor-pointer ${
                           filterHppSamaHargaBeda 
                             ? 'bg-amber-500/20 border-amber-500/50 text-amber-400 hover:bg-amber-500/30' 
-                            : 'bg-slate-800/80 border-slate-700/60 text-slate-400 hover:text-slate-300 hover:bg-slate-700/80'
+                            : 'bg-slate-100/80 border-slate-300/60 text-slate-500 hover:text-slate-700 hover:bg-slate-200'
                         }`}
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -269,14 +269,14 @@ export default function BandingHargaPage() {
                         <span className="hidden sm:inline">{filterHppSamaHargaBeda ? 'Filter: Anomali' : 'Cari Anomali'}</span>
                       </button>
                       {/* Cabang Acuan */}
-                      <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs">
-                        <span className="font-bold text-slate-500 uppercase">Acuan</span>
+                      <div className="flex items-center gap-2 bg-slate-100/80 border border-slate-300/60 rounded-xl px-3 py-1.5 text-xs">
+                        <span className="font-bold text-slate-400 uppercase">Acuan</span>
                         <input
                           id="base-branch-search"
                           type="text"
                           list="base-cabang-options"
                           placeholder="Ketik cabang..."
-                          className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-32 sm:w-40"
+                          className="bg-transparent text-slate-900 font-semibold focus:outline-none placeholder:text-slate-400 w-32 sm:w-40"
                           defaultValue={baseCabang ? `${baseCabang} - ${cabangList.find(c => c.kode === baseCabang)?.nama || ''}` : ''}
                           disabled={session.role === 'cabang'}
                           onChange={(e) => {
@@ -295,14 +295,14 @@ export default function BandingHargaPage() {
                       <span className="text-slate-600 font-bold px-1 text-xs">VS</span>
 
                       {/* Cabang Target */}
-                      <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs">
-                        <span className="font-bold text-slate-500 uppercase">Target</span>
+                      <div className="flex items-center gap-2 bg-slate-100/80 border border-slate-300/60 rounded-xl px-3 py-1.5 text-xs">
+                        <span className="font-bold text-slate-400 uppercase">Target</span>
                         <input
                           id="target-branch-search"
                           type="text"
                           list="target-cabang-options"
                           placeholder="Ketik cabang..."
-                          className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-32 sm:w-40"
+                          className="bg-transparent text-slate-900 font-semibold focus:outline-none placeholder:text-slate-400 w-32 sm:w-40"
                           defaultValue={targetCabang ? `${targetCabang} - ${cabangList.find(c => c.kode === targetCabang)?.nama || ''}` : ''}
                           onChange={(e) => {
                             const val = e.target.value;

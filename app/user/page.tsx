@@ -71,7 +71,7 @@ export default function UserAdminPage() {
 
   if (isCheckingAuth) {
     return (
-      <div className="h-screen bg-slate-950 flex items-center justify-center text-cyan-400 font-bold text-sm">
+      <div className="h-screen bg-slate-50 flex items-center justify-center text-[#209452] font-bold text-sm">
         Loading...
       </div>
     );
@@ -124,7 +124,7 @@ export default function UserAdminPage() {
       label: 'NO',
       sortable: false,
       align: 'center',
-      render: (_row, index) => <span className="text-slate-500 font-mono text-xs">{index}</span>,
+      render: (_row, index) => <span className="text-slate-400 font-mono text-xs">{index}</span>,
     },
     {
       key: 'username',
@@ -147,14 +147,14 @@ export default function UserAdminPage() {
       key: 'nama',
       label: 'NAMA LENGKAP',
       sortable: true,
-      render: (row) => <span className="font-bold text-white text-sm">{row.nama}</span>,
+      render: (row) => <span className="font-bold text-slate-900 text-sm">{row.nama}</span>,
     },
     {
       key: 'password',
       label: 'PASSWORD',
       sortable: false,
       render: (row) => (
-        <span className="font-mono text-slate-400 text-xs bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+        <span className="font-mono text-slate-400 text-xs bg-white px-2 py-0.5 rounded border border-slate-200">
           {row.password || 'admin123'}
         </span>
       ),
@@ -192,7 +192,7 @@ export default function UserAdminPage() {
   ];
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
+    <div className="flex h-screen bg-slate-50 text-slate-800 overflow-hidden font-sans">
       <Sidebar 
         session={session} 
         onOpenUpload={() => setIsUploadOpen(true)}
@@ -212,7 +212,7 @@ export default function UserAdminPage() {
 
         <main className="p-3 sm:p-6 space-y-4 sm:space-y-6 flex-1 relative pb-24 md:pb-6">
           {isLoading && (
-            <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6">
+            <div className="absolute inset-0 bg-slate-50/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6">
               <div className="w-12 h-12 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin mb-4"></div>
               <p className="text-amber-400 font-bold animate-pulse">Memuat data admin...</p>
             </div>
@@ -251,19 +251,19 @@ export default function UserAdminPage() {
 
       {/* Modal Tambah Admin */}
       {showForm && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden">
-            <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-slate-50/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-sm shadow-lg overflow-hidden">
+            <div className="p-5 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
                   <Users className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-white text-sm">Tambah Admin Baru</h3>
+                  <h3 className="font-bold text-slate-900 text-sm">Tambah Admin Baru</h3>
                   <p className="text-[11px] text-slate-400">Daftarkan akun admin pusat</p>
                 </div>
               </div>
-              <button onClick={() => setShowForm(false)} className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+              <button onClick={() => setShowForm(false)} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -276,7 +276,7 @@ export default function UserAdminPage() {
                   placeholder="Contoh: spv_madura"
                   value={newUsername}
                   onChange={(e) => setNewUsername(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 transition-colors"
                   required
                 />
               </div>
@@ -288,7 +288,7 @@ export default function UserAdminPage() {
                   placeholder="Contoh: Ahmad SPV Bisnis"
                   value={newNama}
                   onChange={(e) => setNewNama(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 transition-colors"
                   required
                 />
               </div>
@@ -301,17 +301,17 @@ export default function UserAdminPage() {
                     placeholder="Password login"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 font-mono pr-10 transition-colors"
+                    className="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 font-mono pr-10 transition-colors"
                     required
                   />
-                  <button type="button" onClick={() => setShowNewPass(!showNewPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                  <button type="button" onClick={() => setShowNewPass(!showNewPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900">
                     {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
               <div className="flex gap-2 pt-1">
-                <button type="button" onClick={() => setShowForm(false)} className="flex-1 py-2.5 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-700 transition-colors">
+                <button type="button" onClick={() => setShowForm(false)} className="flex-1 py-2.5 rounded-xl bg-slate-100 text-xs font-semibold text-slate-600 hover:bg-slate-700 transition-colors">
                   Batal
                 </button>
                 <button type="submit" className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold text-xs hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5">
@@ -326,19 +326,19 @@ export default function UserAdminPage() {
 
       {/* Modal Edit Admin */}
       {editingAdmin && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden">
-            <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-slate-50/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-sm shadow-lg overflow-hidden">
+            <div className="p-5 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
                   <Edit className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-white text-sm">Edit Admin</h3>
+                  <h3 className="font-bold text-slate-900 text-sm">Edit Admin</h3>
                   <p className="text-[11px] text-amber-400 font-mono">{editingAdmin.username}</p>
                 </div>
               </div>
-              <button onClick={() => setEditingAdmin(null)} className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+              <button onClick={() => setEditingAdmin(null)} className="p-1.5 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -350,7 +350,7 @@ export default function UserAdminPage() {
                   type="text"
                   value={editNama}
                   onChange={(e) => setEditNama(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 transition-colors"
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 transition-colors"
                 />
               </div>
 
@@ -361,16 +361,16 @@ export default function UserAdminPage() {
                     type={showEditPass ? 'text' : 'password'}
                     value={editPassword}
                     onChange={(e) => setEditPassword(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500 pr-10 transition-colors"
+                    className="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 font-mono focus:outline-none focus:border-amber-500 pr-10 transition-colors"
                   />
-                  <button type="button" onClick={() => setShowEditPass(!showEditPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                  <button type="button" onClick={() => setShowEditPass(!showEditPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900">
                     {showEditPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
               <div className="flex gap-2 pt-1">
-                <button onClick={() => setEditingAdmin(null)} className="flex-1 py-2.5 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-700 transition-colors">
+                <button onClick={() => setEditingAdmin(null)} className="flex-1 py-2.5 rounded-xl bg-slate-100 text-xs font-semibold text-slate-600 hover:bg-slate-700 transition-colors">
                   Batal
                 </button>
                 <button onClick={handleSaveEdit} className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-colors flex items-center justify-center gap-1.5">

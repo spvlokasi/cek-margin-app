@@ -37,72 +37,74 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 relative overflow-hidden font-sans">
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xl relative z-10 space-y-6">
-        <div className="text-center space-y-3">
-          <Logo size="lg" className="mx-auto" />
-          <h1 className="text-2xl font-black text-white tracking-tight">DC02 MANAGEMENT</h1>
+    <div className="min-h-screen bg-gradient-to-br from-[#eaf5d8] to-[#60b67e] text-slate-800 flex items-center justify-center p-4 relative overflow-hidden font-sans">
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl relative z-10 overflow-hidden flex flex-col">
+        {/* Header Section */}
+        <div className="bg-[#269a5a] py-8 relative flex flex-col items-center justify-center">
+          {/* Decorative circle */}
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#7cb84a] rounded-full opacity-90 blur-md pointer-events-none" />
+          
+          <Logo size="lg" className="mx-auto mb-3 z-10 relative drop-shadow-xl" />
+          <h1 className="text-xl font-bold text-white tracking-tight z-10 relative">Login Sistem</h1>
+          <p className="text-xs text-green-100 font-semibold z-10 relative">TokoBASMALAH</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          {error && (
-            <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-medium flex items-center gap-2.5">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
+        {/* Form Section */}
+        <div className="p-8 space-y-6">
+          <form onSubmit={handleLogin} className="space-y-5">
+            {error && (
+              <div className="p-3 rounded-xl bg-rose-100 border border-rose-300 text-rose-600 text-xs font-medium flex items-center gap-2.5">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Username:</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Masukkan username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-medium"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5">
-              <Lock className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Password:</span>
-            </label>
-            <div className="relative">
+            <div>
+              <label className="block text-xs font-bold text-[#1a5b3a] mb-1.5 flex items-center gap-1.5">
+                <span>NIK</span>
+              </label>
               <input
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Masukkan password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700/80 rounded-xl pl-3.5 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-medium"
+                type="text"
+                placeholder="2013187080"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full bg-[#fef9c3] border border-yellow-200/50 rounded-xl px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-400 font-semibold transition-all shadow-inner"
                 required
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
             </div>
-          </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 hover:opacity-90 transition-all cursor-pointer disabled:opacity-50"
-          >
-            <span>{loading ? 'Loading...' : 'Login'}</span>
-            <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-          </button>
-        </form>
+            <div>
+              <label className="block text-xs font-bold text-[#1a5b3a] mb-1.5 flex items-center gap-1.5">
+                <span>Password</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-[#fef9c3] border border-yellow-200/50 rounded-xl pl-4 pr-10 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-400 font-semibold transition-all shadow-inner"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-800"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3.5 mt-2 rounded-xl bg-gradient-to-r from-orange-400 to-orange-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-orange-500/30 hover:opacity-90 hover:-translate-y-0.5 transition-all cursor-pointer disabled:opacity-50 disabled:hover:translate-y-0"
+            >
+              <span>{loading ? 'Loading...' : 'Login'}</span>
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

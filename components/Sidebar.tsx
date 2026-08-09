@@ -56,14 +56,14 @@ export default function Sidebar({ session, onOpenUpload, isOpenMobile, onCloseMo
     <div className="flex flex-col h-full justify-between">
       <div>
         {/* Header Logo */}
-        <div className="p-5 border-b border-slate-800/80 flex items-center justify-between">
+        <div className="p-5 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Logo size="md" />
             <div>
-              <h1 className="font-bold text-white tracking-wide text-base leading-tight">
+              <h1 className="font-bold text-[#209452] tracking-wide text-base leading-tight">
                 DC02
               </h1>
-              <span className="text-[11px] text-cyan-400 font-medium">
+              <span className="text-[11px] text-slate-500 font-medium">
                 {session.role === 'admin' ? 'Admin Pusat' : session.namaCabang}
               </span>
             </div>
@@ -72,7 +72,7 @@ export default function Sidebar({ session, onOpenUpload, isOpenMobile, onCloseMo
           {onCloseMobile && (
             <button 
               onClick={onCloseMobile}
-              className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -94,12 +94,12 @@ export default function Sidebar({ session, onOpenUpload, isOpenMobile, onCloseMo
                 onClick={onCloseMobile}
                 className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
                   isActive
-                    ? 'bg-gradient-to-r from-cyan-500/20 to-emerald-500/10 text-cyan-400 border border-cyan-500/30 shadow-md shadow-cyan-950/50'
-                    : 'hover:bg-slate-800/60 hover:text-white text-slate-400'
+                    ? 'bg-gradient-to-r from-[#e8f8ed] to-[#d8f5e0] text-[#209452] border border-[#a7dfc0] shadow-sm'
+                    : 'hover:bg-slate-50 hover:text-[#209452] text-slate-500'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-cyan-400' : 'text-slate-400 group-hover:text-cyan-400'}`} />
+                  <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-[#209452]' : 'text-slate-400 group-hover:text-[#209452]'}`} />
                   <span>{item.label}</span>
                 </div>
               </Link>
@@ -111,7 +111,7 @@ export default function Sidebar({ session, onOpenUpload, isOpenMobile, onCloseMo
   );
 
   return (
-    <aside className="hidden md:flex w-64 bg-slate-900 border-r border-slate-800 text-slate-300 flex-col justify-between shrink-0 shadow-2xl h-screen sticky top-0 z-30">
+    <aside className="hidden md:flex w-64 bg-white border-r border-slate-100 text-slate-600 flex-col justify-between shrink-0 shadow-lg h-screen sticky top-0 z-30">
       {sidebarContent}
     </aside>
   );

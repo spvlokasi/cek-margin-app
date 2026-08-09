@@ -70,7 +70,7 @@ export default function CekMarginPage() {
 
   if (isCheckingAuth) {
     return (
-      <div className="h-screen bg-slate-950 flex items-center justify-center text-cyan-400 font-bold text-sm">
+      <div className="h-screen bg-slate-50 flex items-center justify-center text-[#209452] font-bold text-sm">
         Loading...
       </div>
     );
@@ -100,14 +100,14 @@ export default function CekMarginPage() {
       label: 'NO',
       sortable: false, // We usually don't sort by dynamic row number
       align: 'center',
-      render: (row, index) => <span className="text-slate-500 font-mono">{index}</span>,
+      render: (row, index) => <span className="text-slate-400 font-mono">{index}</span>,
     },
     {
       key: 'kode',
       label: 'KODE',
       sortable: true,
       render: (row) => (
-        <span className="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-900/60">
+        <span className="font-mono text-[#209452] font-bold bg-green-50 px-2 py-0.5 rounded border border-cyan-900/60">
           {row.kode}
         </span>
       ),
@@ -118,7 +118,7 @@ export default function CekMarginPage() {
       sortable: true,
       render: (row) => (
         <div>
-          <p className="font-bold text-white leading-snug">{row.nama}</p>
+          <p className="font-bold text-slate-900 leading-snug">{row.nama}</p>
         </div>
       ),
     },
@@ -126,13 +126,13 @@ export default function CekMarginPage() {
       key: 'namaSupplier',
       label: 'NAMA SUPPLIER',
       sortable: true,
-      render: (row) => <span className="text-slate-300 font-medium text-xs">{row.namaSupplier}</span>,
+      render: (row) => <span className="text-slate-600 font-medium text-xs">{row.namaSupplier}</span>,
     },
     {
       key: 'stok',
       label: 'STOK',
       sortable: true,
-      render: (row) => <span className="text-white font-bold">{row.stok.toLocaleString('id-ID')}</span>,
+      render: (row) => <span className="text-slate-900 font-bold">{row.stok.toLocaleString('id-ID')}</span>,
     },
     {
       key: 'hrg1',
@@ -171,7 +171,7 @@ export default function CekMarginPage() {
       label: 'HRG2',
       sortable: true,
       align: 'right',
-      render: (row) => <span className="font-medium text-slate-300">{formatRupiah(row.hrg2)}</span>,
+      render: (row) => <span className="font-medium text-slate-600">{formatRupiah(row.hrg2)}</span>,
     },
     {
       key: 'mrg2',
@@ -181,7 +181,7 @@ export default function CekMarginPage() {
       render: (row) => {
         const isPlus = row.mrg2 >= 0;
         return (
-          <span className={`font-semibold ${isPlus ? 'text-cyan-400' : 'text-rose-400'}`}>
+          <span className={`font-semibold ${isPlus ? 'text-[#209452]' : 'text-rose-400'}`}>
             {formatRupiah(row.mrg2)}
           </span>
         );
@@ -193,7 +193,7 @@ export default function CekMarginPage() {
       sortable: true,
       align: 'right',
       render: (row) => (
-        <span className="text-[11px] font-medium bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/20">
+        <span className="text-[11px] font-medium bg-green-50 text-[#209452] px-2 py-0.5 rounded border border-cyan-500/20">
           {row.persen2.toFixed(1)}%
         </span>
       ),
@@ -213,7 +213,7 @@ export default function CekMarginPage() {
       render: (row) => {
         const isPlus = row.mrg3 >= 0;
         return (
-          <span className={`font-semibold ${isPlus ? 'text-slate-300' : 'text-rose-400'}`}>
+          <span className={`font-semibold ${isPlus ? 'text-slate-600' : 'text-rose-400'}`}>
             {formatRupiah(row.mrg3)}
           </span>
         );
@@ -225,7 +225,7 @@ export default function CekMarginPage() {
       sortable: true,
       align: 'right',
       render: (row) => (
-        <span className="text-[11px] font-medium bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">
+        <span className="text-[11px] font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-300">
           {row.persen3.toFixed(1)}%
         </span>
       ),
@@ -233,7 +233,7 @@ export default function CekMarginPage() {
   ];
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
+    <div className="flex h-screen bg-slate-50 text-slate-800 overflow-hidden font-sans">
       <Sidebar 
         session={session} 
         onOpenUpload={() => setIsUploadOpen(true)}
@@ -253,9 +253,9 @@ export default function CekMarginPage() {
 
         <main className="p-3 sm:p-6 flex-1 relative pb-24 md:pb-6">
           {isLoadingData && (
-            <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6">
-              <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mb-4"></div>
-              <p className="text-cyan-400 font-bold animate-pulse">Loading...</p>
+            <div className="absolute inset-0 bg-slate-50/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6">
+              <div className="w-12 h-12 border-4 border-[#a7dfc0] border-t-cyan-500 rounded-full animate-spin mb-4"></div>
+              <p className="text-[#209452] font-bold animate-pulse">Loading...</p>
             </div>
           )}
           
@@ -271,7 +271,7 @@ export default function CekMarginPage() {
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-colors cursor-pointer mr-1 ${
                     showMinusOnly 
                       ? 'bg-rose-500/20 border-rose-500/50 text-rose-400 hover:bg-rose-500/30' 
-                      : 'bg-slate-800/80 border-slate-700/60 text-slate-400 hover:text-slate-300 hover:bg-slate-700/80'
+                      : 'bg-slate-100/80 border-slate-300/60 text-slate-500 hover:text-slate-700 hover:bg-slate-200'
                   }`}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -280,8 +280,8 @@ export default function CekMarginPage() {
                   <span className="hidden sm:inline">{showMinusOnly ? 'Filter: Minus' : 'Minus Saja'}</span>
                 </button>
                 {session.role === 'admin' && (
-                  <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs mr-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
+                  <div className="flex items-center gap-2 bg-slate-100/80 border border-slate-300/60 rounded-xl px-3 py-1.5 text-xs mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#209452]">
                       <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
                       <path d="M9 22v-4h6v4"></path>
                       <path d="M8 6h.01"></path>
@@ -299,7 +299,7 @@ export default function CekMarginPage() {
                       type="text"
                       list="cabang-options-table"
                       placeholder="Ketik & pilih cabang..."
-                      className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-48"
+                      className="bg-transparent text-slate-900 font-semibold focus:outline-none placeholder:text-slate-400 w-48"
                       defaultValue={(session.kodeCabang && session.kodeCabang !== 'ALL') ? `${session.kodeCabang} - ${session.namaCabang}` : ''}
                       onChange={(e) => {
                         const val = e.target.value;

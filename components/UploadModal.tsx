@@ -195,22 +195,22 @@ export default function UploadModal({
   );
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-50 bg-slate-50/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-2xl shadow-lg overflow-hidden animate-in fade-in zoom-in duration-200">
         {/* Modal Header */}
-        <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+        <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-white/60">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+            <div className="p-2.5 rounded-xl bg-green-50 border border-cyan-500/20 text-[#209452]">
               <UploadCloud className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-white text-base">{title}</h3>
+              <h3 className="font-bold text-slate-900 text-base">{title}</h3>
               <p className="text-xs text-slate-400">{subtitle}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -219,9 +219,9 @@ export default function UploadModal({
         {/* Modal Body */}
         <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
           {/* Target Branch Selector */}
-          <div className="p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60">
+          <div className="p-4 rounded-2xl bg-slate-100/60 border border-slate-300/60">
             <label className="block text-xs font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-cyan-400" />
+              <Building2 className="w-3.5 h-3.5 text-[#209452]" />
               <span>Target Cabang Pengunggahan:</span>
             </label>
 
@@ -245,7 +245,7 @@ export default function UploadModal({
                       setSelectedKodeCabang('');
                     }
                   }}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-semibold text-white focus:outline-none focus:border-cyan-500 placeholder:text-slate-500 transition-colors"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-500 placeholder:text-slate-400 transition-colors"
                   autoComplete="off"
                 />
                 <datalist id="upload-cabang-datalist">
@@ -255,7 +255,7 @@ export default function UploadModal({
                 </datalist>
               </div>
             ) : (
-              <div className="flex items-center justify-between text-xs font-bold text-white bg-slate-900 px-3 py-2 rounded-xl border border-slate-700">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-900 bg-white px-3 py-2 rounded-xl border border-slate-300">
                 <span>📍 {activeCabangObj.nama} ({activeCabangObj.kode})</span>
                 <span className="text-[10px] text-emerald-400 font-semibold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
                   Terkunci (Mode Cabang)
@@ -267,7 +267,7 @@ export default function UploadModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* File Dropzone - PRODUK */}
             {(mode === 'margin' || mode === 'produk') && (
-              <div className="relative border-2 border-dashed border-slate-700 hover:border-emerald-500 rounded-2xl p-5 text-center transition-all bg-slate-950/40 group flex flex-col h-full">
+              <div className="relative border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-2xl p-5 text-center transition-all bg-slate-50/40 group flex flex-col h-full">
                 <input
                   type="file"
                   accept=".xlsx, .xls"
@@ -275,12 +275,12 @@ export default function UploadModal({
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 />
                 <div className="flex flex-col items-center flex-1 justify-center">
-                  <div className="p-3 rounded-full bg-slate-800 text-emerald-400 group-hover:scale-110 transition-transform duration-200">
+                  <div className="p-3 rounded-full bg-slate-100 text-emerald-400 group-hover:scale-110 transition-transform duration-200">
                     <PackageSearch className="w-7 h-7" />
                   </div>
-                    <p className="mt-3 text-xs font-bold text-white">
+                    <p className="mt-3 text-xs font-bold text-slate-900">
                       <span className="font-bold text-emerald-300 block mb-1">FILE PRODUK</span>
-                      <span className="font-semibold text-slate-300 block truncate w-full max-w-[200px]">
+                      <span className="font-semibold text-slate-600 block truncate w-full max-w-[200px]">
                         {produkFile ? produkFile.name : 'Pilih File Produk Excel'}
                       </span>
                     </p>
@@ -312,7 +312,7 @@ export default function UploadModal({
 
             {/* File Dropzone - STOK */}
             {(mode === 'margin' || mode === 'stok') && (
-              <div className="relative border-2 border-dashed border-slate-700 hover:border-cyan-500 rounded-2xl p-5 text-center transition-all bg-slate-950/40 group flex flex-col h-full">
+              <div className="relative border-2 border-dashed border-slate-300 hover:border-cyan-500 rounded-2xl p-5 text-center transition-all bg-slate-50/40 group flex flex-col h-full">
                 <input
                   type="file"
                   accept=".xlsx, .xls"
@@ -320,12 +320,12 @@ export default function UploadModal({
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 />
                 <div className="flex flex-col items-center flex-1 justify-center">
-                  <div className="p-3 rounded-full bg-slate-800 text-cyan-400 group-hover:scale-110 transition-transform duration-200">
+                  <div className="p-3 rounded-full bg-slate-100 text-[#209452] group-hover:scale-110 transition-transform duration-200">
                     <LineChart className="w-7 h-7" />
                   </div>
-                    <p className="mt-3 text-xs font-bold text-white">
+                    <p className="mt-3 text-xs font-bold text-slate-900">
                       <span className="font-bold text-cyan-300 block mb-1">FILE STOK</span>
-                      <span className="font-semibold text-slate-300 block truncate w-full max-w-[200px]">
+                      <span className="font-semibold text-slate-600 block truncate w-full max-w-[200px]">
                         {stokFile ? stokFile.name : 'Pilih File StokTokoGudang Excel'}
                       </span>
                     </p>
@@ -333,7 +333,7 @@ export default function UploadModal({
 
                 {/* Parse Status Indicator Stok */}
                 {isParsingStok && (
-                  <div className="flex items-center justify-center gap-1.5 text-[10px] text-cyan-400 font-semibold mt-3">
+                  <div className="flex items-center justify-center gap-1.5 text-[10px] text-[#209452] font-semibold mt-3">
                     <RefreshCw className="w-3 h-3 animate-spin" />
                     <span>Membaca file...</span>
                   </div>
@@ -347,7 +347,7 @@ export default function UploadModal({
                       </div>
                     ) : (
                       <div className="p-2 rounded-lg bg-cyan-900/20 border border-cyan-800/60 text-[10px]">
-                        <span className="text-cyan-400 font-bold">{parseResultStok.detectedStokCount} data stok</span> siap disinkron.
+                        <span className="text-[#209452] font-bold">{parseResultStok.detectedStokCount} data stok</span> siap disinkron.
                       </div>
                     )}
                   </div>
@@ -365,10 +365,10 @@ export default function UploadModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-5 border-t border-slate-800 bg-slate-900/80 flex items-center justify-between">
+        <div className="p-5 border-t border-slate-200 bg-white/90 flex items-center justify-between">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-700 text-xs font-semibold text-slate-600 transition-colors cursor-pointer"
           >
             Batal
           </button>
@@ -376,7 +376,7 @@ export default function UploadModal({
           <button
             onClick={handleExecuteSync}
             disabled={isSyncDisabled}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-cyan-500/20 transition-all cursor-pointer"
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#209452] to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/20 transition-all cursor-pointer"
           >
             {isSyncing ? (
               <>

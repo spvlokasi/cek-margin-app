@@ -61,7 +61,7 @@ export default function StokPage() {
 
   if (isCheckingAuth) {
     return (
-      <div className="h-screen bg-slate-950 flex items-center justify-center text-cyan-400 font-bold text-sm">
+      <div className="h-screen bg-slate-50 flex items-center justify-center text-[#209452] font-bold text-sm">
         Loading...
       </div>
     );
@@ -115,14 +115,14 @@ export default function StokPage() {
       label: 'NO',
       sortable: false,
       align: 'center',
-      render: (_row, index) => <span className="text-slate-500 font-mono text-xs">{index}</span>,
+      render: (_row, index) => <span className="text-slate-400 font-mono text-xs">{index}</span>,
     },
     {
       key: 'kode',
       label: 'KODE',
       sortable: true,
       render: (row) => (
-        <span className="font-mono text-cyan-400 font-bold text-xs bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-900/60">
+        <span className="font-mono text-[#209452] font-bold text-xs bg-green-50 px-2 py-0.5 rounded border border-cyan-900/60">
           {row.kode}
         </span>
       ),
@@ -133,7 +133,7 @@ export default function StokPage() {
       sortable: true,
       render: (row) => (
         <div className="flex flex-col">
-          <span className="font-bold text-white leading-snug">{row.nama}</span>
+          <span className="font-bold text-slate-900 leading-snug">{row.nama}</span>
           <span className="text-[10px] text-slate-400">{row.namaCabang}</span>
         </div>
       ),
@@ -163,7 +163,7 @@ export default function StokPage() {
       label: 'HPP',
       sortable: true,
       align: 'right',
-      render: (row) => <span className="font-medium text-slate-300">{formatRupiah(row.hpp)}</span>,
+      render: (row) => <span className="font-medium text-slate-600">{formatRupiah(row.hpp)}</span>,
     },
     {
       key: 'nilai',
@@ -177,7 +177,7 @@ export default function StokPage() {
   ];
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
+    <div className="flex h-screen bg-slate-50 text-slate-800 overflow-hidden font-sans">
       <Sidebar 
         session={session} 
         onOpenUpload={() => setIsUploadOpen(true)}
@@ -197,9 +197,9 @@ export default function StokPage() {
 
         <main className="p-3 sm:p-6 flex-1 relative pb-24 md:pb-6">
           {isLoadingData && (
-            <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6">
-              <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mb-4"></div>
-              <p className="text-cyan-400 font-bold animate-pulse">Loading...</p>
+            <div className="absolute inset-0 bg-slate-50/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6">
+              <div className="w-12 h-12 border-4 border-[#a7dfc0] border-t-cyan-500 rounded-full animate-spin mb-4"></div>
+              <p className="text-[#209452] font-bold animate-pulse">Loading...</p>
             </div>
           )}
 
@@ -211,8 +211,8 @@ export default function StokPage() {
             customHeaderAction={
               <div className="flex items-center gap-2">
                 {session.role === 'admin' && (
-                  <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs mr-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
+                  <div className="flex items-center gap-2 bg-slate-100/80 border border-slate-300/60 rounded-xl px-3 py-1.5 text-xs mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#209452]">
                       <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
                       <path d="M9 22v-4h6v4"></path>
                       <path d="M8 6h.01"></path>
@@ -230,7 +230,7 @@ export default function StokPage() {
                       type="text"
                       list="stok-cabang-options"
                       placeholder="Ketik & pilih cabang..."
-                      className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-48"
+                      className="bg-transparent text-slate-900 font-semibold focus:outline-none placeholder:text-slate-400 w-48"
                       defaultValue={selectedBranch !== 'ALL' && selectedBranch !== '' ? `${selectedBranch} - ${cabangList.find(c => c.kode === selectedBranch)?.nama}` : ''}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -266,10 +266,10 @@ export default function StokPage() {
                 <button
                   onClick={() => setIsUploadOpen(true)}
                   title="Upload Excel Stok"
-                  className="p-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 hover:opacity-90 transition-opacity group relative"
+                  className="p-2 rounded-xl bg-gradient-to-r from-[#209452] to-emerald-500 text-slate-950 hover:opacity-90 transition-opacity group relative"
                 >
                   <Upload className="w-4 h-4 stroke-[2.5]" />
-                  <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-max bg-slate-800 text-slate-200 text-[10px] px-2 py-1 rounded border border-slate-700 z-50">
+                  <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-max bg-slate-100 text-slate-200 text-[10px] px-2 py-1 rounded border border-slate-300 z-50">
                     Upload Excel Stok
                   </div>
                 </button>

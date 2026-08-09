@@ -61,7 +61,7 @@ export default function ProdukPage() {
 
   if (isCheckingAuth) {
     return (
-      <div className="h-screen bg-slate-950 flex items-center justify-center text-cyan-400 font-bold text-sm">
+      <div className="h-screen bg-slate-50 flex items-center justify-center text-[#209452] font-bold text-sm">
         Loading...
       </div>
     );
@@ -127,14 +127,14 @@ export default function ProdukPage() {
       label: 'NO',
       sortable: false,
       align: 'center',
-      render: (row, index) => <span className="text-slate-500 font-mono">{index}</span>,
+      render: (row, index) => <span className="text-slate-400 font-mono">{index}</span>,
     },
     {
       key: 'kode',
       label: 'KODE',
       sortable: true,
       render: (row) => (
-        <span className="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-900/60">
+        <span className="font-mono text-[#209452] font-bold bg-green-50 px-2 py-0.5 rounded border border-cyan-900/60">
           {row.kode}
         </span>
       ),
@@ -143,19 +143,19 @@ export default function ProdukPage() {
       key: 'nama',
       label: 'NAMA PRODUK',
       sortable: true,
-      render: (row) => <p className="font-bold text-white leading-snug">{row.nama}</p>,
+      render: (row) => <p className="font-bold text-slate-900 leading-snug">{row.nama}</p>,
     },
     {
       key: 'principle',
       label: 'PRINCIPLE',
       sortable: true,
-      render: (row) => <span className="text-slate-300 font-mono text-xs">{row.principle || '-'}</span>,
+      render: (row) => <span className="text-slate-600 font-mono text-xs">{row.principle || '-'}</span>,
     },
     {
       key: 'namaPrinciple',
       label: 'NAMA PRINCIPLE',
       sortable: true,
-      render: (row) => <span className="text-slate-300 text-xs">{row.namaPrinciple || '-'}</span>,
+      render: (row) => <span className="text-slate-600 text-xs">{row.namaPrinciple || '-'}</span>,
     },
     {
       key: 'supplier',
@@ -174,7 +174,7 @@ export default function ProdukPage() {
       render: (row) => {
         let val = row.namaSupplier;
         if (val === 'undefined' || !val) val = '-';
-        return <span className="text-slate-300 font-medium text-xs">{val}</span>;
+        return <span className="text-slate-600 font-medium text-xs">{val}</span>;
       }
     },
     {
@@ -182,7 +182,7 @@ export default function ProdukPage() {
       label: 'KATEGORI',
       sortable: true,
       render: (row) => (
-        <span className="text-[10px] text-cyan-400 font-medium bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20">
+        <span className="text-[10px] text-[#209452] font-medium bg-green-50 px-1.5 py-0.5 rounded border border-cyan-500/20">
           {row.kategori || 'Umum'}
         </span>
       ),
@@ -192,7 +192,7 @@ export default function ProdukPage() {
       label: 'HPP',
       sortable: true,
       align: 'right',
-      render: (row) => <span className="font-medium text-slate-300">{formatRupiah(row.hpp)}</span>,
+      render: (row) => <span className="font-medium text-slate-600">{formatRupiah(row.hpp)}</span>,
     },
     {
       key: 'hrg1',
@@ -206,7 +206,7 @@ export default function ProdukPage() {
       label: 'HRG2',
       sortable: true,
       align: 'right',
-      render: (row) => <span className="font-semibold text-cyan-400">{formatRupiah(row.hrg2)}</span>,
+      render: (row) => <span className="font-semibold text-[#209452]">{formatRupiah(row.hrg2)}</span>,
     },
     {
       key: 'hrg3',
@@ -218,7 +218,7 @@ export default function ProdukPage() {
   ];
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
+    <div className="flex h-screen bg-slate-50 text-slate-800 overflow-hidden font-sans">
       <Sidebar 
         session={session} 
         onOpenUpload={() => setIsUploadOpen(true)}
@@ -238,9 +238,9 @@ export default function ProdukPage() {
 
         <main className="p-3 sm:p-6 flex-1 relative pb-24 md:pb-6">
           {isLoadingData && (
-            <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6">
-              <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mb-4"></div>
-              <p className="text-cyan-400 font-bold animate-pulse">Loading...</p>
+            <div className="absolute inset-0 bg-slate-50/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6">
+              <div className="w-12 h-12 border-4 border-[#a7dfc0] border-t-cyan-500 rounded-full animate-spin mb-4"></div>
+              <p className="text-[#209452] font-bold animate-pulse">Loading...</p>
             </div>
           )}
           {/* Branch Search Datalist hidden if not admin */}
@@ -252,8 +252,8 @@ export default function ProdukPage() {
             customHeaderAction={
               <div className="flex items-center gap-2">
                 {session.role === 'admin' && (
-                  <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs mr-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
+                  <div className="flex items-center gap-2 bg-slate-100/80 border border-slate-300/60 rounded-xl px-3 py-1.5 text-xs mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#209452]">
                       <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
                       <path d="M9 22v-4h6v4"></path>
                       <path d="M8 6h.01"></path>
@@ -271,7 +271,7 @@ export default function ProdukPage() {
                       type="text"
                       list="cabang-options-table"
                       placeholder="Ketik & pilih cabang..."
-                      className="bg-transparent text-white font-semibold focus:outline-none placeholder:text-slate-500 w-48"
+                      className="bg-transparent text-slate-900 font-semibold focus:outline-none placeholder:text-slate-400 w-48"
                       defaultValue={selectedBranch !== 'ALL' && selectedBranch !== '' ? `${selectedBranch} - ${cabangList.find(c => c.kode === selectedBranch)?.nama}` : ''}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -307,20 +307,20 @@ export default function ProdukPage() {
                 <button
                   onClick={handleDownloadTemplate}
                   title="Download Template Excel"
-                  className="p-2 rounded-xl bg-slate-800 border border-slate-700 text-cyan-400 hover:bg-cyan-500/10 transition-colors group relative"
+                  className="p-2 rounded-xl bg-slate-100 border border-slate-300 text-[#209452] hover:bg-green-50 transition-colors group relative"
                 >
                   <Download className="w-4 h-4" />
-                  <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-max bg-slate-800 text-slate-200 text-[10px] px-2 py-1 rounded border border-slate-700 z-50">
+                  <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-max bg-slate-100 text-slate-200 text-[10px] px-2 py-1 rounded border border-slate-300 z-50">
                     Download Template
                   </div>
                 </button>
                 <button
                   onClick={() => setIsUploadOpen(true)}
                   title="Upload Excel Produk"
-                  className="p-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 hover:opacity-90 transition-opacity group relative"
+                  className="p-2 rounded-xl bg-gradient-to-r from-[#209452] to-emerald-500 text-slate-950 hover:opacity-90 transition-opacity group relative"
                 >
                   <Upload className="w-4 h-4 stroke-[2.5]" />
-                  <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-max bg-slate-800 text-slate-200 text-[10px] px-2 py-1 rounded border border-slate-700 z-50">
+                  <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-max bg-slate-100 text-slate-200 text-[10px] px-2 py-1 rounded border border-slate-300 z-50">
                     Upload Excel
                   </div>
                 </button>
