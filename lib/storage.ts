@@ -16,7 +16,6 @@ function safeSetItem(key: string, value: string) {
     localStorage.setItem(key, value);
   } catch (e) {
     console.error(`Storage Quota Exceeded for ${key}`, e);
-    alert(`Peringatan: Kapasitas penyimpanan browser Anda hampir penuh. Sebagian data mungkin tidak tersimpan.`);
   }
 }
 
