@@ -99,7 +99,7 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 hover:opacity-90 transition-all cursor-pointer disabled:opacity-50"
           >
-            <span>{loading ? 'Memeriksa...' : 'Login'}</span>
+            <span>{loading ? 'Loading...' : 'Login'}</span>
             <ArrowRight className="w-4 h-4 stroke-[2.5]" />
           </button>
         </form>

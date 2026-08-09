@@ -253,7 +253,7 @@ export default function CekMarginPage() {
           {isLoadingData && (
             <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6">
               <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mb-4"></div>
-              <p className="text-cyan-400 font-bold animate-pulse">Mengambil Data dari Supabase...</p>
+              <p className="text-cyan-400 font-bold animate-pulse">Loading...</p>
             </div>
           )}
           
