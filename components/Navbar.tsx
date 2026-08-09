@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   KeyRound, 
   LogOut,
-  Menu
+  Menu,
+  ChevronDown,
+  User
 } from 'lucide-react';
 import { Cabang, UserSession } from '@/lib/types';
 import { logoutUser } from '@/lib/storage';
@@ -31,6 +33,20 @@ export default function Navbar({
 }: NavbarProps) {
   const router = useRouter();
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleLogout = () => {
     logoutUser();
@@ -55,27 +71,53 @@ export default function Navbar({
           )}
         </div>
 
-        {/* Controls / Session Switcher */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Change Password Button */}
+        {/* Profile Dropdown */}
+        <div className="relative" ref={dropdownRef}>
           <button
-            onClick={() => setIsPasswordModalOpen(true)}
-            title="Ubah Password"
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs font-semibold text-amber-400 transition-all cursor-pointer"
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="flex items-center gap-2 p-1 pl-3 pr-2 rounded-full bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 transition-all cursor-pointer"
           >
-            <KeyRound className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Ubah Password</span>
+            <span className="text-xs font-bold text-slate-300 hidden sm:block">
+              {session.role === 'admin' ? 'Admin Pusat' : session.kodeCabang}
+            </span>
+            <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-cyan-500 to-emerald-400 flex items-center justify-center shadow-inner shadow-black/20">
+              <span className="text-xs font-extrabold text-slate-950">
+                {session.role === 'admin' ? 'A' : session.kodeCabang.charAt(0)}
+              </span>
+            </div>
+            <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />
           </button>
 
-          {/* Logout Button */}
-          <button
-            onClick={handleLogout}
-            title="Keluar / Logout"
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-xs font-semibold text-rose-400 transition-all cursor-pointer"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Logout</span>
-          </button>
+          {/* Dropdown Menu */}
+          {isProfileOpen && (
+            <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 shadow-2xl shadow-black/50 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="px-4 py-3 border-b border-slate-800/80 bg-slate-800/30">
+                <p className="text-xs text-slate-400 font-medium">Masuk sebagai</p>
+                <p className="text-sm font-bold text-white truncate">
+                  {session.role === 'admin' ? 'Administrator' : `${session.kodeCabang} - ${session.namaCabang}`}
+                </p>
+              </div>
+              <div className="p-2">
+                <button
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    setIsPasswordModalOpen(true);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 transition-colors text-sm font-medium"
+                >
+                  <KeyRound className="w-4 h-4 text-amber-400" />
+                  Ubah Password
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-slate-300 hover:text-rose-400 hover:bg-rose-500/10 transition-colors text-sm font-medium mt-1"
+                >
+                  <LogOut className="w-4 h-4 text-rose-500" />
+                  Keluar / Logout
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
