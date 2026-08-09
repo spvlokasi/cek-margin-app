@@ -329,89 +329,140 @@ export async function syncBranchStok(
     });
 
     if (newStokItems && newStokItems.length > 0) {
-      await supabaseAuthAndStok.from('stok').delete().eq('kode_cabang', targetKodeCabang);
+      const existingStok = await getStokList(targetKodeCabang);
+      const existingMap = new Map<string, StokItem>();
+      existingStok.forEach(s => existingMap.set(s.kode, s));
 
-      const dbStokRows = newStokItems.map(s => ({
-        kode_cabang: targetKodeCabang,
-        kode_produk: s.kode,
-        nama_produk: s.nama,
-        stok: s.stok,
-        hpp: s.hpp,
-        nilai: s.nilai,
-        rl1: 0,
-        persen_h1: 0,
-        rl2: 0,
-        persen_h2: 0,
-        rl3: 0,
-        persen_h3: 0,
-      }));
+      const toUpsert: any[] = [];
+      const toDelete: string[] = [];
+      const newMap = new Map<string, boolean>();
 
-      const chunkSize = 1500;
-      for (let i = 0; i < dbStokRows.length; i += chunkSize) {
-        const chunk = dbStokRows.slice(i, i + chunkSize);
-        
-        let attempts = 0;
-        while (attempts < 3) {
-          try {
-            const { error } = await supabaseAuthAndStok.from('stok').upsert(chunk, { onConflict: 'kode_cabang,kode_produk' });
-            if (error) throw new Error(error.message);
-            break; // Success, break retry loop
-          } catch (err: any) {
-            attempts++;
-            if (attempts >= 3) {
-              throw new Error(`Gagal menyimpan stok: ${err.message || err}`);
-            }
-            // Wait 1.5 seconds before retrying
-            await new Promise(res => setTimeout(res, 1500));
-          }
+      for (const s of newStokItems) {
+        newMap.set(s.kode, true);
+        const ex = existingMap.get(s.kode);
+        if (!ex || ex.stok !== s.stok || ex.hpp !== s.hpp || ex.nilai !== s.nilai || ex.nama !== s.nama) {
+          toUpsert.push({
+            kode_cabang: targetKodeCabang,
+            kode_produk: s.kode,
+            nama_produk: s.nama,
+            stok: s.stok,
+            hpp: s.hpp,
+            nilai: s.nilai,
+            rl1: 0, persen_h1: 0, rl2: 0, persen_h2: 0, rl3: 0, persen_h3: 0,
+          });
         }
-        // Small delay between successful chunks to avoid overwhelming the network
-        await new Promise(res => setTimeout(res, 300));
       }
-      stokAddedCount = dbStokRows.length;
+
+      for (const ex of existingStok) {
+        if (!newMap.has(ex.kode)) {
+          toDelete.push(ex.kode);
+        }
+      }
+
+      if (toDelete.length > 0) {
+        const chunkSize = 1500;
+        for (let i = 0; i < toDelete.length; i += chunkSize) {
+          const chunk = toDelete.slice(i, i + chunkSize);
+          await supabaseAuthAndStok.from('stok').delete().eq('kode_cabang', targetKodeCabang).in('kode_produk', chunk);
+        }
+      }
+
+      if (toUpsert.length > 0) {
+        const chunkSize = 1500;
+        for (let i = 0; i < toUpsert.length; i += chunkSize) {
+          const chunk = toUpsert.slice(i, i + chunkSize);
+          let attempts = 0;
+          while (attempts < 3) {
+            try {
+              const { error } = await supabaseAuthAndStok.from('stok').upsert(chunk, { onConflict: 'kode_cabang,kode_produk' });
+              if (error) throw new Error(error.message);
+              break;
+            } catch (err: any) {
+              attempts++;
+              if (attempts >= 3) {
+                throw new Error(`Gagal menyimpan stok: ${err.message || err}`);
+              }
+              await new Promise(res => setTimeout(res, 1500));
+            }
+          }
+          await new Promise(res => setTimeout(res, 300));
+        }
+      }
+      stokAddedCount = toUpsert.length;
     }
 
     if (newProdukItems && newProdukItems.length > 0) {
-      await supabaseProduk.from('produk').delete().eq('kode_cabang', targetKodeCabang);
+      const existingProduk = await getProdukList(targetKodeCabang);
+      const existingMap = new Map<string, Produk>();
+      existingProduk.forEach(p => existingMap.set(p.kode, p));
 
-      const dbProdukRows = newProdukItems.map(p => ({
-        kode_produk: p.kode,
-        kode_cabang: targetKodeCabang,
-        nama_produk: p.nama,
-        kategori: p.kategori,
-        principle: p.principle,
-        nama_principle: p.namaPrinciple,
-        supplier: p.supplier,
-        nama_supplier: p.namaSupplier,
-        hpp: p.hpp,
-        hrg1: p.hrg1,
-        hrg2: p.hrg2,
-        hrg3: p.hrg3,
-      }));
+      const toUpsert: any[] = [];
+      const toDelete: string[] = [];
+      const newMap = new Map<string, boolean>();
 
-      const chunkSize = 1500;
-      for (let i = 0; i < dbProdukRows.length; i += chunkSize) {
-        const chunk = dbProdukRows.slice(i, i + chunkSize);
+      for (const p of newProdukItems) {
+        newMap.set(p.kode, true);
+        const ex = existingMap.get(p.kode);
         
-        let attempts = 0;
-        while (attempts < 3) {
-          try {
-            const { error } = await supabaseProduk.from('produk').upsert(chunk, { onConflict: 'kode_cabang,kode_produk' });
-            if (error) throw new Error(error.message);
-            break; // Success, break retry loop
-          } catch (err: any) {
-            attempts++;
-            if (attempts >= 3) {
-              throw new Error(`Gagal menyimpan produk: ${err.message || err}`);
-            }
-            // Wait 1.5 seconds before retrying
-            await new Promise(res => setTimeout(res, 1500));
-          }
+        const hasChanged = !ex || 
+          ex.hpp !== p.hpp || ex.hrg1 !== p.hrg1 || ex.hrg2 !== p.hrg2 || ex.hrg3 !== p.hrg3 ||
+          ex.nama !== p.nama || ex.kategori !== p.kategori || ex.principle !== p.principle || 
+          ex.namaPrinciple !== p.namaPrinciple || ex.supplier !== p.supplier || ex.namaSupplier !== p.namaSupplier;
+
+        if (hasChanged) {
+          toUpsert.push({
+            kode_produk: p.kode,
+            kode_cabang: targetKodeCabang,
+            nama_produk: p.nama,
+            kategori: p.kategori,
+            principle: p.principle,
+            nama_principle: p.namaPrinciple,
+            supplier: p.supplier,
+            nama_supplier: p.namaSupplier,
+            hpp: p.hpp,
+            hrg1: p.hrg1,
+            hrg2: p.hrg2,
+            hrg3: p.hrg3,
+          });
         }
-        // Small delay between successful chunks
-        await new Promise(res => setTimeout(res, 300));
       }
-      produkUpdatedCount = dbProdukRows.length;
+
+      for (const ex of existingProduk) {
+        if (!newMap.has(ex.kode)) {
+          toDelete.push(ex.kode);
+        }
+      }
+
+      if (toDelete.length > 0) {
+        const chunkSize = 1500;
+        for (let i = 0; i < toDelete.length; i += chunkSize) {
+          const chunk = toDelete.slice(i, i + chunkSize);
+          await supabaseProduk.from('produk').delete().eq('kode_cabang', targetKodeCabang).in('kode_produk', chunk);
+        }
+      }
+
+      if (toUpsert.length > 0) {
+        const chunkSize = 1500;
+        for (let i = 0; i < toUpsert.length; i += chunkSize) {
+          const chunk = toUpsert.slice(i, i + chunkSize);
+          let attempts = 0;
+          while (attempts < 3) {
+            try {
+              const { error } = await supabaseProduk.from('produk').upsert(chunk, { onConflict: 'kode_cabang,kode_produk' });
+              if (error) throw new Error(error.message);
+              break; 
+            } catch (err: any) {
+              attempts++;
+              if (attempts >= 3) {
+                throw new Error(`Gagal menyimpan produk: ${err.message || err}`);
+              }
+              await new Promise(res => setTimeout(res, 1500));
+            }
+          }
+          await new Promise(res => setTimeout(res, 300));
+        }
+      }
+      produkUpdatedCount = toUpsert.length;
     }
   } catch (e) {
     console.error('Supabase Cloud Sync Error:', e);
