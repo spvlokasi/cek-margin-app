@@ -94,7 +94,7 @@ export default function Sidebar({ session, onOpenUpload, isOpenMobile, onCloseMo
                 onClick={onCloseMobile}
                 className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
                   isActive
-                    ? 'bg-gradient-to-r from-[#e8f8ed] to-[#d8f5e0] text-[#209452] border border-[#a7dfc0] shadow-sm'
+                    ? 'bg-gradient-to-r from-[#d8f5e2] to-[#c8f0d8] text-[#209452] border border-[#a7dfc0] shadow-sm'
                     : 'hover:bg-slate-50 hover:text-[#209452] text-slate-500'
                 }`}
               >
@@ -111,7 +111,7 @@ export default function Sidebar({ session, onOpenUpload, isOpenMobile, onCloseMo
   );
 
   return (
-    <aside className="hidden md:flex w-64 bg-white border-r border-slate-100 text-slate-600 flex-col justify-between shrink-0 shadow-lg h-screen sticky top-0 z-30">
+    <aside className="hidden md:flex w-64 bg-white/80 border-r border-green-100/80 text-slate-600 backdrop-blur-sm flex-col justify-between shrink-0 shadow-lg h-screen sticky top-0 z-30">
       {sidebarContent}
     </aside>
   );

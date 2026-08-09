@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={`${inter.className} bg-slate-50 text-slate-800 antialiased selection:bg-emerald-500 selection:text-white`}>
+      <body className={`${inter.className} antialiased selection:bg-emerald-500 selection:text-white`} style={{background: 'linear-gradient(135deg, #e8f5e9 0%, #f1fdf4 40%, #e0f2f1 100%)', minHeight: '100vh'}}>
         {children}
       </body>
     </html>

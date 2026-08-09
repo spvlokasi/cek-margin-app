@@ -208,7 +208,7 @@ export default function BandingHargaPage() {
   ];
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-800 overflow-hidden font-sans">
+    <div className="flex h-screen bg-transparent text-slate-800 overflow-hidden font-sans">
       <Sidebar 
         session={session} 
         onOpenUpload={() => {}} // Dummy as upload is not used here

@@ -55,7 +55,7 @@ export default function Navbar({
 
   return (
     <>
-      <header className="h-16 border-b border-slate-200 bg-white/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-20 shadow-sm text-slate-800">
+      <header className="h-16 border-b border-slate-200 bg-white/75 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-20 shadow-sm border-b border-green-100/80 text-slate-800">
         {/* Left Side: Mobile Menu Toggle + Title */}
         <div className="flex items-center gap-3">
           {/* Logo on Mobile Navbar */}

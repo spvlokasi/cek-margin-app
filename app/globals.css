@@ -7,19 +7,21 @@
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #090d16;
+    background: #e8f5e9;
   }
   ::-webkit-scrollbar-thumb {
-    background: #1e293b;
+    background: #a7d7b5;
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #0ea5e9;
+    background: #4caf72;
   }
 }
 
-body {
-  background-color: #020617;
-  color: #f8fafc;
+html, body {
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1fdf4 40%, #e0f2f1 100%);
+  background-attachment: fixed;
+  color: #1e293b;
+  min-height: 100vh;
 }
 

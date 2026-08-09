@@ -233,7 +233,7 @@ export default function CekMarginPage() {
   ];
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-800 overflow-hidden font-sans">
+    <div className="flex h-screen bg-transparent text-slate-800 overflow-hidden font-sans">
       <Sidebar 
         session={session} 
         onOpenUpload={() => setIsUploadOpen(true)}
@@ -251,7 +251,7 @@ export default function CekMarginPage() {
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         />
 
-        <main className="p-3 sm:p-6 flex-1 relative pb-24 md:pb-6">
+        <main className="p-3 sm:p-6 flex-1 relative pb-24 md:pb-6 text-slate-800">
           {isLoadingData && (
             <div className="absolute inset-0 bg-slate-50/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6">
               <div className="w-12 h-12 border-4 border-[#a7dfc0] border-t-cyan-500 rounded-full animate-spin mb-4"></div>

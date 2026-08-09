@@ -115,9 +115,9 @@ export default function DataTable<T extends Record<string, any>>({
   const endEntry = Math.min(safeCurrentPage * pageSize, totalEntries);
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden">
+    <div className="bg-white/95 border border-green-100 rounded-2xl shadow-lg shadow-green-900/5 overflow-hidden">
       {/* Table Header Controls */}
-      <div className="p-5 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/60">
+      <div className="p-5 border-b border-green-100/80 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/50">
         <div className="flex flex-wrap items-center gap-3">
           {(title || subtitle) && (
             <div className="mr-4">
@@ -127,7 +127,7 @@ export default function DataTable<T extends Record<string, any>>({
           )}
 
           {/* Show Entries Dropdown */}
-          <div className="flex items-center gap-2 bg-slate-100/80 border border-slate-300/60 rounded-xl px-3 py-1.5 text-xs text-slate-600">
+          <div className="flex items-center gap-2 bg-white/70 border border-green-200/80 rounded-xl px-3 py-1.5 text-xs text-slate-600">
             <select
               value={pageSize}
               onChange={(e) => {
@@ -159,7 +159,7 @@ export default function DataTable<T extends Record<string, any>>({
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-slate-100/80 border border-slate-300/60 rounded-xl pl-9 pr-4 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+              className="w-full bg-white/70 border border-green-200/80 rounded-xl pl-9 pr-4 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 transition-all"
             />
           </div>
 
@@ -179,7 +179,7 @@ export default function DataTable<T extends Record<string, any>>({
       {/* Desktop Table */}
       <div className="overflow-x-auto hidden md:block">
         <table className="w-full text-left text-xs text-slate-600">
-          <thead className="bg-slate-50/80 text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200">
+          <thead className="bg-green-50/60 text-slate-500 font-bold uppercase tracking-wider border-b border-green-100/80">
             <tr>
               {columns.map((col) => {
                 const isSorted = sortKey === col.key;
@@ -233,7 +233,7 @@ export default function DataTable<T extends Record<string, any>>({
                 return (
                   <tr
                     key={row.id || row.kode || idx}
-                    className="hover:bg-slate-100/40 transition-colors duration-150"
+                    className="hover:bg-green-50/60 transition-colors duration-150"
                   >
                     {columns.map((col) => (
                       <td
@@ -258,7 +258,7 @@ export default function DataTable<T extends Record<string, any>>({
       </div>
 
       {/* Mobile Card List */}
-      <div className="md:hidden flex flex-col gap-3 p-3 bg-slate-50">
+      <div className="md:hidden flex flex-col gap-3 p-3 bg-transparent">
         {paginatedData.length === 0 ? (
           <div className="text-center py-12 text-slate-400 text-xs">
             Tidak ada data yang ditemukan.
