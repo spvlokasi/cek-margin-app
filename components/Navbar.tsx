@@ -42,16 +42,6 @@ export default function Navbar({
       <header className="h-16 border-b border-slate-800 bg-slate-900/80 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-20 text-slate-200">
         {/* Left Side: Mobile Menu Toggle + Title */}
         <div className="flex items-center gap-3">
-          {onToggleMobileMenu && (
-            <button
-              onClick={onToggleMobileMenu}
-              className="md:hidden p-2 rounded-xl bg-slate-800 border border-slate-700/80 text-cyan-400 hover:text-white transition-colors cursor-pointer"
-              title="Buka Menu"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-          )}
-
           {/* Logo on Mobile Navbar */}
           <div className="flex items-center gap-2.5 md:hidden">
             <Logo size="sm" />

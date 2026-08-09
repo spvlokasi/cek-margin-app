@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
+import BottomNav from '@/components/BottomNav';
 import Navbar from '@/components/Navbar';
 import dynamic from 'next/dynamic';
 import DataTable, { Column } from '@/components/DataTable';
@@ -257,7 +258,7 @@ export default function CabangPage() {
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         />
 
-        <main className="p-3 sm:p-6 space-y-4 sm:space-y-6 flex-1 max-w-7xl mx-auto w-full">
+        <main className="p-3 sm:p-6 space-y-4 sm:space-y-6 flex-1 max-w-7xl mx-auto w-full pb-24 md:pb-6">
           <DataTable<Cabang>
             data={cabangList}
             columns={cabangColumns}
@@ -357,6 +358,7 @@ export default function CabangPage() {
         </div>
       )}
 
+      <BottomNav session={session} />
       <UploadModal
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}

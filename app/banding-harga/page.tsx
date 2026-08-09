@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
+import BottomNav from '@/components/BottomNav';
 import Navbar from '@/components/Navbar';
 import DataTable, { Column } from '@/components/DataTable';
 import { Cabang, CekMarginItem, UserSession } from '@/lib/types';
@@ -227,7 +228,7 @@ export default function BandingHargaPage() {
           onToggleMobileMenu={() => setIsMobileMenuOpen(true)}
         />
 
-        <main className="flex-1 overflow-auto p-4 md:p-6 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative">
+        <main className="flex-1 overflow-auto p-4 md:p-6 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative pb-24 md:pb-6">
           <div className="max-w-7xl mx-auto space-y-6">
             
             <div className="bg-slate-900/50 rounded-2xl border border-slate-800/50 backdrop-blur-sm overflow-hidden flex flex-col relative min-h-[500px] shadow-2xl z-10">

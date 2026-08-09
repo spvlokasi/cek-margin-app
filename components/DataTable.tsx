@@ -176,8 +176,8 @@ export default function DataTable<T extends Record<string, any>>({
         </div>
       </div>
 
-      {/* Main Table */}
-      <div className="overflow-x-auto">
+      {/* Desktop Table */}
+      <div className="overflow-x-auto hidden md:block">
         <table className="w-full text-left text-xs text-slate-300">
           <thead className="bg-slate-950/80 text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800">
             <tr>
@@ -210,7 +210,7 @@ export default function DataTable<T extends Record<string, any>>({
                               <ArrowDown className="w-3.5 h-3.5 text-cyan-400" />
                             )
                           ) : (
-                            <ArrowUpDown className="w-3 h-3 opacity-40 hover:opacity-100" />
+                            <ArrowUpDown className="w-3.5 h-3.5 opacity-50" />
                           )}
                         </span>
                       )}
@@ -255,6 +255,34 @@ export default function DataTable<T extends Record<string, any>>({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card List */}
+      <div className="md:hidden flex flex-col gap-3 p-3 bg-slate-950/30">
+        {paginatedData.length === 0 ? (
+          <div className="text-center py-12 text-slate-500 text-xs">
+            Tidak ada data yang ditemukan.
+          </div>
+        ) : (
+          paginatedData.map((row, idx) => {
+            const globalIndex = (currentPage - 1) * pageSize + idx + 1;
+            return (
+              <div key={row.id || row.kode || idx} className="bg-slate-900 border border-slate-700/50 rounded-2xl p-4 flex flex-col gap-3 shadow-lg shadow-black/20 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500/50"></div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3">
+                  {columns.map((col) => (
+                    <div key={col.key} className="flex flex-col gap-0.5">
+                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider line-clamp-1">{col.label}</span>
+                      <span className="text-xs text-slate-200 font-medium break-words">
+                        {col.render ? col.render(row, globalIndex) : row[col.key] ?? '-'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
       {/* Table Pagination Footer */}

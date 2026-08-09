@@ -111,27 +111,8 @@ export default function Sidebar({ session, onOpenUpload, isOpenMobile, onCloseMo
   );
 
   return (
-    <>
-      {/* Desktop Sidebar (hidden on mobile, visible md+) */}
-      <aside className="hidden md:flex w-64 bg-slate-900 border-r border-slate-800 text-slate-300 flex-col justify-between shrink-0 shadow-2xl h-screen sticky top-0 z-30">
-        {sidebarContent}
-      </aside>
-
-      {/* Mobile Drawer (visible on mobile when isOpenMobile is true) */}
-      {isOpenMobile && (
-        <div className="fixed inset-0 z-50 md:hidden flex">
-          {/* Backdrop Overlay */}
-          <div 
-            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
-            onClick={onCloseMobile}
-          />
-
-          {/* Sliding Panel */}
-          <aside className="relative w-64 max-w-[80vw] bg-slate-900 border-r border-slate-800 text-slate-300 flex flex-col justify-between h-full shadow-2xl z-10 animate-in slide-in-from-left duration-200">
-            {sidebarContent}
-          </aside>
-        </div>
-      )}
-    </>
+    <aside className="hidden md:flex w-64 bg-slate-900 border-r border-slate-800 text-slate-300 flex-col justify-between shrink-0 shadow-2xl h-screen sticky top-0 z-30">
+      {sidebarContent}
+    </aside>
   );
 }

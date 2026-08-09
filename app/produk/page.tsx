@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
+import BottomNav from '@/components/BottomNav';
 import Navbar from '@/components/Navbar';
 import DataTable, { Column } from '@/components/DataTable';
 import dynamic from 'next/dynamic';
@@ -235,7 +236,7 @@ export default function ProdukPage() {
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         />
 
-        <main className="p-3 sm:p-6 flex-1 relative">
+        <main className="p-3 sm:p-6 flex-1 relative pb-24 md:pb-6">
           {isLoadingData && (
             <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-xl mx-6">
               <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mb-4"></div>
@@ -329,6 +330,7 @@ export default function ProdukPage() {
         </main>
       </div>
 
+      <BottomNav session={session} />
       <UploadModal
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
