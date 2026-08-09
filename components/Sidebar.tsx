@@ -9,7 +9,10 @@ import {
   Package, 
   BarChart3, 
   Users, 
-  X
+  X,
+  LogOut,
+  LineChart,
+  Scale
 } from 'lucide-react';
 import { UserSession } from '@/lib/types';
 import Logo from './Logo';
@@ -28,7 +31,12 @@ export default function Sidebar({ session, onOpenUpload, isOpenMobile, onCloseMo
     {
       label: 'Cek Margin',
       href: '/',
-      icon: TrendingUp,
+      icon: LineChart,
+    },
+    {
+      label: 'Banding Harga',
+      href: '/banding-harga',
+      icon: Scale,
     },
     {
       label: 'Cabang',
