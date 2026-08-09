@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, 
   UploadCloud, 
@@ -69,6 +69,7 @@ export default function UploadModal({
 
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
+  const isSyncingRef = useRef(false);
 
   if (!isOpen) return null;
 
@@ -132,6 +133,8 @@ export default function UploadModal({
   };
 
   const handleExecuteSync = async () => {
+    if (isSyncingRef.current) return;
+    
     let produkToSync: any[] = [];
     let stokToSync: any[] = [];
 
@@ -148,6 +151,7 @@ export default function UploadModal({
       return;
     }
 
+    isSyncingRef.current = true;
     setIsSyncing(true);
     setSyncStatus(null);
 
@@ -165,19 +169,21 @@ export default function UploadModal({
       );
 
       setTimeout(() => {
-        onUploadSuccess();
-        onClose();
+        setIsSyncing(false);
+        isSyncingRef.current = false;
+        setSyncStatus(null);
         setProdukFile(null);
         setStokFile(null);
         setParseResultProduk(null);
         setParseResultStok(null);
-        setSyncStatus(null);
-        setIsSyncing(false);
+        onClose();
+        if (onUploadSuccess) onUploadSuccess();
       }, 1500);
     } catch (err: any) {
       console.error(err);
       setSyncStatus(err.message || "Gagal memproses data. Pastikan format file benar.");
       setIsSyncing(false);
+      isSyncingRef.current = false;
     }
   };
 

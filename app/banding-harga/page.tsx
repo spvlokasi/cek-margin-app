@@ -63,6 +63,10 @@ export default function BandingHargaPage() {
 
   const handleCompare = async () => {
     if (!baseCabang || !targetCabang) return;
+    if (baseCabang === targetCabang) {
+      setBandingData([]);
+      return;
+    }
     
     setIsLoadingData(true);
     try {
@@ -235,7 +239,13 @@ export default function BandingHargaPage() {
                 </div>
               )}
 
-              <div className="p-4 md:p-6 flex-1 flex flex-col">
+              <div className="p-4 md:p-6 flex-1 flex flex-col relative">
+                {baseCabang && targetCabang && baseCabang === targetCabang && (
+                  <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-40 flex flex-col items-center justify-center rounded-xl mx-4 my-4 border border-rose-500/30">
+                    <Scale className="w-12 h-12 text-rose-500 mb-4 animate-bounce" />
+                    <p className="text-rose-400 font-bold text-lg px-4 text-center">Cabang Acuan dan Target tidak boleh sama!</p>
+                  </div>
+                )}
                 <DataTable 
                   columns={columns} 
                   data={bandingData}
