@@ -40,7 +40,7 @@ export default function UploadModal({
   
   const subtitle = mode === 'produk' ? 'Pembaruan master produk cabang' 
                  : mode === 'stok' ? 'Pembaruan data stok gudang' 
-                 : 'Upload File Produk & Stok secara bersamaan';
+                 : 'Upload File Produk & Stoktokogudang';
 
   const [selectedKodeCabang, setSelectedKodeCabang] = useState<string>('');
   const [adminInputText, setAdminInputText] = useState<string>('');
@@ -380,7 +380,7 @@ export default function UploadModal({
             ) : (
               <>
                 <Sparkles className="w-4 h-4" />
-                <span>Simpan & Kawinkan Data</span>
+                <span>Upload</span>
               </>
             )}
           </button>
